@@ -346,7 +346,7 @@
 </template>
 
 <script setup lang="ts">
-import logoImage from '~~/assets/logo.png';
+import logoImage from '~/assets/logo.png';
 
 const navLinks = ['Fitur', 'Untuk Talent', 'Untuk EO', 'Tentang Kami'];
 
