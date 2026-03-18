@@ -18,8 +18,8 @@
         </div>
 
         <div class="flex items-center gap-3">
-          <button class="hidden md:block text-sm px-4 py-2 text-neutral-medium hover:text-ui-light transition-colors">Masuk</button>
-          <button class="text-sm px-5 py-2 rounded-full bg-highlight hover:bg-purple-700 text-white font-medium transition-all duration-200 shadow-glow-sm">Daftar Gratis</button>
+          <NuxtLink to="/auth/login" class="hidden md:block text-sm px-4 py-2 text-neutral-medium hover:text-ui-light transition-colors">Masuk</NuxtLink>
+          <NuxtLink to="/auth/register" class="text-sm px-5 py-2 rounded-full bg-highlight hover:bg-purple-700 text-white font-medium transition-all duration-200 shadow-glow-sm">Daftar Gratis</NuxtLink>
         </div>
       </div>
     </nav>
@@ -53,14 +53,13 @@
         </p>
 
         <div class="flex flex-col sm:flex-row items-center justify-center gap-4 animate-slide-up-delay-2">
-          <button class="group w-full sm:w-auto px-8 py-4 rounded-full bg-highlight hover:bg-purple-600 text-white font-semibold text-base transition-all duration-300 shadow-glow flex items-center justify-center gap-2">
-            Mulai Sebagai Talent
+          <NuxtLink
+            to="/auth/register"
+            class="group w-full sm:w-auto px-8 py-4 rounded-full bg-highlight hover:bg-purple-600 text-white font-semibold text-base transition-all duration-300 shadow-glow flex items-center justify-center gap-2"
+          >
+            Mulai Sekarang
             <Icon name="mdi:arrow-right" class="w-4 h-4 group-hover:translate-x-1 transition-transform" />
-          </button>
-          <button class="group w-full sm:w-auto px-8 py-4 rounded-full border border-accent/40 hover:border-accent text-accent hover:bg-accent/10 font-semibold text-base transition-all duration-300 flex items-center justify-center gap-2">
-            Cari Talent untuk Event
-            <Icon name="mdi:magnify" class="w-4 h-4 group-hover:translate-x-1 transition-transform" />
-          </button>
+          </NuxtLink>
         </div>
 
         <!-- Stats bar -->
@@ -306,8 +305,7 @@
         <h2 class="font-display text-4xl md:text-6xl font-black text-ui-light mb-6 leading-tight">Siap naik panggung<br />atau temukan <span class="text-highlight">talenta?</span></h2>
         <p class="text-neutral-medium text-lg mb-10">Bergabung dengan ribuan musisi dan penyelenggara acara yang telah menggunakan CariTalent.</p>
         <div class="flex flex-col sm:flex-row gap-4 justify-center">
-          <button class="px-8 py-4 rounded-full bg-highlight hover:bg-purple-600 text-white font-semibold text-base transition-all duration-300 shadow-glow">Daftar Sebagai Talent</button>
-          <button class="px-8 py-4 rounded-full bg-accent/10 hover:bg-accent/20 border border-accent/30 hover:border-accent text-accent font-semibold text-base transition-all duration-300">Daftar Sebagai EO</button>
+          <NuxtLink to="/auth/register" class="px-8 py-4 rounded-full bg-highlight hover:bg-purple-600 text-white font-semibold text-base transition-all duration-300 shadow-glow">Daftar Sekarang</NuxtLink>
         </div>
       </div>
     </section>

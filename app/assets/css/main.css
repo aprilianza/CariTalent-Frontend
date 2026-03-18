@@ -1,0 +1,12 @@
+@import "tailwindcss";
+@import "@nuxt/ui";
+
+@theme {
+  --color-highlight: #8a2be2;
+  --color-accent: #00bfff;
+  --color-ui-dark: #1e1b4b;
+  --color-ui-light: #f9fafb;
+  --color-neutral-dark: #111827;
+  --color-neutral-medium: #6b7280;
+  --color-neutral-light: #e5e7eb;
+}
