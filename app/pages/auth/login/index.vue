@@ -41,26 +41,49 @@
 
           <form class="space-y-4 px-3 pb-3" @submit.prevent="onSubmit">
             <UFormField label="Email" required>
-              <UInput v-model="email" type="email" size="xl" placeholder="nama@email.com" class="w-full" />
+              <UInput
+                v-model="email"
+                type="email"
+                size="xl"
+                placeholder="nama@email.com"
+                class="w-full"
+                :ui="{
+                  base: `
+          !bg-white/5 !border-white/10 !text-white
+          placeholder-neutral-light/50
+          focus:!border-accent focus:!ring-accent
+        `,
+                }"
+              />
             </UFormField>
 
             <UFormField label="Password" required>
-              <UInput v-model="password" type="password" size="xl" placeholder="Masukkan password" class="w-full" />
+              <UInput
+                v-model="password"
+                type="password"
+                size="xl"
+                placeholder="Masukkan password"
+                class="w-full"
+                :ui="{
+                  base: `
+          !bg-white/5 !border-white/10 !text-white
+          placeholder-neutral-light/50
+          focus:!border-accent focus:!ring-accent
+        `,
+                }"
+              />
             </UFormField>
 
-            <div class="flex items-center justify-between gap-4 pt-1">
-              <UCheckbox v-model="rememberMe" label="Ingat saya" />
-              <NuxtLink to="#" class="text-sm font-medium text-accent transition-colors hover:text-cyan-300">Lupa password?</NuxtLink>
-            </div>
-
-            <UButton type="submit" color="primary" size="xl" block class="mt-2 justify-center rounded-xl py-3 text-sm font-semibold"> Masuk Sekarang </UButton>
+            <UButton type="submit" color="primary" size="xl" block class="!mt-2 !justify-center !rounded-xl !py-3 text-sm font-semibold !bg-gradient-to-r !from-accent !to-highlight hover:!opacity-90" variant="solid">
+              Masuk Sekarang
+            </UButton>
 
             <div class="relative py-2">
               <div class="h-px w-full bg-white/10"></div>
-              <span class="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 bg-neutral-dark px-3 text-xs uppercase tracking-widest text-neutral-light/60">atau</span>
+              <span class="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 bg-neutral-dark px-3 text-xs uppercase tracking-widest text-neutral-light/60"> atau </span>
             </div>
 
-            <UButton color="neutral" variant="outline" size="xl" block class="justify-center rounded-xl border-white/20 py-3 text-sm font-semibold text-neutral-light hover:bg-white/5">
+            <UButton size="xl" block class="!justify-center !rounded-xl !border !border-white/20 !bg-white/5 !py-3 text-sm font-semibold text-neutral-light transition-colors hover:!bg-white/10 hover:!border-white/30">
               <Icon name="mdi:google" class="mr-2 h-4 w-4" />
               Masuk dengan Google
             </UButton>

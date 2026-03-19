@@ -41,43 +41,120 @@
           </template>
 
           <form class="space-y-4 px-3 pb-3" @submit.prevent="onSubmit">
+            <!-- Nama & Role -->
             <div class="grid gap-4 sm:grid-cols-2">
               <UFormField label="Nama Lengkap" required>
-                <UInput v-model="fullName" size="xl" placeholder="Contoh: Rizky Saputra" class="w-full" />
+                <UInput
+                  v-model="fullName"
+                  size="xl"
+                  placeholder="Contoh: Rizky Saputra"
+                  class="w-full"
+                  :ui="{
+                    base: `
+            !bg-white/5 !border-white/10 !text-white
+            placeholder-neutral-light/50
+            focus:!border-accent focus:!ring-accent
+          `,
+                  }"
+                />
               </UFormField>
 
               <UFormField label="Peran" required>
-                <USelect v-model="role" :items="roles" size="xl" placeholder="Pilih peran" class="w-full" />
+                <USelect
+                  v-model="role"
+                  :items="roles"
+                  size="xl"
+                  placeholder="Pilih peran"
+                  class="w-full"
+                  :ui="{
+                    base: `
+            !bg-white/5 !border-white/10 !text-white
+            focus:!border-accent focus:!ring-accent
+          `,
+                  }"
+                />
               </UFormField>
             </div>
 
+            <!-- Email & Phone -->
             <div class="grid gap-4 sm:grid-cols-2">
               <UFormField label="Email" required>
-                <UInput v-model="email" type="email" size="xl" placeholder="nama@email.com" class="w-full" />
+                <UInput
+                  v-model="email"
+                  type="email"
+                  size="xl"
+                  placeholder="nama@email.com"
+                  class="w-full"
+                  :ui="{
+                    base: `
+            !bg-white/5 !border-white/10 !text-white
+            placeholder-neutral-light/50
+            focus:!border-accent focus:!ring-accent
+          `,
+                  }"
+                />
               </UFormField>
 
               <UFormField label="Nomor WhatsApp" required>
-                <UInput v-model="phone" type="tel" size="xl" placeholder="08xxxxxxxxxx" class="w-full" />
+                <UInput
+                  v-model="phone"
+                  type="tel"
+                  size="xl"
+                  placeholder="08xxxxxxxxxx"
+                  class="w-full"
+                  :ui="{
+                    base: `
+            !bg-white/5 !border-white/10 !text-white
+            placeholder-neutral-light/50
+            focus:!border-accent focus:!ring-accent
+          `,
+                  }"
+                />
               </UFormField>
             </div>
 
+            <!-- Password -->
             <div class="grid gap-4 sm:grid-cols-2">
               <UFormField label="Password" required>
-                <UInput v-model="password" type="password" size="xl" placeholder="Minimal 8 karakter" class="w-full" />
+                <UInput
+                  v-model="password"
+                  type="password"
+                  size="xl"
+                  placeholder="Minimal 8 karakter"
+                  class="w-full"
+                  :ui="{
+                    base: `
+            !bg-white/5 !border-white/10 !text-white
+            placeholder-neutral-light/50
+            focus:!border-accent focus:!ring-accent
+          `,
+                  }"
+                />
               </UFormField>
 
               <UFormField label="Konfirmasi Password" required>
-                <UInput v-model="confirmPassword" type="password" size="xl" placeholder="Ulangi password" class="w-full" />
+                <UInput
+                  v-model="confirmPassword"
+                  type="password"
+                  size="xl"
+                  placeholder="Ulangi password"
+                  class="w-full"
+                  :ui="{
+                    base: `
+            !bg-white/5 !border-white/10 !text-white
+            placeholder-neutral-light/50
+            focus:!border-accent focus:!ring-accent
+          `,
+                  }"
+                />
               </UFormField>
             </div>
 
-            <UCheckbox v-model="agreeTerms" label="Saya menyetujui Syarat & Ketentuan CariTalent" />
-
-            <UButton type="submit" color="primary" size="xl" block class="justify-center rounded-xl py-3 text-sm font-semibold"> Daftar Sekarang </UButton>
+            <!-- Button -->
+            <UButton type="submit" size="xl" block class="!justify-center !rounded-xl !py-3 text-sm font-semibold !bg-gradient-to-r !from-accent !to-highlight hover:!opacity-90"> Daftar Sekarang </UButton>
 
             <p class="text-center text-xs leading-relaxed text-neutral-light/60">Dengan mendaftar, kamu setuju menerima notifikasi terkait event, update akun, dan informasi penting platform.</p>
           </form>
-
           <template #footer>
             <p class="px-3 pb-3 pt-1 text-center text-sm text-neutral-light/70">
               Sudah punya akun?

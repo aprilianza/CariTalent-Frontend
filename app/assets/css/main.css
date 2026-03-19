@@ -1,5 +1,5 @@
-@import "tailwindcss";
-@import "@nuxt/ui";
+@import 'tailwindcss';
+@import '@nuxt/ui';
 
 @theme {
   --color-highlight: #8a2be2;
@@ -9,4 +9,8 @@
   --color-neutral-dark: #111827;
   --color-neutral-medium: #6b7280;
   --color-neutral-light: #e5e7eb;
+}
+
+html {
+  scroll-behavior: smooth;
 }
