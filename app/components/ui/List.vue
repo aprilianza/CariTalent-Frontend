@@ -17,11 +17,7 @@
     </div>
 
     <ul v-else class="space-y-2">
-      <li
-        v-for="item in items"
-        :key="item.id"
-        class="rounded-xl border border-neutral-200 bg-white px-4 py-3 transition-colors hover:border-primary/40 dark:border-white/10 dark:bg-white/5"
-      >
+      <li v-for="item in items" :key="item.id" class="rounded-xl border border-neutral-200 bg-white px-4 py-3 transition-colors hover:border-primary/40 dark:border-white/10 dark:bg-white/5">
         <slot name="item" :item="item">
           <div class="flex items-center justify-between gap-3">
             <div>

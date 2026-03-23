@@ -2,18 +2,6 @@
 @import '@nuxt/ui';
 
 @theme static {
-  --color-green-50: #f3e8ff;
-  --color-green-100: #e9d5ff;
-  --color-green-200: #d8b4fe;
-  --color-green-300: #c084fc;
-  --color-green-400: #a855f7;
-  --color-green-500: #8a2be2;
-  --color-green-600: #7e22ce;
-  --color-green-700: #6b21a8;
-  --color-green-800: #581c87;
-  --color-green-900: #3f0f5c;
-  --color-green-950: #2a0a3d;
-
   --color-blue-50: #e0f7ff;
   --color-blue-100: #b3edff;
   --color-blue-200: #80e1ff;
