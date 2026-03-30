@@ -7,13 +7,13 @@
     <UiList v-else :items="mappedItems" empty-text="Belum ada undangan masuk.">
       <template #item="{ item }">
         <div class="space-y-3">
-          <div class="flex items-start justify-between gap-3">
-            <div>
+          <div class="flex flex-wrap items-start justify-between gap-3">
+            <div class="min-w-0 flex-1">
               <p class="text-sm font-semibold text-neutral-900 dark:text-neutral-100">{{ item.title }}</p>
               <p class="mt-1 text-xs text-neutral-500 dark:text-neutral-400">Organizer: {{ item.organizer }}</p>
               <p class="mt-1 text-xs font-medium text-primary">Offer: {{ item.offer }}</p>
             </div>
-            <UiBadge :label="item.statusLabel" :color="item.statusColor" variant="soft" />
+            <UiBadge class="shrink-0" :label="item.statusLabel" :color="item.statusColor" variant="soft" />
           </div>
 
           <div class="flex flex-wrap gap-2">

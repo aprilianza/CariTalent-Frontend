@@ -12,6 +12,13 @@ const invitationsPayload: ApiResponse<Invitation[]> = {
       offered_price: 2000000,
       status: 'pending',
     },
+    {
+      id: 2,
+      event: { title: 'Blues Session' },
+      organizer_name: 'Blue Note',
+      offered_price: 1500000,
+      status: 'pending',
+    },
   ],
 };
 

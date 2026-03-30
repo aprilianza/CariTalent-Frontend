@@ -11,6 +11,18 @@ const applicationsPayload: ApiResponse<Application[]> = {
       proposed_price: 1500000,
       status: 'pending',
     },
+    {
+      id: 2,
+      event: { title: 'Punk Night Vol. 3' },
+      proposed_price: 1500000,
+      status: 'pending',
+    },
+    {
+      id: 3,
+      event: { title: 'Punk Night Vol. 3' },
+      proposed_price: 1500000,
+      status: 'pending',
+    },
   ],
 };
 

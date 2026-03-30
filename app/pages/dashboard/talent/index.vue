@@ -28,13 +28,13 @@
     </section>
 
     <!-- Main Content Section -->
-    <section class="grid gap-4 xl:grid-cols-3">
-      <div class="space-y-4 xl:col-span-2" id="bookings">
+    <section class="flex flex-col gap-4 xl:grid xl:grid-cols-3 xl:items-start">
+      <div class="min-w-0 space-y-4 xl:col-span-2" id="bookings">
         <BookingList :bookings="bookings" :loading="bookingsPending" />
         <ApplicationList id="applications" :applications="applications" :loading="applicationsPending" />
       </div>
 
-      <div class="space-y-4">
+      <div class="min-w-0 space-y-4">
         <InvitationList :invitations="invitations" :loading="invitationsPending" @accept="handleInvitation('accept', $event)" @reject="handleInvitation('reject', $event)" />
         <RecommendationList />
       </div>
