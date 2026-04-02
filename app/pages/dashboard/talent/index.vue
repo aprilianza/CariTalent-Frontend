@@ -30,12 +30,12 @@
     <!-- Main Content Section -->
     <section class="flex flex-col gap-4 xl:grid xl:grid-cols-3 xl:items-start">
       <div class="min-w-0 space-y-4 xl:col-span-2" id="bookings">
-        <BookingList :bookings="bookings" :loading="bookingsPending" />
-        <ApplicationList id="applications" :applications="applications" :loading="applicationsPending" />
+        <BookingList :bookings="bookings" :loading="bookingsPending" :detailed="false" />
+        <ApplicationList id="applications" :applications="applications" :loading="applicationsPending" :detailed="false" />
       </div>
 
       <div class="min-w-0 space-y-4">
-        <InvitationList :invitations="invitations" :loading="invitationsPending" @accept="handleInvitation('accept', $event)" @reject="handleInvitation('reject', $event)" />
+        <InvitationList :invitations="invitations" :loading="invitationsPending" :detailed="false" @accept="handleInvitation('accept', $event)" @reject="handleInvitation('reject', $event)" />
         <RecommendationList />
       </div>
     </section>
@@ -107,19 +107,19 @@ const quickActions = [
     label: 'Edit Profile',
     icon: 'mdi:account-edit-outline',
     color: 'primary',
-    to: '/dashboard/talent#profile',
+    to: '/dashboard/talent/profile',
   },
   {
-    label: 'Upload Portfolio',
+    label: 'See Invitations',
     icon: 'mdi:folder-multiple-image',
     color: 'secondary',
-    to: '/dashboard/talent#profile',
+    to: '/dashboard/talent/invitations',
   },
   {
     label: 'Browse Events',
     icon: 'mdi:compass-outline',
     color: 'primary',
-    to: '/dashboard/talent#applications',
+    to: '/dashboard/talent/applications',
   },
 ] as const;
 

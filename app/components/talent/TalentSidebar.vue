@@ -46,10 +46,10 @@ const props = withDefaults(
   {
     links: () => [
       { label: 'Dashboard', to: '/dashboard/talent', icon: 'mdi:view-dashboard-outline' },
-      { label: 'Applications', to: '/dashboard/talent#applications', icon: 'mdi:file-document-outline' },
-      { label: 'Invitations', to: '/dashboard/talent#invitations', icon: 'mdi:email-fast-outline' },
-      { label: 'Bookings', to: '/dashboard/talent#bookings', icon: 'mdi:calendar-check-outline' },
-      { label: 'Profile', to: '/dashboard/talent#profile', icon: 'mdi:account-circle-outline' },
+      { label: 'Applications', to: '/dashboard/talent/applications', icon: 'mdi:file-document-outline' },
+      { label: 'Invitations', to: '/dashboard/talent/invitations', icon: 'mdi:email-fast-outline' },
+      { label: 'Bookings', to: '/dashboard/talent/bookings', icon: 'mdi:calendar-check-outline' },
+      { label: 'Profile', to: '/dashboard/talent/profile', icon: 'mdi:account-circle-outline' },
     ],
     headerTitle: 'CariTalent',
     headerSubtitle: 'Talent Workspace',
