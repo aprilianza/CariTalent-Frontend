@@ -119,7 +119,7 @@ const quickActions = [
     label: 'Browse Events',
     icon: 'mdi:compass-outline',
     color: 'primary',
-    to: '/dashboard/talent/applications',
+    to: '/dashboard/talent/events',
   },
 ] as const;
 

@@ -46,6 +46,7 @@ const props = withDefaults(
   {
     links: () => [
       { label: 'Dashboard', to: '/dashboard/talent', icon: 'mdi:view-dashboard-outline' },
+      { label: 'Events', to: '/dashboard/talent/events', icon: 'mdi:calendar-search-outline' },
       { label: 'Applications', to: '/dashboard/talent/applications', icon: 'mdi:file-document-outline' },
       { label: 'Invitations', to: '/dashboard/talent/invitations', icon: 'mdi:email-fast-outline' },
       { label: 'Bookings', to: '/dashboard/talent/bookings', icon: 'mdi:calendar-check-outline' },

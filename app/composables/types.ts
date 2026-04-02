@@ -18,6 +18,8 @@ export type InvitationStatus = 'pending' | 'accepted' | 'rejected';
 
 export type BookingStatus = 'confirmed' | 'completed';
 
+export type EventStatus = 'draft' | 'open' | 'closed' | 'completed' | 'cancelled';
+
 export type Application = {
   id: number;
   source?: 'apply' | 'invitation';
@@ -69,6 +71,30 @@ export type Booking = {
   created_at?: string;
 };
 
+export type Event = {
+  id: number;
+  organizer_id?: number;
+  organizer_name?: string;
+  title: string;
+  description?: string;
+  genre_needed?: string[];
+  budget: number;
+  event_date: string;
+  venue_name: string;
+  latitude?: number;
+  longitude?: number;
+  city?: string;
+  status: EventStatus;
+  created_at?: string;
+};
+
+export type PaginationMeta = {
+  current_page: number;
+  per_page: number;
+  total: number;
+  last_page: number;
+};
+
 export type MyApplicationsData = {
   applications: Application[];
 };
@@ -79,4 +105,9 @@ export type MyInvitationsData = {
 
 export type MyBookingsData = {
   bookings: Booking[];
+};
+
+export type EventsData = {
+  events: Event[];
+  pagination?: PaginationMeta;
 };
