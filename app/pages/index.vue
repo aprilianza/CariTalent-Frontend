@@ -4,28 +4,10 @@
     <div class="noise-overlay fixed inset-0 pointer-events-none z-0 opacity-30"></div>
 
     <!-- ═══════════════════════════ NAVBAR ═══════════════════════════ -->
-    <nav class="fixed top-0 left-0 right-0 z-50 px-6 py-4">
-      <div class="max-w-7xl mx-auto flex items-center justify-between">
-        <div class="flex items-center gap-3">
-          <img :src="logoImage" alt="Logo CariTalent" class="w-10 h-10 rounded-lg object-contain" />
-          <span class="font-display text-xl font-bold tracking-tight text-ui-light"> Cari<span class="text-highlight">Talent</span> </span>
-        </div>
-
-        <div class="hidden md:flex items-center gap-8">
-          <a v-for="link in navLinks" :key="link" href="#" class="text-sm text-neutral-medium hover:text-ui-light transition-colors duration-200 tracking-wide">
-            {{ link }}
-          </a>
-        </div>
-
-        <div class="flex items-center gap-3">
-          <button class="hidden md:block text-sm px-4 py-2 text-neutral-medium hover:text-ui-light transition-colors">Masuk</button>
-          <button class="text-sm px-5 py-2 rounded-full bg-highlight hover:bg-purple-700 text-white font-medium transition-all duration-200 shadow-glow-sm">Daftar Gratis</button>
-        </div>
-      </div>
-    </nav>
+    <LandingNavbar :nav-links="navLinks" />
 
     <!-- ═══════════════════════════ HERO ═══════════════════════════ -->
-    <section class="relative min-h-screen flex flex-col items-center justify-center px-6 pt-24 pb-20">
+    <section class="relative min-h-screen flex flex-col items-center justify-center px-6 pt-24 pb-20 scroll-mt-28" id="beranda">
       <!-- Background grid -->
       <div class="grid-bg absolute inset-0 opacity-10 pointer-events-none"></div>
 
@@ -53,14 +35,13 @@
         </p>
 
         <div class="flex flex-col sm:flex-row items-center justify-center gap-4 animate-slide-up-delay-2">
-          <button class="group w-full sm:w-auto px-8 py-4 rounded-full bg-highlight hover:bg-purple-600 text-white font-semibold text-base transition-all duration-300 shadow-glow flex items-center justify-center gap-2">
-            Mulai Sebagai Talent
+          <NuxtLink
+            to="/auth/register"
+            class="group w-full sm:w-auto px-8 py-4 rounded-full bg-highlight hover:bg-purple-600 text-white font-semibold text-base transition-all duration-300 shadow-glow flex items-center justify-center gap-2"
+          >
+            Mulai Sekarang
             <Icon name="mdi:arrow-right" class="w-4 h-4 group-hover:translate-x-1 transition-transform" />
-          </button>
-          <button class="group w-full sm:w-auto px-8 py-4 rounded-full border border-accent/40 hover:border-accent text-accent hover:bg-accent/10 font-semibold text-base transition-all duration-300 flex items-center justify-center gap-2">
-            Cari Talent untuk Event
-            <Icon name="mdi:magnify" class="w-4 h-4 group-hover:translate-x-1 transition-transform" />
-          </button>
+          </NuxtLink>
         </div>
 
         <!-- Stats bar -->
@@ -95,7 +76,7 @@
     </section>
 
     <!-- ═══════════════════════════ HOW IT WORKS ═══════════════════════════ -->
-    <section class="relative py-28 px-6">
+    <section id="fitur" class="relative py-28 px-6 scroll-mt-28">
       <div class="max-w-6xl mx-auto">
         <div class="text-center mb-16">
           <span class="text-xs font-semibold tracking-widest text-highlight uppercase">Cara Kerja</span>
@@ -124,7 +105,7 @@
     </section>
 
     <!-- ═══════════════════════════ FEATURES: TALENT ═══════════════════════════ -->
-    <section class="relative py-28 px-6 overflow-hidden">
+    <section id="talent" class="relative py-28 px-6 overflow-hidden scroll-mt-28">
       <div class="absolute right-0 top-1/2 -translate-y-1/2 w-96 h-96 bg-highlight/10 rounded-full blur-3xl pointer-events-none"></div>
 
       <div class="max-w-6xl mx-auto relative z-10">
@@ -175,8 +156,8 @@
                 </div>
               </div>
               <div class="flex gap-2">
-                <button class="flex-1 py-2.5 rounded-xl bg-highlight text-white text-sm font-semibold">Undang Talent</button>
-                <button class="flex-1 py-2.5 rounded-xl border border-white/10 text-neutral-medium text-sm hover:border-white/20 transition-colors">Lihat Profil</button>
+                <NuxtLink to="/auth/register" class="flex-1 py-2.5 rounded-xl bg-highlight text-white text-sm font-semibold text-center">Undang Talent</NuxtLink>
+                <NuxtLink to="/auth/login" class="flex-1 py-2.5 rounded-xl border border-white/10 text-neutral-medium text-sm hover:border-white/20 transition-colors text-center">Lihat Profil</NuxtLink>
               </div>
             </div>
             <!-- Floating notification -->
@@ -192,7 +173,7 @@
     </section>
 
     <!-- ═══════════════════════════ FEATURES: EO ═══════════════════════════ -->
-    <section class="relative py-28 px-6 overflow-hidden">
+    <section id="eo" class="relative py-28 px-6 overflow-hidden scroll-mt-28">
       <div class="absolute left-0 top-1/2 -translate-y-1/2 w-96 h-96 bg-accent/8 rounded-full blur-3xl pointer-events-none"></div>
 
       <div class="max-w-6xl mx-auto relative z-10">
@@ -306,49 +287,23 @@
         <h2 class="font-display text-4xl md:text-6xl font-black text-ui-light mb-6 leading-tight">Siap naik panggung<br />atau temukan <span class="text-highlight">talenta?</span></h2>
         <p class="text-neutral-medium text-lg mb-10">Bergabung dengan ribuan musisi dan penyelenggara acara yang telah menggunakan CariTalent.</p>
         <div class="flex flex-col sm:flex-row gap-4 justify-center">
-          <button class="px-8 py-4 rounded-full bg-highlight hover:bg-purple-600 text-white font-semibold text-base transition-all duration-300 shadow-glow">Daftar Sebagai Talent</button>
-          <button class="px-8 py-4 rounded-full bg-accent/10 hover:bg-accent/20 border border-accent/30 hover:border-accent text-accent font-semibold text-base transition-all duration-300">Daftar Sebagai EO</button>
+          <NuxtLink to="/auth/register" class="px-8 py-4 rounded-full bg-highlight hover:bg-purple-600 text-white font-semibold text-base transition-all duration-300 shadow-glow">Daftar Sekarang</NuxtLink>
         </div>
       </div>
     </section>
 
     <!-- ═══════════════════════════ FOOTER ═══════════════════════════ -->
-    <footer class="border-t border-white/8 px-6 py-12">
-      <div class="max-w-6xl mx-auto">
-        <div class="flex flex-col md:flex-row items-start justify-between gap-8">
-          <div class="max-w-xs">
-            <div class="flex items-center gap-3 mb-4">
-              <img :src="logoImage" alt="Logo CariTalent" class="w-8 h-8 rounded-lg object-contain" />
-              <span class="font-display text-xl font-bold text-ui-light">Cari<span class="text-highlight">Talent</span></span>
-            </div>
-            <p class="text-neutral-medium text-sm leading-relaxed">Platform direktori dan booking talenta musik independen Indonesia.</p>
-          </div>
-
-          <div class="grid grid-cols-2 sm:grid-cols-3 gap-8 text-sm">
-            <div v-for="col in footerLinks" :key="col.title">
-              <div class="font-semibold text-ui-light mb-3">{{ col.title }}</div>
-              <ul class="space-y-2">
-                <li v-for="link in col.links" :key="link">
-                  <a href="#" class="text-neutral-medium hover:text-ui-light transition-colors">{{ link }}</a>
-                </li>
-              </ul>
-            </div>
-          </div>
-        </div>
-
-        <div class="border-t border-white/8 mt-10 pt-6 flex flex-col sm:flex-row items-center justify-between gap-4">
-          <p class="text-neutral-medium text-xs">© 2026 CariTalent. Dikembangkan oleh Kelompok 5 – Universitas Telkom.</p>
-          <p class="text-neutral-medium text-xs">CAK3HAB4 · Aplikasi Berbasis Platform</p>
-        </div>
-      </div>
-    </footer>
+    <LandingFooter />
   </div>
 </template>
 
 <script setup lang="ts">
-import logoImage from '~~/assets/logo.png';
-
-const navLinks = ['Fitur', 'Untuk Talent', 'Untuk EO', 'Tentang Kami'];
+const navLinks = [
+  { label: 'Fitur', to: '/#fitur' },
+  { label: 'Untuk Talent', to: '/#talent' },
+  { label: 'Untuk EO', to: '/#eo' },
+  { label: 'Tentang Kami', to: '/#tentang' },
+];
 
 const stats = [
   { value: '2.400+', label: 'Talent Terdaftar' },
@@ -433,26 +388,9 @@ const testimonials = [
     avatarBg: 'bg-purple-600',
   },
 ];
-
-const footerLinks = [
-  {
-    title: 'Platform',
-    links: ['Fitur', 'Cara Kerja', 'Harga', 'FAQ'],
-  },
-  {
-    title: 'Untuk',
-    links: ['Musisi & Talent', 'Event Organizer', 'Pemilik Kafe', 'Admin'],
-  },
-  {
-    title: 'Perusahaan',
-    links: ['Tentang Kami', 'Blog', 'Karier', 'Kontak'],
-  },
-];
 </script>
 
 <style scoped>
-@import url('https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,400&display=swap');
-
 * {
   font-family: 'DM Sans', sans-serif;
 }

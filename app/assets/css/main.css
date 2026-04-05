@@ -1,0 +1,70 @@
+@import 'tailwindcss';
+@import '@nuxt/ui';
+
+@theme static {
+  --color-blue-50: #e0f7ff;
+  --color-blue-100: #b3edff;
+  --color-blue-200: #80e1ff;
+  --color-blue-300: #4dd9ff;
+  --color-blue-400: #1ac8ff;
+  --color-blue-500: #00bfff;
+  --color-blue-600: #00a8d8;
+  --color-blue-700: #0088aa;
+  --color-blue-800: #006b8a;
+  --color-blue-900: #004d61;
+  --color-blue-950: #003342;
+
+  --color-brand-50: #f3e8ff;
+  --color-brand-100: #e9d5ff;
+  --color-brand-200: #d8b4fe;
+  --color-brand-300: #c084fc;
+  --color-brand-400: #a855f7;
+  --color-brand-500: #8a2be2;
+  --color-brand-600: #7e22ce;
+  --color-brand-700: #6b21a8;
+  --color-brand-800: #581c87;
+  --color-brand-900: #3f0f5c;
+  --color-brand-950: #2a0a3d;
+
+  --color-ocean-50: #e0f7ff;
+  --color-ocean-100: #b3edff;
+  --color-ocean-200: #80e1ff;
+  --color-ocean-300: #4dd9ff;
+  --color-ocean-400: #1ac8ff;
+  --color-ocean-500: #00bfff;
+  --color-ocean-600: #00a8d8;
+  --color-ocean-700: #0088aa;
+  --color-ocean-800: #006b8a;
+  --color-ocean-900: #004d61;
+  --color-ocean-950: #003342;
+
+  --color-highlight: #8a2be2;
+  --color-accent: #00bfff;
+  --color-ui-dark: #1e1b4b;
+  --color-ui-light: #f9fafb;
+  --color-neutral-dark: #111827;
+  --color-neutral-medium: #6b7280;
+  --color-neutral-light: #e5e7eb;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  font-family: 'DM Sans', sans-serif;
+}
+
+.font-display {
+  font-family: 'Syne', sans-serif;
+}
+
+.noise-overlay {
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 512 512' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='1'/%3E%3C/svg%3E");
+  background-size: 200px;
+}
+
+.grid-bg {
+  background-image: linear-gradient(rgba(255, 255, 255, 0.04) 1px, transparent 1px), linear-gradient(90deg, rgba(255, 255, 255, 0.04) 1px, transparent 1px);
+  background-size: 60px 60px;
+}
