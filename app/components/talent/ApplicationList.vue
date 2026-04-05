@@ -36,6 +36,10 @@
               Dikirim: <span class="font-medium text-neutral-900 dark:text-neutral-100">{{ item.createdAt }}</span>
             </p>
           </div>
+
+          <div v-if="detailed && item.canCancel" class="flex justify-end">
+            <UiButton size="xs" color="error" variant="soft" @click="emit('cancel', Number(item.id))"> Cancel Application </UiButton>
+          </div>
         </div>
       </template>
     </UiList>
@@ -59,6 +63,10 @@ const props = withDefaults(
 );
 
 const detailed = computed(() => props.detailed);
+
+const emit = defineEmits<{
+  cancel: [id: number];
+}>();
 
 const { formatCurrency, formatDate } = useFormatters();
 
@@ -107,6 +115,7 @@ const mappedItems = computed(() =>
     sourceLabel: application.source ? sourceMap[application.source] : '-',
     coordinates: formatCoordinates(application.event.latitude, application.event.longitude),
     createdAt: formatDateSafe(application.created_at),
+    canCancel: application.status === 'pending',
     statusLabel: statusMap[application.status].label,
     statusColor: statusMap[application.status].color,
   })),
