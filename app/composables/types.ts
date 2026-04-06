@@ -4,12 +4,26 @@ export type ApiResponse<T> = {
   data: T;
 };
 
+export type TalentMediaType = 'image' | 'video' | 'audio';
+
+export type TalentMedia = {
+  id: number;
+  media_url: string;
+  type: TalentMediaType;
+};
+
 export type TalentProfile = {
   id: number;
+  talent_id?: number;
+  name?: string;
+  email?: string;
+  phone?: string;
+  role?: 'admin' | 'eo' | 'talent';
   stage_name: string;
   genre: string[];
   verified: boolean;
   average_rating: number;
+  media?: TalentMedia[];
 };
 
 export type ApplicationStatus = 'pending' | 'accepted' | 'rejected';
@@ -19,6 +33,15 @@ export type InvitationStatus = 'pending' | 'accepted' | 'rejected';
 export type BookingStatus = 'confirmed' | 'completed';
 
 export type EventStatus = 'draft' | 'open' | 'closed' | 'completed' | 'cancelled';
+
+export type TalentReviewItem = {
+  id: number;
+  organizer_name: string;
+  event_title: string;
+  rating: number;
+  comment: string;
+  created_at?: string;
+};
 
 export type Application = {
   id: number;
@@ -109,5 +132,14 @@ export type MyBookingsData = {
 
 export type EventsData = {
   events: Event[];
+  pagination?: PaginationMeta;
+};
+
+export type TalentReviewsData = {
+  talent_id: number;
+  stage_name: string;
+  average_rating: number;
+  total_reviews: number;
+  reviews: TalentReviewItem[];
   pagination?: PaginationMeta;
 };
