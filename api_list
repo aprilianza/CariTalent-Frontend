@@ -1,0 +1,241 @@
+# 🚀 CariTalent API Documentation
+
+Base URL:
+
+```
+https://api.caritalent.id/api/v1
+```
+
+Format: JSON
+Auth: Bearer Token (Laravel Sanctum)
+
+---
+
+# 📌 Overview
+
+API ini digunakan untuk menghubungkan **Talent (seniman)** dengan **Event Organizer (EO)** dalam proses:
+
+- Pencarian talent
+- Pembuatan event
+- Lamaran & undangan
+- Booking & review
+
+---
+
+# 🔐 Authentication
+
+| Method | Endpoint         | Description      |
+| ------ | ---------------- | ---------------- |
+| POST   | `/auth/register` | Register user    |
+| POST   | `/auth/login`    | Login            |
+| POST   | `/auth/logout`   | Logout           |
+| GET    | `/auth/me`       | Get current user |
+
+---
+
+# 👤 User & Profile
+
+| Method | Endpoint          | Description     |
+| ------ | ----------------- | --------------- |
+| PUT    | `/users/profile`  | Update profile  |
+| PUT    | `/users/password` | Change password |
+
+---
+
+# 🎤 Talent
+
+| Method | Endpoint        | Description           |
+| ------ | --------------- | --------------------- |
+| GET    | `/talents`      | Get all talents       |
+| GET    | `/talents/{id}` | Get talent detail     |
+| POST   | `/talents`      | Create talent profile |
+| PUT    | `/talents/{id}` | Update talent         |
+| DELETE | `/talents/{id}` | Delete talent (admin) |
+
+### 🎬 Talent Media
+
+| Method | Endpoint                                | Description  |
+| ------ | --------------------------------------- | ------------ |
+| POST   | `/talents/{id}/media`                   | Upload media |
+| DELETE | `/talents/{talent_id}/media/{media_id}` | Delete media |
+
+---
+
+# 🎪 Event
+
+| Method | Endpoint       | Description      |
+| ------ | -------------- | ---------------- |
+| GET    | `/events`      | Get all events   |
+| GET    | `/events/{id}` | Get event detail |
+| POST   | `/events`      | Create event     |
+| PUT    | `/events/{id}` | Update event     |
+| DELETE | `/events/{id}` | Cancel event     |
+| GET    | `/events/my`   | Get my events    |
+
+---
+
+# 📩 Application (Lamaran)
+
+| Method | Endpoint                          | Description         |
+| ------ | --------------------------------- | ------------------- |
+| POST   | `/applications`                   | Apply ke event      |
+| GET    | `/events/{event_id}/applications` | Get applicants      |
+| GET    | `/applications/my`                | Get my applications |
+| PUT    | `/applications/{id}/status`       | Accept / Reject     |
+| DELETE | `/applications/{id}`              | Cancel application  |
+
+---
+
+# 📬 Invitation
+
+| Method | Endpoint                    | Description     |
+| ------ | --------------------------- | --------------- |
+| POST   | `/invitations`              | Invite talent   |
+| GET    | `/invitations/my`           | Get invitations |
+| PUT    | `/invitations/{id}/respond` | Accept / Reject |
+
+---
+
+# 📅 Booking
+
+| Method | Endpoint                  | Description        |
+| ------ | ------------------------- | ------------------ |
+| GET    | `/bookings/{id}`          | Get booking detail |
+| GET    | `/bookings/my`            | Get my bookings    |
+| PUT    | `/bookings/{id}/complete` | Complete booking   |
+| PUT    | `/bookings/{id}/cancel`   | Cancel booking     |
+
+---
+
+# ⭐ Review
+
+| Method | Endpoint                       | Description   |
+| ------ | ------------------------------ | ------------- |
+| POST   | `/reviews`                     | Create review |
+| GET    | `/talents/{talent_id}/reviews` | Get reviews   |
+
+---
+
+# 🔔 Notification
+
+| Method | Endpoint                   | Description       |
+| ------ | -------------------------- | ----------------- |
+| GET    | `/notifications`           | Get notifications |
+| PUT    | `/notifications/{id}/read` | Mark as read      |
+| PUT    | `/notifications/read-all`  | Mark all as read  |
+
+---
+
+# 🛠 Admin
+
+| Method | Endpoint                      | Description     |
+| ------ | ----------------------------- | --------------- |
+| GET    | `/admin/users`                | Get all users   |
+| DELETE | `/admin/users/{id}`           | Delete user     |
+| PUT    | `/admin/talents/{id}/verify`  | Verify talent   |
+| GET    | `/admin/dashboard`            | Dashboard stats |
+| PUT    | `/admin/events/{id}/moderate` | Moderate event  |
+
+---
+
+# 🤖 Matchmaking
+
+| Method | Endpoint                             | Description            |
+| ------ | ------------------------------------ | ---------------------- |
+| GET    | `/events/{event_id}/recommendations` | Talent recommendations |
+| GET    | `/genres`                            | Get genres             |
+
+---
+
+# 🔄 Main Flow
+
+```
+Talent Register/Login
+        ↓
+Create Talent Profile
+        ↓
+EO Create Event
+        ↓
+Talent Apply / EO Invite
+        ↓
+Application Accepted
+        ↓
+Booking Created
+        ↓
+Event Completed
+        ↓
+Review
+```
+
+---
+
+# ⚠️ HTTP Status Codes
+
+| Code | Description           |
+| ---- | --------------------- |
+| 200  | OK                    |
+| 201  | Created               |
+| 400  | Bad Request           |
+| 401  | Unauthorized          |
+| 403  | Forbidden             |
+| 404  | Not Found             |
+| 422  | Validation Error      |
+| 500  | Internal Server Error |
+
+---
+
+# 🧩 Roles
+
+- **admin**
+- **eo (Event Organizer)**
+- **talent**
+- **public**
+
+---
+
+# 📦 Response Format
+
+### Success
+
+```json
+{
+  "success": true,
+  "message": "Success message",
+  "data": {}
+}
+```
+
+### Error
+
+```json
+{
+  "success": false,
+  "message": "Error message",
+  "errors": {}
+}
+```
+
+---
+
+# 💡 Notes
+
+- Application & Invitation menggunakan **tabel yang sama**
+- Booking otomatis dibuat saat:
+  - Application accepted
+  - Invitation accepted
+
+- Satu talent tidak bisa apply ke event yang sama lebih dari sekali
+
+---
+
+# ✨ Tech Stack (Recommended)
+
+- Backend: Laravel (Sanctum Auth)
+- Frontend: Flutter / React
+- Database: MySQL / PostgreSQL
+
+---
+
+# 📄 Source
+
+API ini disusun berdasarkan spesifikasi internal proyek CariTalent

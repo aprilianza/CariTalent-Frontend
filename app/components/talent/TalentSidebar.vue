@@ -50,6 +50,7 @@ const props = withDefaults(
       { label: 'Applications', to: '/dashboard/talent/applications', icon: 'mdi:file-document-outline' },
       { label: 'Invitations', to: '/dashboard/talent/invitations', icon: 'mdi:email-fast-outline' },
       { label: 'Bookings', to: '/dashboard/talent/bookings', icon: 'mdi:calendar-check-outline' },
+      { label: 'Reviews', to: '/dashboard/talent/reviews', icon: 'mdi:star-outline' },
       { label: 'Profile', to: '/dashboard/talent/profile', icon: 'mdi:account-circle-outline' },
     ],
     headerTitle: 'CariTalent',

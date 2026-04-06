@@ -15,12 +15,13 @@
       </div>
     </UiCard>
 
-    <ApplicationList :applications="applications" :loading="pending" />
+    <ApplicationList :applications="applications" :loading="pending" @cancel="handleCancelApplication" />
   </div>
 </template>
 
 <script setup lang="ts">
 import ApplicationList from '~/components/talent/ApplicationList.vue';
+import type { Application } from '~/composables/types';
 import { useApplications } from '~/composables/useApplications';
 
 definePageMeta({
@@ -29,7 +30,43 @@ definePageMeta({
 
 useState('talent-layout-title', () => 'Talent Dashboard').value = 'Applications';
 
-const { data: applications, pending } = useApplications();
+const toast = useToast();
+
+const { data: applicationsRaw, pending } = useApplications();
+const applications = ref<Application[]>([]);
+
+watch(
+  applicationsRaw,
+  (value) => {
+    applications.value = value.map((item) => ({ ...item }));
+  },
+  { immediate: true },
+);
+
+const handleCancelApplication = async (applicationId: number) => {
+  const target = applications.value.find((item) => item.id === applicationId);
+
+  if (!target) {
+    return;
+  }
+
+  if (target.status !== 'pending') {
+    toast.add({
+      title: 'Cancel tidak tersedia',
+      description: 'Hanya lamaran dengan status pending yang bisa dibatalkan.',
+      color: 'warning',
+    });
+    return;
+  }
+
+  applications.value = applications.value.filter((item) => item.id !== applicationId);
+
+  toast.add({
+    title: 'Lamaran dibatalkan',
+    description: `${target.event.title} berhasil dihapus dari daftar lamaran (dummy update).`,
+    color: 'success',
+  });
+};
 
 const statusSummary = computed(() => ({
   pending: applications.value.filter((item) => item.status === 'pending').length,
