@@ -135,6 +135,126 @@ export type EventsData = {
   pagination?: PaginationMeta;
 };
 
+// ─── EO-specific types ────────────────────────────────────────────────────────
+
+export type Genre = {
+  id: number;
+  name: string;
+};
+
+export type EoEvent = Event & {
+  total_applicants?: number;
+};
+
+export type TalentSummary = {
+  id: number;
+  stage_name: string;
+  genre: string[];
+  city?: string;
+  verified: boolean;
+  average_rating: number;
+};
+
+export type EoApplication = {
+  id: number;
+  talent: TalentSummary;
+  source: 'apply' | 'invitation';
+  message?: string;
+  proposed_price: number;
+  status: ApplicationStatus;
+  created_at?: string;
+};
+
+export type EoBooking = {
+  id: number;
+  application_id: number;
+  source?: 'apply' | 'invitation';
+  event: {
+    id: number;
+    title: string;
+    event_date: string;
+    venue_name: string;
+    latitude?: number;
+    longitude?: number;
+  };
+  talent: {
+    id: number;
+    stage_name: string;
+  };
+  agreed_price: number;
+  status: BookingStatus;
+  created_at?: string;
+};
+
+export type ScoreBreakdown = {
+  genre_score: number;
+  budget_score: number;
+  location_score: number;
+};
+
+export type TalentRecommendation = {
+  rank: number;
+  score: number;
+  score_breakdown: ScoreBreakdown;
+  talent: TalentSummary;
+};
+
+export type MyEoEventsData = {
+  events: EoEvent[];
+  pagination?: PaginationMeta;
+};
+
+export type EventApplicationsData = {
+  applications: EoApplication[];
+};
+
+export type MyEoBookingsData = {
+  bookings: EoBooking[];
+};
+
+export type RecommendationsData = {
+  event_id: number;
+  event_title: string;
+  recommendations: TalentRecommendation[];
+};
+
+export type GenresData = {
+  genres: Genre[];
+};
+
+// ─── Payload types ────────────────────────────────────────────────────────────
+
+export type CreateEventPayload = {
+  title: string;
+  description: string;
+  genre_ids: number[];
+  budget: number;
+  event_date: string;
+  venue_name: string;
+  latitude?: number;
+  longitude?: number;
+  city: string;
+  status: EventStatus;
+};
+
+export type UpdateEventPayload = Partial<CreateEventPayload>;
+
+export type UpdateApplicationStatusPayload = {
+  status: 'accepted' | 'rejected';
+  agreed_price?: number;
+};
+
+export type SendInvitationPayload = {
+  event_id: number;
+  talent_id: number;
+  offered_price: number;
+};
+
+export type CreateReviewPayload = {
+  booking_id: number;
+  rating: number;
+  comment: string;
+};
 export type TalentReviewsData = {
   talent_id: number;
   stage_name: string;

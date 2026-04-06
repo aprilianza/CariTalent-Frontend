@@ -1,0 +1,106 @@
+import type { ApiResponse, EoEvent, MyEoEventsData } from '~/composables/types';
+import { useMockResource } from '~/composables/useMockResource';
+
+const eoEventsPayload: ApiResponse<MyEoEventsData> = {
+  success: true,
+  message: 'My events fetched successfully',
+  data: {
+    events: [
+      {
+        id: 1,
+        organizer_id: 10,
+        organizer_name: 'Kafe Kota',
+        title: 'Punk Night Vol. 3',
+        description: 'Malam punk rock terbaik di Bandung. Hadirkan suasana energik dengan musik underground lokal.',
+        genre_needed: ['Pop Punk', 'Hardcore'],
+        budget: 3000000,
+        event_date: '2026-04-15',
+        venue_name: 'Kafe Kota Bandung',
+        latitude: -6.9175,
+        longitude: 107.6191,
+        city: 'Bandung',
+        status: 'open',
+        total_applicants: 5,
+        created_at: '2026-03-01T09:00:00Z',
+      },
+      {
+        id: 2,
+        organizer_id: 10,
+        organizer_name: 'Kafe Kota',
+        title: 'Jazz & Soul Evening',
+        description: 'Malam jazz dan soul yang intimate untuk penonton dewasa.',
+        genre_needed: ['Jazz', 'Soul'],
+        budget: 2500000,
+        event_date: '2026-04-22',
+        venue_name: 'Kafe Kota Rooftop',
+        latitude: -6.9180,
+        longitude: 107.6200,
+        city: 'Bandung',
+        status: 'open',
+        total_applicants: 3,
+        created_at: '2026-03-05T10:00:00Z',
+      },
+      {
+        id: 3,
+        organizer_id: 10,
+        organizer_name: 'Kafe Kota',
+        title: 'Acoustic Sunday Session',
+        description: 'Sesi akustik santai di akhir pekan.',
+        genre_needed: ['Acoustic', 'Folk'],
+        budget: 1500000,
+        event_date: '2026-04-07',
+        venue_name: 'Kafe Kota Garden',
+        city: 'Bandung',
+        status: 'closed',
+        total_applicants: 8,
+        created_at: '2026-02-20T08:00:00Z',
+      },
+      {
+        id: 4,
+        organizer_id: 10,
+        organizer_name: 'Kafe Kota',
+        title: 'Heavy Metal Feast',
+        description: 'Event metal penuh energi untuk pecinta musik keras.',
+        genre_needed: ['Heavy Metal', 'Hardcore'],
+        budget: 4000000,
+        event_date: '2026-05-10',
+        venue_name: 'GOR Bandung',
+        city: 'Bandung',
+        status: 'draft',
+        total_applicants: 0,
+        created_at: '2026-03-10T14:00:00Z',
+      },
+      {
+        id: 5,
+        organizer_id: 10,
+        organizer_name: 'Kafe Kota',
+        title: 'Indie Showcase March',
+        description: 'Showcase band indie lokal terpilih.',
+        genre_needed: ['Indie', 'Alternative'],
+        budget: 2000000,
+        event_date: '2026-03-20',
+        venue_name: 'Kafe Kota Bandung',
+        city: 'Bandung',
+        status: 'completed',
+        total_applicants: 6,
+        created_at: '2026-02-10T09:00:00Z',
+      },
+    ],
+    pagination: {
+      current_page: 1,
+      per_page: 15,
+      total: 5,
+      last_page: 1,
+    },
+  },
+};
+
+export const useEoEvents = () => {
+  const resource = useMockResource<MyEoEventsData>('eo-events', eoEventsPayload);
+
+  return {
+    ...resource,
+    data: computed<EoEvent[]>(() => resource.data.value.events),
+    pagination: computed(() => resource.response.value?.data.pagination ?? eoEventsPayload.data.pagination),
+  };
+};
