@@ -111,3 +111,58 @@ export type EventsData = {
   events: Event[];
   pagination?: PaginationMeta;
 };
+
+// ─── Admin Types ───────────────────────────────────────────────────────────────
+
+export type AdminDashboardStats = {
+  total_users: number;
+  total_talents: number;
+  total_eo: number;
+  total_events: number;
+  active_events: number;
+  total_bookings: number;
+  completed_bookings: number;
+  total_reviews: number;
+};
+
+export type AdminUser = {
+  id: number;
+  name: string;
+  email: string;
+  role: 'talent' | 'eo';
+  phone?: string;
+  created_at?: string;
+};
+
+export type AdminUsersData = {
+  users: AdminUser[];
+  pagination?: PaginationMeta;
+};
+
+export type AdminTalent = {
+  id: number;
+  user_id: number;
+  stage_name: string;
+  genre: string[];
+  verified: boolean;
+  average_rating: number;
+  total_reviews?: number;
+  price_min?: number;
+  price_max?: number;
+  city?: string;
+  bio?: string;
+};
+
+export type AdminTalentsData = {
+  talents: AdminTalent[];
+  pagination?: PaginationMeta;
+};
+
+export type AdminModeratePayload = {
+  status: EventStatus;
+  reason?: string;
+};
+
+export type AdminVerifyPayload = {
+  verified: boolean;
+};
