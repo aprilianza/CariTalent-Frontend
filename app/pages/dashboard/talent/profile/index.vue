@@ -61,11 +61,11 @@
       <UiCard title="Update Profile" description="Implementasi endpoint PUT /users/profile.">
         <form class="space-y-4" @submit.prevent="handleUpdateProfile">
           <UFormField label="Name" required>
-            <UInput v-model="profileForm.name" placeholder="Masukkan nama lengkap" />
+            <UInput v-model="profileForm.name" placeholder="Masukkan nama lengkap" :ui="{ base: 'rounded-xl border-white/20 bg-white/8 text-ui-light' }"/>
           </UFormField>
 
           <UFormField label="Phone" required>
-            <UInput v-model="profileForm.phone" placeholder="08xxxxxxxxxx" />
+            <UInput v-model="profileForm.phone" placeholder="08xxxxxxxxxx" :ui="{ base: 'rounded-xl border-white/20 bg-white/8 text-ui-light' }"/>
           </UFormField>
 
           <UiButton type="submit" color="primary" :loading="isSavingProfile">Simpan Perubahan</UiButton>
@@ -75,15 +75,15 @@
       <UiCard title="Change Password" description="Implementasi endpoint PUT /users/password.">
         <form class="space-y-4" @submit.prevent="handleChangePassword">
           <UFormField label="Current Password" required>
-            <UInput v-model="passwordForm.current_password" type="password" placeholder="Password saat ini" />
+            <UInput v-model="passwordForm.current_password" type="password" placeholder="Password saat ini" :ui="{ base: 'rounded-xl border-white/20 bg-white/8 text-ui-light' }"/>
           </UFormField>
 
           <UFormField label="New Password" required>
-            <UInput v-model="passwordForm.new_password" type="password" placeholder="Password baru" />
+            <UInput v-model="passwordForm.new_password" type="password" placeholder="Password baru" :ui="{ base: 'rounded-xl border-white/20 bg-white/8 text-ui-light' }"/>
           </UFormField>
 
           <UFormField label="Confirm New Password" required>
-            <UInput v-model="passwordForm.new_password_confirmation" type="password" placeholder="Konfirmasi password baru" />
+            <UInput v-model="passwordForm.new_password_confirmation" type="password" placeholder="Konfirmasi password baru" :ui="{ base: 'rounded-xl border-white/20 bg-white/8 text-ui-light' }"/>
           </UFormField>
 
           <UiButton type="submit" color="secondary" :loading="isChangingPassword">Update Password</UiButton>
