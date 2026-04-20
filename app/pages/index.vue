@@ -44,35 +44,8 @@
           </NuxtLink>
         </div>
 
-        <!-- Stats bar -->
-        <div class="mt-20 grid grid-cols-3 gap-4 max-w-xl mx-auto">
-          <div v-for="stat in stats" :key="stat.label" class="text-center">
-            <div class="font-display text-3xl font-black text-ui-light">{{ stat.value }}</div>
-            <div class="text-xs text-neutral-medium mt-1 tracking-wide">{{ stat.label }}</div>
-          </div>
-        </div>
       </div>
 
-      <!-- Floating music card mockup -->
-      <div class="relative z-10 mt-16 w-full max-w-4xl mx-auto px-4">
-        <div class="card-mockup rounded-2xl border border-white/10 bg-white/5 backdrop-blur-sm p-6 overflow-hidden">
-          <div class="absolute inset-0 bg-gradient-to-br from-highlight/5 to-accent/5"></div>
-          <div class="relative flex flex-wrap gap-3 justify-center">
-            <div
-              v-for="card in talentCards"
-              :key="card.name"
-              class="talent-chip flex items-center gap-3 bg-white/5 border border-white/10 rounded-xl px-4 py-3 hover:border-highlight/40 hover:bg-highlight/5 transition-all duration-200 cursor-pointer group"
-            >
-              <Icon :name="card.icon" class="w-8 h-8" :class="card.color" />
-              <div class="text-left">
-                <div class="text-sm font-semibold text-ui-light group-hover:text-white">{{ card.name }}</div>
-                <div class="text-xs text-neutral-medium">{{ card.genre }}</div>
-              </div>
-              <div class="ml-2 text-xs text-accent font-medium">{{ card.price }}</div>
-            </div>
-          </div>
-        </div>
-      </div>
     </section>
 
     <!-- ═══════════════════════════ HOW IT WORKS ═══════════════════════════ -->

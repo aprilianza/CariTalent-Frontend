@@ -77,16 +77,6 @@
             <UButton type="submit" color="primary" size="xl" block class="!mt-2 !justify-center !rounded-xl !py-3 text-sm font-semibold !bg-gradient-to-r !from-accent !to-highlight hover:!opacity-90" variant="solid">
               Masuk Sekarang
             </UButton>
-
-            <div class="relative py-2">
-              <div class="h-px w-full bg-white/10"></div>
-              <span class="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 bg-neutral-dark px-3 text-xs uppercase tracking-widest text-neutral-light/60"> atau </span>
-            </div>
-
-            <UButton size="xl" block class="!justify-center !rounded-xl !border !border-white/20 !bg-white/5 !py-3 text-sm font-semibold text-neutral-light transition-colors hover:!bg-white/10 hover:!border-white/30">
-              <Icon name="mdi:google" class="mr-2 h-4 w-4" />
-              Masuk dengan Google
-            </UButton>
           </form>
 
           <template #footer>
