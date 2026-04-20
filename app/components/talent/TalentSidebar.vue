@@ -15,6 +15,7 @@
     :footer-title-class="talentFooterTitleClass"
     :footer-content-class="talentFooterContentClass"
     @navigate="emit('navigate')"
+    @logout="emit('logout')"
   >
     <!-- Slots can be overridden if needed -->
     <template #header="slotProps">
@@ -64,6 +65,7 @@ const props = withDefaults(
 
 const emit = defineEmits<{
   navigate: [];
+  logout: [];
 }>();
 
 // Talent-specific styling

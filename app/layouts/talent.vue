@@ -7,12 +7,12 @@
 
     <div class="relative z-10 flex h-full">
       <div :class="desktopSidebarClasses">
-        <TalentSidebar @navigate="handleSidebarNavigate" />
+        <TalentSidebar @navigate="handleSidebarNavigate" @logout="handleLogout" />
       </div>
 
       <UDrawer v-model:open="isSidebarOpen" side="left" :ui="{ content: 'max-w-72' }" @update:open="onDrawerOpenChange">
         <template #content>
-          <TalentSidebar @navigate="handleSidebarNavigate" />
+          <TalentSidebar @navigate="handleSidebarNavigate" @logout="handleLogout" />
         </template>
       </UDrawer>
 
@@ -66,6 +66,14 @@ const handleSidebarNavigate = () => {
   if (!isDesktop.value) {
     isSidebarOpen.value = false;
   }
+};
+
+const handleLogout = () => {
+  // Clear user state if any
+  userName.value = '';
+  notificationCount.value = 0;
+  // Redirect to login
+  navigateTo('/auth/login');
 };
 
 const onDrawerOpenChange = (value: boolean) => {

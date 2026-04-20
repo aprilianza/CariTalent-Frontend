@@ -31,6 +31,17 @@
         <p class="mt-2 text-sm" :class="footerContentClasses">{{ footerContent }}</p>
       </div>
     </slot>
+
+    <!-- Logout Button Section -->
+    <div class="mt-6 border-t border-white/10 pt-4">
+      <button
+        class="w-full flex items-center justify-center gap-2 rounded-xl px-4 py-2.5 text-sm font-medium transition-colors text-neutral-600 hover:bg-neutral-100 hover:text-neutral-900 dark:text-neutral-300 dark:hover:bg-white/10 dark:hover:text-white"
+        @click="handleLogout"
+      >
+        <Icon name="mdi:logout" class="h-4 w-4" />
+        Logout
+      </button>
+    </div>
   </aside>
 </template>
 
@@ -86,7 +97,12 @@ const props = withDefaults(
 
 const emit = defineEmits<{
   navigate: [];
+  logout: [];
 }>();
+
+const handleLogout = () => {
+  emit('logout');
+};
 
 const sidebarClasses = computed(() => props.sidebarClass);
 

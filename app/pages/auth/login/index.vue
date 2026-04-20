@@ -114,11 +114,22 @@ const sideFeatures = [
   },
 ];
 
-const onSubmit = () => {
-  console.log('Login submitted', {
-    email: email.value,
-    rememberMe: rememberMe.value,
-  });
+const onSubmit = async () => {
+  if (email.value && password.value) {
+    // Mock login - in production this would call your auth API
+    console.log('Login submitted', {
+      email: email.value,
+      password: password.value,
+      rememberMe: rememberMe.value,
+    });
+
+    // Clear form
+    email.value = '';
+    password.value = '';
+
+    // Redirect to talent dashboard after successful login
+    await navigateTo('/dashboard/talent');
+  }
 };
 </script>
 
