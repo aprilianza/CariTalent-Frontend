@@ -18,8 +18,12 @@
           </div>
 
           <div class="flex flex-wrap gap-3 text-xs text-neutral-500 dark:text-neutral-400">
-            <span>Harga ditawarkan: <span class="font-medium text-ui-light">{{ item.offeredPrice }}</span></span>
-            <span>Dikirim: <span class="font-medium text-ui-light">{{ item.createdAt }}</span></span>
+            <span
+              >Harga ditawarkan: <span class="font-medium text-ui-light">{{ item.offeredPrice }}</span></span
+            >
+            <span
+              >Dikirim: <span class="font-medium text-ui-light">{{ item.createdAt }}</span></span
+            >
           </div>
         </div>
       </template>
@@ -51,7 +55,11 @@ const statusMap: Record<ApplicationStatus, { label: string; color: 'success' | '
 
 const formatDateSafe = (value?: string) => {
   if (!value) return '-';
-  try { return formatDate(value); } catch { return value; }
+  try {
+    return formatDate(value);
+  } catch {
+    return value;
+  }
 };
 
 const mappedItems = computed(() =>
@@ -59,6 +67,7 @@ const mappedItems = computed(() =>
     const status = statusMap[inv.status];
     return {
       id: String(inv.id),
+      title: inv.talent.stage_name,
       talentName: inv.talent.stage_name,
       eventTitle: '-', // injected from parent context
       offeredPrice: formatCurrency(inv.proposed_price),
