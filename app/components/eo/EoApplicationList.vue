@@ -1,9 +1,5 @@
 <template>
-  <UiCard
-    title="Daftar Pelamar"
-    :description="detailed ? 'Talent yang mendaftar atau diundang ke event ini' : 'Ringkasan pelamar event'"
-    card-class="h-full"
-  >
+  <UiCard title="Daftar Pelamar" :description="detailed ? 'Talent yang mendaftar atau diundang ke event ini' : 'Ringkasan pelamar event'" card-class="h-full">
     <div v-if="loading" class="space-y-3">
       <USkeleton v-for="n in 3" :key="`app-skeleton-${n}`" class="h-28 w-full rounded-xl" />
     </div>
@@ -19,12 +15,8 @@
                 <UiBadge v-if="item.verified" label="Verified" color="success" variant="soft" size="sm" dot />
               </div>
               <div class="mt-1 flex flex-wrap items-center gap-2">
-                <span class="text-xs text-neutral-500 dark:text-neutral-400">
-                  <Icon name="mdi:map-marker-outline" class="inline h-3 w-3" /> {{ item.city }}
-                </span>
-                <span class="text-xs text-neutral-500 dark:text-neutral-400">
-                  <Icon name="mdi:star-outline" class="inline h-3 w-3 text-yellow-400" /> {{ item.rating }}
-                </span>
+                <span class="text-xs text-neutral-500 dark:text-neutral-400"> <Icon name="mdi:map-marker-outline" class="inline h-3 w-3" /> {{ item.city }} </span>
+                <span class="text-xs text-neutral-500 dark:text-neutral-400"> <Icon name="mdi:star-outline" class="inline h-3 w-3 text-yellow-400" /> {{ item.rating }} </span>
               </div>
             </div>
             <div class="flex shrink-0 flex-wrap items-center gap-2">
@@ -49,26 +41,8 @@
 
           <!-- Accept / Reject actions — only for pending items -->
           <div v-if="item.isPending" class="flex flex-wrap gap-2">
-            <UiButton
-              size="sm"
-              color="success"
-              variant="soft"
-              icon="mdi:check-circle-outline"
-              :loading="acceptingId === item.rawId"
-              @click="handleAccept(item.rawId)"
-            >
-              Terima
-            </UiButton>
-            <UiButton
-              size="sm"
-              color="error"
-              variant="ghost"
-              icon="mdi:close-circle-outline"
-              :loading="rejectingId === item.rawId"
-              @click="emit('reject', item.rawId)"
-            >
-              Tolak
-            </UiButton>
+            <UiButton size="sm" color="success" variant="soft" icon="mdi:check-circle-outline" :loading="acceptingId === item.rawId" @click="handleAccept(item.rawId)"> Terima </UiButton>
+            <UiButton size="sm" color="error" variant="ghost" icon="mdi:close-circle-outline" :loading="rejectingId === item.rawId" @click="emit('reject', item.rawId)"> Tolak </UiButton>
           </div>
         </div>
       </template>
@@ -79,33 +53,18 @@
       <template #content>
         <div class="rounded-2xl border border-white/10 bg-ui-dark p-6 space-y-5">
           <div>
-            <h3 class="text-lg font-bold bg-gradient-to-r from-violet-400 to-fuchsia-400 bg-clip-text text-transparent">
-              Terima Lamaran
-            </h3>
+            <h3 class="text-lg font-bold bg-gradient-to-r from-violet-400 to-fuchsia-400 bg-clip-text text-transparent">Terima Lamaran</h3>
             <p class="mt-1 text-sm text-neutral-light/70">Masukkan harga yang disepakati untuk booking ini.</p>
           </div>
 
           <div class="space-y-2">
             <label class="text-sm font-medium text-neutral-light">Harga Disepakati (Rp)</label>
-            <UInput
-              v-model="agreedPriceInput"
-              type="number"
-              placeholder="Contoh: 1500000"
-              :ui="{ base: 'rounded-xl border-white/20 bg-white/8 text-ui-light' }"
-            />
+            <UInput v-model="agreedPriceInput" type="number" placeholder="Contoh: 1500000" :ui="{ base: 'rounded-xl border-white/20 bg-white/8 text-ui-light' }" />
           </div>
 
           <div class="flex gap-3 justify-end">
             <UiButton color="neutral" variant="ghost" @click="showAcceptModal = false">Batal</UiButton>
-            <UiButton
-              color="success"
-              variant="soft"
-              :loading="!!acceptingId"
-              :disabled="!agreedPriceInput || Number(agreedPriceInput) <= 0"
-              @click="confirmAccept"
-            >
-              Konfirmasi
-            </UiButton>
+            <UiButton color="success" variant="soft" :loading="!!acceptingId" :disabled="!agreedPriceInput || Number(agreedPriceInput) <= 0" @click="confirmAccept"> Konfirmasi </UiButton>
           </div>
         </div>
       </template>
@@ -156,7 +115,11 @@ const sourceMap = {
 
 const formatDateSafe = (value?: string) => {
   if (!value) return '-';
-  try { return formatDate(value); } catch { return value; }
+  try {
+    return formatDate(value);
+  } catch {
+    return value;
+  }
 };
 
 const mappedItems = computed(() =>
@@ -164,6 +127,7 @@ const mappedItems = computed(() =>
     const status = statusMap[app.status];
     return {
       id: String(app.id),
+      title: app.talent.stage_name,
       rawId: app.id,
       stageName: app.talent.stage_name,
       city: app.talent.city || '-',
@@ -195,6 +159,8 @@ const confirmAccept = () => {
   pendingAcceptId.value = null;
 
   // Reset loading state after brief delay (mock)
-  setTimeout(() => { acceptingId.value = null; }, 600);
+  setTimeout(() => {
+    acceptingId.value = null;
+  }, 600);
 };
 </script>
