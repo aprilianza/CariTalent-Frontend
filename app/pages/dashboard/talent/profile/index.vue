@@ -61,11 +61,11 @@
       <UiCard title="Update Profile" description="Implementasi endpoint PUT /users/profile.">
         <form class="space-y-4" @submit.prevent="handleUpdateProfile">
           <UFormField label="Name" required>
-            <UInput v-model="profileForm.name" placeholder="Masukkan nama lengkap" />
+            <UInput v-model="profileForm.name" placeholder="Masukkan nama lengkap" :ui="{ base: 'rounded-xl border-white/20 bg-white/8 text-ui-light' }" />
           </UFormField>
 
           <UFormField label="Phone" required>
-            <UInput v-model="profileForm.phone" placeholder="08xxxxxxxxxx" />
+            <UInput v-model="profileForm.phone" placeholder="08xxxxxxxxxx" :ui="{ base: 'rounded-xl border-white/20 bg-white/8 text-ui-light' }" />
           </UFormField>
 
           <UiButton type="submit" color="primary" :loading="isSavingProfile">Simpan Perubahan</UiButton>
@@ -75,15 +75,15 @@
       <UiCard title="Change Password" description="Implementasi endpoint PUT /users/password.">
         <form class="space-y-4" @submit.prevent="handleChangePassword">
           <UFormField label="Current Password" required>
-            <UInput v-model="passwordForm.current_password" type="password" placeholder="Password saat ini" />
+            <UInput v-model="passwordForm.current_password" type="password" placeholder="Password saat ini" :ui="{ base: 'rounded-xl border-white/20 bg-white/8 text-ui-light' }" />
           </UFormField>
 
           <UFormField label="New Password" required>
-            <UInput v-model="passwordForm.new_password" type="password" placeholder="Password baru" />
+            <UInput v-model="passwordForm.new_password" type="password" placeholder="Password baru" :ui="{ base: 'rounded-xl border-white/20 bg-white/8 text-ui-light' }" />
           </UFormField>
 
           <UFormField label="Confirm New Password" required>
-            <UInput v-model="passwordForm.new_password_confirmation" type="password" placeholder="Konfirmasi password baru" />
+            <UInput v-model="passwordForm.new_password_confirmation" type="password" placeholder="Konfirmasi password baru" :ui="{ base: 'rounded-xl border-white/20 bg-white/8 text-ui-light' }" />
           </UFormField>
 
           <UiButton type="submit" color="secondary" :loading="isChangingPassword">Update Password</UiButton>
@@ -119,7 +119,7 @@
               </div>
               <div class="flex items-center gap-2">
                 <UiBadge :label="item.type" color="secondary" variant="soft" />
-                <UiButton size="xs" color="error" variant="soft" :loading="deletingMediaId === item.id" @click="handleDeleteMedia(item.id)"> Delete </UiButton>
+                <UiButton size="xs" color="error" variant="soft" :loading="deletingMediaId === Number(item.id)" @click="handleDeleteMedia(Number(item.id))"> Delete </UiButton>
               </div>
             </div>
           </template>
@@ -142,7 +142,7 @@ useState('talent-layout-title', () => 'Talent Dashboard').value = 'Profile';
 
 const toast = useToast();
 
-const { data: profile, pending } = useProfile();
+const { data: profile, response: profileResponse, pending } = useProfile();
 const { updateProfile, changePassword, uploadMedia, deleteMedia } = useProfileSettings();
 
 const profileForm = reactive({
@@ -187,6 +187,7 @@ watch(
 const mediaItems = computed(() =>
   mediaList.value.map((media) => ({
     id: media.id,
+    title: media.media_url,
     type: media.type.toUpperCase(),
     url: media.media_url,
   })),
@@ -216,11 +217,13 @@ const handleUpdateProfile = async () => {
       phone: profileForm.phone.trim(),
     });
 
-    profile.value = {
-      ...profile.value,
-      name: response.data.name,
-      phone: response.data.phone,
-    };
+    if (profileResponse.value?.data) {
+      profileResponse.value.data = {
+        ...profileResponse.value.data,
+        name: response.data.name,
+        phone: response.data.phone,
+      };
+    }
 
     toast.add({
       title: 'Profile updated',
@@ -293,10 +296,12 @@ const handleUploadMedia = async () => {
     });
 
     mediaList.value = [response.data, ...mediaList.value];
-    profile.value = {
-      ...profile.value,
-      media: mediaList.value,
-    };
+    if (profileResponse.value?.data) {
+      profileResponse.value.data = {
+        ...profileResponse.value.data,
+        media: mediaList.value as any, // Ignore strict typing here
+      };
+    }
 
     uploadForm.fileName = '';
 
@@ -326,10 +331,12 @@ const handleDeleteMedia = async (mediaId: number) => {
     });
 
     mediaList.value = mediaList.value.filter((item) => item.id !== mediaId);
-    profile.value = {
-      ...profile.value,
-      media: mediaList.value,
-    };
+    if (profileResponse.value?.data) {
+      profileResponse.value.data = {
+        ...profileResponse.value.data,
+        media: mediaList.value as any, // Ignore strict typing here
+      };
+    }
 
     toast.add({
       title: 'Media deleted',

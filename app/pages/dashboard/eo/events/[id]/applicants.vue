@@ -3,33 +3,14 @@
     <!-- Back nav & page header -->
     <UiCard card-class="border-white/10 bg-gradient-to-r from-violet-500/10 to-fuchsia-500/10">
       <div class="space-y-4">
-        <UiButton
-          size="sm"
-          color="neutral"
-          variant="ghost"
-          icon="mdi:arrow-left"
-          @click="navigateTo('/dashboard/eo/events')"
-        >
-          Kembali ke Events
-        </UiButton>
+        <UiButton size="sm" color="neutral" variant="ghost" icon="mdi:arrow-left" @click="navigateTo('/dashboard/eo/events')"> Kembali ke Events </UiButton>
 
         <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           <div>
-            <h1 class="font-display text-2xl font-bold bg-gradient-to-r from-violet-400 to-fuchsia-400 bg-clip-text text-transparent">
-              Pelamar Event
-            </h1>
-            <p class="mt-1 text-sm text-neutral-light/70">
-              Event ID: #{{ route.params.id }} · {{ applications.length }} pelamar
-            </p>
+            <h1 class="font-display text-2xl font-bold bg-gradient-to-r from-violet-400 to-fuchsia-400 bg-clip-text text-transparent">Pelamar Event</h1>
+            <p class="mt-1 text-sm text-neutral-light/70">Event ID: #{{ route.params.id }} · {{ applications.length }} pelamar</p>
           </div>
-          <UiButton
-            icon="mdi:star-shooting-outline"
-            color="secondary"
-            variant="soft"
-            @click="navigateTo(`/dashboard/eo/events/${route.params.id}/recommendations`)"
-          >
-            Lihat Rekomendasi
-          </UiButton>
+          <UiButton icon="mdi:star-shooting-outline" color="secondary" variant="soft" @click="navigateTo(`/dashboard/eo/events/${route.params.id}/recommendations`)"> Lihat Rekomendasi </UiButton>
         </div>
       </div>
     </UiCard>
@@ -41,9 +22,7 @@
         :key="tab.value"
         :class="[
           'rounded-xl px-4 py-1.5 text-sm font-medium transition-all',
-          activeFilter === tab.value
-            ? 'bg-violet-500/20 border border-violet-500/30 text-violet-300'
-            : 'border border-white/10 bg-white/5 text-neutral-light/60 hover:bg-white/8 hover:text-neutral-light',
+          activeFilter === tab.value ? 'bg-violet-500/20 border border-violet-500/30 text-violet-300' : 'border border-white/10 bg-white/5 text-neutral-light/60 hover:bg-white/8 hover:text-neutral-light',
         ]"
         @click="activeFilter = tab.value"
       >
@@ -53,13 +32,7 @@
     </div>
 
     <!-- Application list -->
-    <EoApplicationList
-      :applications="filteredApplications"
-      :loading="pending"
-      :detailed="true"
-      @accept="handleAccept"
-      @reject="handleReject"
-    />
+    <EoApplicationList :applications="filteredApplications" :loading="pending" :detailed="true" @accept="handleAccept" @reject="handleReject" />
   </div>
 </template>
 
@@ -114,7 +87,7 @@ const handleAccept = async (applicationId: number, agreedPrice: number) => {
   // Optimistic update
   const idx = applications.value.findIndex((a) => a.id === applicationId);
   if (idx !== -1) {
-    applications.value[idx] = { ...applications.value[idx], status: 'accepted' };
+    applications.value[idx] = { ...applications.value[idx], status: 'accepted' } as EoApplication;
   }
 
   await new Promise((resolve) => setTimeout(resolve, 400));
@@ -131,7 +104,7 @@ const handleReject = async (applicationId: number) => {
   // Optimistic update
   const idx = applications.value.findIndex((a) => a.id === applicationId);
   if (idx !== -1) {
-    applications.value[idx] = { ...applications.value[idx], status: 'rejected' };
+    applications.value[idx] = { ...applications.value[idx], status: 'rejected' } as EoApplication;
   }
 
   await new Promise((resolve) => setTimeout(resolve, 400));

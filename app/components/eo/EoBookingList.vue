@@ -1,9 +1,5 @@
 <template>
-  <UiCard
-    title="Bookings"
-    :description="detailed ? 'Detail booking event beserta talent, harga deal, dan status' : 'Ringkasan booking terkini'"
-    card-class="h-full"
-  >
+  <UiCard title="Bookings" :description="detailed ? 'Detail booking event beserta talent, harga deal, dan status' : 'Ringkasan booking terkini'" card-class="h-full">
     <div v-if="loading" class="space-y-3">
       <USkeleton v-for="n in 3" :key="`booking-skeleton-${n}`" class="h-24 w-full rounded-xl" />
     </div>
@@ -22,35 +18,24 @@
 
           <!-- Talent & price info -->
           <div v-if="detailed" class="grid gap-2 text-xs text-neutral-600 dark:text-neutral-300 sm:grid-cols-2">
-            <p>Talent: <span class="font-medium text-neutral-900 dark:text-neutral-100">{{ item.talentName }}</span></p>
-            <p>Harga Deal: <span class="font-medium text-neutral-900 dark:text-neutral-100">{{ item.agreedPrice }}</span></p>
-            <p>Sumber: <span class="font-medium text-neutral-900 dark:text-neutral-100">{{ item.sourceLabel }}</span></p>
-            <p>Dibuat: <span class="font-medium text-neutral-900 dark:text-neutral-100">{{ item.createdAt }}</span></p>
+            <p>
+              Talent: <span class="font-medium text-neutral-900 dark:text-neutral-100">{{ item.talentName }}</span>
+            </p>
+            <p>
+              Harga Deal: <span class="font-medium text-neutral-900 dark:text-neutral-100">{{ item.agreedPrice }}</span>
+            </p>
+            <p>
+              Sumber: <span class="font-medium text-neutral-900 dark:text-neutral-100">{{ item.sourceLabel }}</span>
+            </p>
+            <p>
+              Dibuat: <span class="font-medium text-neutral-900 dark:text-neutral-100">{{ item.createdAt }}</span>
+            </p>
           </div>
 
           <!-- Actions -->
           <div v-if="item.canComplete || item.canCancel" class="flex flex-wrap gap-2">
-            <UiButton
-              v-if="item.canComplete"
-              size="sm"
-              color="primary"
-              variant="soft"
-              icon="mdi:check-circle-outline"
-              :loading="completingId === item.rawId"
-              @click="emit('complete', item.rawId)"
-            >
-              Tandai Selesai
-            </UiButton>
-            <UiButton
-              v-if="item.canCancel"
-              size="sm"
-              color="error"
-              variant="ghost"
-              icon="mdi:close-circle-outline"
-              @click="emit('cancel', item.rawId)"
-            >
-              Batalkan
-            </UiButton>
+            <UiButton v-if="item.canComplete" size="sm" color="primary" variant="soft" icon="mdi:check-circle-outline" :loading="completingId === item.rawId" @click="emit('complete', item.rawId)"> Tandai Selesai </UiButton>
+            <UiButton v-if="item.canCancel" size="sm" color="error" variant="ghost" icon="mdi:close-circle-outline" @click="emit('cancel', item.rawId)"> Batalkan </UiButton>
           </div>
         </div>
       </template>
@@ -94,7 +79,11 @@ const sourceMap = { apply: 'Apply Langsung', invitation: 'Via Invitation' } as c
 
 const formatDateSafe = (value?: string) => {
   if (!value) return '-';
-  try { return formatDate(value); } catch { return value; }
+  try {
+    return formatDate(value);
+  } catch {
+    return value;
+  }
 };
 
 const mappedItems = computed(() =>
@@ -102,6 +91,7 @@ const mappedItems = computed(() =>
     const status = statusMap[b.status];
     return {
       id: String(b.id),
+      title: b.event.title,
       rawId: b.id,
       eventTitle: b.event.title,
       eventDate: formatDateSafe(b.event.event_date),
