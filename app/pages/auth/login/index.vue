@@ -74,7 +74,7 @@
               />
             </UFormField>
 
-            <UButton type="submit" color="primary" size="xl" block class="!mt-2 !justify-center !rounded-xl !py-3 text-sm font-semibold !bg-gradient-to-r !from-accent !to-highlight hover:!opacity-90" variant="solid">
+            <UButton type="submit" color="primary" size="xl" block :loading="isSubmitting" class="!mt-2 !justify-center !rounded-xl !py-3 text-sm font-semibold !bg-gradient-to-r !from-accent !to-highlight hover:!opacity-90" variant="solid">
               Masuk Sekarang
             </UButton>
           </form>
@@ -92,9 +92,13 @@
 </template>
 
 <script setup lang="ts">
+import { useAuth } from '~/composables/useAuth';
 const email = ref('');
 const password = ref('');
-const rememberMe = ref(false);
+const isSubmitting = ref(false);
+
+const toast = useToast();
+const { login } = useAuth();
 
 const sideFeatures = [
   {
@@ -115,20 +119,38 @@ const sideFeatures = [
 ];
 
 const onSubmit = async () => {
-  if (email.value && password.value) {
-    // Mock login - in production this would call your auth API
-    console.log('Login submitted', {
+  if (!email.value || !password.value || isSubmitting.value) {
+    return;
+  }
+
+  isSubmitting.value = true;
+  try {
+    const response = await login({
       email: email.value,
       password: password.value,
-      rememberMe: rememberMe.value,
     });
 
-    // Clear form
+    toast.add({
+      title: 'Login berhasil',
+      description: `Selamat datang kembali, ${response.data.user.name}.`,
+      color: 'success',
+    });
+
     email.value = '';
     password.value = '';
 
-    // Redirect to talent dashboard after successful login
-    await navigateTo('/dashboard/talent');
+    const role = response.data.user.role;
+    const target = role === 'eo' ? '/dashboard/eo' : role === 'admin' ? '/dashboard/admin' : '/dashboard/talent';
+    await navigateTo(target);
+  } catch (error: any) {
+    const message = error?.message || 'Login gagal. Periksa kembali email dan password.';
+    toast.add({
+      title: 'Login gagal',
+      description: message,
+      color: 'error',
+    });
+  } finally {
+    isSubmitting.value = false;
   }
 };
 </script>
