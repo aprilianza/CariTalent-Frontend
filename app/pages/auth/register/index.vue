@@ -188,6 +188,20 @@ const metrics = [
   { value: '12rb+', label: 'Booking Sukses' },
 ];
 
+const getRegisterErrorMessage = (error: any) => {
+  const validationErrors = error?.errors;
+
+  if (validationErrors && typeof validationErrors === 'object') {
+    const firstError = Object.values(validationErrors).find((messages) => Array.isArray(messages) && messages.length > 0);
+
+    if (Array.isArray(firstError)) {
+      return String(firstError[0]);
+    }
+  }
+
+  return error?.message || 'Registrasi gagal. Periksa kembali data yang kamu masukkan.';
+};
+
 const onSubmit = async () => {
   if (isSubmitting.value) {
     return;
@@ -240,7 +254,7 @@ const onSubmit = async () => {
     const target = roleValue === 'eo' ? '/dashboard/eo' : '/dashboard/talent';
     await navigateTo(target);
   } catch (error: any) {
-    const message = error?.message || 'Registrasi gagal. Periksa kembali data yang kamu masukkan.';
+    const message = getRegisterErrorMessage(error);
     toast.add({
       title: 'Registrasi gagal',
       description: message,

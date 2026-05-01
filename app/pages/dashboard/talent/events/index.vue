@@ -21,38 +21,69 @@
     <EventList :events="events" :loading="pending" :applied-event-ids="appliedEventIds" :applying-event-ids="applyingEventIds" @apply="handleApply" />
 
     <!-- Apply Modal -->
-    <UModal v-model:open="showApplyModal">
+    <UModal
+      v-model:open="showApplyModal"
+      :ui="{
+        content: 'w-[calc(100vw-2rem)] max-w-xl overflow-hidden rounded-[28px] border border-white/10 bg-neutral-dark/95 p-0 shadow-2xl ring-0 backdrop-blur-xl',
+      }"
+    >
       <template #content>
-        <div class="mx-auto w-full max-w-xl rounded-3xl border border-white/10 bg-neutral-dark/95 p-6 shadow-2xl backdrop-blur">
-          <div class="flex items-start justify-between gap-4">
-            <div>
-              <p class="text-xs font-semibold uppercase tracking-[0.2em] text-neutral-light/60">Lamaran Event</p>
-              <h3 class="mt-2 text-xl font-bold text-ui-light">Ajukan Lamaran</h3>
-              <p class="mt-1 text-sm text-neutral-light/70">Lengkapi pesan dan penawaran terbaikmu.</p>
+        <div class="overflow-hidden rounded-[28px]">
+          <div class="border-b border-white/10 bg-white/[0.03] px-5 py-5 sm:px-6">
+            <div class="flex items-start justify-between gap-4">
+              <div class="min-w-0">
+                <p class="text-xs font-semibold uppercase text-neutral-light/60">Lamaran Event</p>
+                <h3 class="mt-2 font-display text-xl font-bold text-ui-light">Ajukan Lamaran</h3>
+                <p class="mt-1 text-sm text-neutral-light/70">Lengkapi pesan dan penawaran terbaikmu.</p>
+              </div>
+              <UButton color="neutral" variant="ghost" icon="i-lucide-x" class="-mr-2 -mt-2 shrink-0 rounded-full" aria-label="Tutup modal" @click="showApplyModal = false" />
             </div>
-            <UButton color="neutral" variant="ghost" icon="i-heroicons-x-mark-20-solid" class="-mt-1" @click="showApplyModal = false" />
           </div>
 
-          <div class="mt-6 space-y-5">
+          <div class="space-y-5 px-5 py-5 sm:px-6">
             <div v-if="selectedEvent" class="rounded-2xl border border-white/10 bg-white/5 p-4">
-              <h4 class="text-base font-semibold text-ui-light">{{ selectedEvent.title }}</h4>
-              <p class="mt-1 text-sm text-neutral-light/70">{{ selectedEvent.venue_name }} • {{ selectedEvent.city }}</p>
-              <p class="mt-2 text-sm text-neutral-light/70">
-                Anggaran: <span class="font-semibold text-ui-light">Rp {{ selectedEvent.budget?.toLocaleString() }}</span>
-              </p>
+              <div class="flex flex-wrap items-start justify-between gap-3">
+                <div class="min-w-0">
+                  <h4 class="text-base font-semibold text-ui-light">{{ selectedEvent.title }}</h4>
+                  <p class="mt-1 text-sm text-neutral-light/70">{{ selectedEvent.venue_name }} • {{ selectedEvent.city }}</p>
+                </div>
+                <UiBadge :label="selectedEvent.status" color="success" variant="soft" />
+              </div>
+              <div class="mt-4 grid gap-3 text-sm text-neutral-light/70 sm:grid-cols-2">
+                <div class="rounded-xl bg-white/[0.04] px-3 py-2">
+                  <p class="text-xs text-neutral-light/50">Anggaran</p>
+                  <p class="mt-1 font-semibold text-ui-light">{{ formatCurrency(selectedEvent.budget) }}</p>
+                </div>
+                <div class="rounded-xl bg-white/[0.04] px-3 py-2">
+                  <p class="text-xs text-neutral-light/50">Tanggal</p>
+                  <p class="mt-1 font-semibold text-ui-light">{{ formatDate(selectedEvent.event_date) }}</p>
+                </div>
+              </div>
             </div>
 
-            <UFormField label="Pesan" required>
-              <UTextarea v-model="applyForm.message" placeholder="Ceritakan kenapa kamu cocok untuk event ini..." :rows="4" :ui="{ base: 'rounded-2xl border-white/10 bg-white/5 text-ui-light placeholder:text-neutral-light/50' }" />
+            <UFormField label="Pesan" required class="w-full" :ui="{ label: 'text-sm font-semibold text-ui-light', container: 'w-full' }">
+              <UTextarea
+                v-model="applyForm.message"
+                class="w-full"
+                placeholder="Ceritakan kenapa kamu cocok untuk event ini..."
+                :rows="4"
+                :ui="{ base: 'w-full rounded-2xl border-white/10 bg-white/5 text-ui-light placeholder:text-neutral-light/50 focus-visible:ring-highlight' }"
+              />
             </UFormField>
 
-            <UFormField label="Harga yang Diajukan (Rp)" required>
-              <UInput v-model.number="applyForm.proposed_price" type="number" placeholder="Masukkan harga yang kamu ajukan" :ui="{ base: 'rounded-2xl border-white/10 bg-white/5 text-ui-light placeholder:text-neutral-light/50' }" />
+            <UFormField label="Harga yang Diajukan (Rp)" required class="w-full" :ui="{ label: 'text-sm font-semibold text-ui-light', container: 'w-full' }">
+              <UInput
+                v-model.number="applyForm.proposed_price"
+                class="w-full"
+                type="number"
+                placeholder="Masukkan harga yang kamu ajukan"
+                :ui="{ base: 'w-full rounded-2xl border-white/10 bg-white/5 text-ui-light placeholder:text-neutral-light/50 focus-visible:ring-highlight' }"
+              />
               <p class="mt-2 text-xs text-neutral-light/60">Sertakan detail nilai tambah jika perlu.</p>
             </UFormField>
           </div>
 
-          <div class="mt-7 flex flex-wrap justify-end gap-3">
+          <div class="flex flex-col-reverse gap-3 border-t border-white/10 bg-white/[0.03] px-5 py-4 sm:flex-row sm:justify-end sm:px-6">
             <UButton color="neutral" variant="soft" @click="showApplyModal = false"> Batal </UButton>
             <UButton color="primary" :loading="isApplying" @click="submitApplication"> Kirim Lamaran </UButton>
           </div>
@@ -75,6 +106,7 @@ definePageMeta({
 useState('talent-layout-title', () => 'Talent Dashboard').value = 'Events';
 
 const toast = useToast();
+const { formatCurrency, formatDate } = useFormatters();
 
 const currentPage = ref(1);
 const { data: events, pending, pagination, refresh: refreshEvents } = useEvents({ page: currentPage.value });
