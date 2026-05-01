@@ -1,64 +1,75 @@
-import type { ApiResponse, Application, MyApplicationsData } from '~/composables/types';
-import { useMockResource } from '~/composables/useMockResource';
+import type { Application, MyApplicationsData, PaginationMeta } from '~/composables/types';
 
-const applicationsPayload: ApiResponse<MyApplicationsData> = {
-  success: true,
-  message: 'Applications fetched successfully',
-  data: {
-    applications: [
-      {
-        id: 1,
-        source: 'apply',
-        event: {
-          id: 1,
-          title: 'Punk Night Vol. 3',
-          event_date: '2026-04-15',
-          venue_name: 'Kafe Kota Bandung',
-          city: 'Bandung',
-          latitude: -6.9175,
-          longitude: 107.6191,
-        },
-        proposed_price: 1500000,
-        status: 'pending',
-        created_at: '2026-03-08T11:00:00Z',
-      },
-      {
-        id: 2,
-        source: 'apply',
-        event: {
-          id: 2,
-          title: 'Alternative Friday Session',
-          event_date: '2026-04-20',
-          venue_name: 'Bandung Creative Space',
-          city: 'Bandung',
-        },
-        proposed_price: 1750000,
-        status: 'accepted',
-        created_at: '2026-03-10T09:30:00Z',
-      },
-      {
-        id: 3,
-        source: 'apply',
-        event: {
-          id: 3,
-          title: 'Indie Summer Showcase',
-          event_date: '2026-04-28',
-          venue_name: 'Jakarta Music Hall',
-          city: 'Jakarta',
-        },
-        proposed_price: 1600000,
-        status: 'rejected',
-        created_at: '2026-03-11T08:15:00Z',
-      },
-    ],
-  },
-};
+export interface ApplicationsFilters {
+  page?: number;
+  per_page?: number;
+}
 
-export const useApplications = () => {
-  const resource = useMockResource('talent-applications', applicationsPayload);
+export const useApplications = (filters?: ApplicationsFilters) => {
+  const api = useApiClient();
+
+  // Build query parameters
+  const queryParams: Record<string, any> = {};
+  if (filters?.page) queryParams.page = filters.page;
+  if (filters?.per_page) queryParams.per_page = filters.per_page;
+
+  // Create dynamic cache key based on filters
+  const filterKey = JSON.stringify(queryParams);
+  const cacheKey = `talent-applications-${filterKey}`;
+
+  const {
+    data: response,
+    pending,
+    error,
+    refresh,
+  } = useAsyncData(
+    cacheKey,
+    async () => {
+      const result = await api.get<MyApplicationsData & { pagination?: PaginationMeta }>('/applications/my', queryParams);
+      return result;
+    },
+    {
+      default: () => ({
+        success: false,
+        message: '',
+        data: { applications: [], pagination: undefined },
+      }),
+    },
+  );
+
+  const data = computed<Application[]>(() => response.value?.data?.applications ?? []);
+  const pagination = computed<PaginationMeta | undefined>(() => response.value?.data?.pagination);
+
+  // Action to apply to an event
+  const applyToEvent = async (eventId: number, payload: { message: string; proposed_price: number }) => {
+    try {
+      await api.post('/applications', {
+        event_id: eventId,
+        ...payload,
+      });
+      await refresh();
+    } catch (err) {
+      throw err;
+    }
+  };
+
+  // Action to cancel an application
+  const cancelApplication = async (applicationId: number) => {
+    try {
+      await api.delete(`/applications/${applicationId}`);
+      await refresh();
+    } catch (err) {
+      throw err;
+    }
+  };
 
   return {
-    ...resource,
-    data: computed<Application[]>(() => resource.data.value.applications),
+    data,
+    pagination,
+    pending,
+    error,
+    refresh,
+    applyToEvent,
+    cancelApplication,
   };
 };

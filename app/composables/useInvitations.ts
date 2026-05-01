@@ -1,52 +1,65 @@
-import type { ApiResponse, Invitation, MyInvitationsData } from '~/composables/types';
-import { useMockResource } from '~/composables/useMockResource';
+import type { Invitation, MyInvitationsData, PaginationMeta } from '~/composables/types';
 
-const invitationsPayload: ApiResponse<MyInvitationsData> = {
-  success: true,
-  message: 'Invitations fetched successfully',
-  data: {
-    invitations: [
-      {
-        id: 1,
-        event: {
-          id: 10,
-          title: 'Jazz Night',
-          event_date: '2026-04-18',
-          venue_name: 'Cafe Jazz Bandung',
-          city: 'Bandung',
-          budget: 3000000,
-          latitude: -6.9175,
-          longitude: 107.6191,
-        },
-        organizer_name: 'Cafe Jazz',
-        offered_price: 2000000,
-        status: 'pending',
-        created_at: '2026-03-08T12:00:00Z',
-      },
-      {
-        id: 2,
-        event: {
-          id: 11,
-          title: 'Blues Session',
-          event_date: '2026-04-22',
-          venue_name: 'Blue Note Jakarta',
-          city: 'Jakarta',
-          budget: 2500000,
-        },
-        organizer_name: 'Blue Note',
-        offered_price: 1500000,
-        status: 'pending',
-        created_at: '2026-03-09T10:20:00Z',
-      },
-    ],
-  },
-};
+export interface InvitationsFilters {
+  page?: number;
+  per_page?: number;
+}
 
-export const useInvitations = () => {
-  const resource = useMockResource('talent-invitations', invitationsPayload);
+export const useInvitations = (filters?: InvitationsFilters) => {
+  const api = useApiClient();
+
+  // Build query parameters
+  const queryParams: Record<string, any> = {};
+  if (filters?.page) queryParams.page = filters.page;
+  if (filters?.per_page) queryParams.per_page = filters.per_page;
+
+  // Create dynamic cache key based on filters
+  const filterKey = JSON.stringify(queryParams);
+  const cacheKey = `talent-invitations-${filterKey}`;
+
+  // Fetch invitations from API
+  const {
+    data: response,
+    pending,
+    error,
+    refresh,
+  } = useAsyncData(
+    cacheKey,
+    async () => {
+      const result = await api.get<MyInvitationsData & { pagination?: PaginationMeta }>('/invitations/my', queryParams);
+      return result;
+    },
+    {
+      default: () => ({
+        success: false,
+        message: '',
+        data: { invitations: [], pagination: undefined },
+      }),
+    },
+  );
+
+  // Transform data to return invitations array
+  const data = computed<Invitation[]>(() => response.value?.data?.invitations ?? []);
+  const pagination = computed<PaginationMeta | undefined>(() => response.value?.data?.pagination);
+
+  // Action method to respond to invitation
+  const respondToInvitation = async (id: number, status: 'accepted' | 'rejected') => {
+    try {
+      await api.put(`/invitations/${id}/respond`, { status });
+      // Refresh data to sync with server state
+      await refresh();
+    } catch (err) {
+      // Re-throw error to be handled by caller
+      throw err;
+    }
+  };
 
   return {
-    ...resource,
-    data: computed<Invitation[]>(() => resource.data.value.invitations),
+    data,
+    pagination,
+    pending,
+    error,
+    refresh,
+    respondToInvitation,
   };
 };

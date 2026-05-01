@@ -1,66 +1,55 @@
 import type { ApiResponse, TalentMedia, TalentMediaType } from '~/composables/types';
 
-const wait = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
-
 export const useProfileSettings = () => {
+  const api = useApiClient();
+
   const updateProfile = async (payload: { name: string; phone: string }) => {
-    await wait(360);
-
-    const response: ApiResponse<{ name: string; phone: string }> = {
-      success: true,
-      message: 'Profil berhasil diperbarui',
-      data: {
-        name: payload.name,
-        phone: payload.phone,
-      },
-    };
-
+    const response = await api.put<{ name: string; phone: string }>('/users/profile', payload);
     return response;
   };
 
   const changePassword = async (payload: { current_password: string; new_password: string; new_password_confirmation: string }) => {
-    await wait(360);
+    const response = await api.put<null>('/users/password', payload);
+    return response;
+  };
 
-    if (payload.new_password !== payload.new_password_confirmation) {
-      throw new Error('Konfirmasi password baru tidak cocok.');
+  const uploadMedia = async (payload: { file: File; type: TalentMediaType }) => {
+    // Get talent_id from profile
+    const { data: profile } = useProfile();
+    const talentId = profile.value?.talent_id;
+
+    if (!talentId) {
+      throw new Error('Talent ID not available');
     }
 
-    const response: ApiResponse<null> = {
-      success: true,
-      message: 'Password berhasil diubah',
-      data: null,
-    };
+    // Create FormData for multipart/form-data upload
+    const formData = new FormData();
+    formData.append('file', payload.file);
+    formData.append('type', payload.type);
+
+    // Use the API client with custom headers for multipart/form-data
+    const config = useRuntimeConfig();
+    const baseURL = config.public.apiBase as string;
+    const token = useCookie<string | null>('auth_token');
+
+    const response = await $fetch<ApiResponse<TalentMedia>>(`/talents/${talentId}/media`, {
+      baseURL,
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${token.value}`,
+      },
+      body: formData,
+    });
+
+    if (!response.success) {
+      throw new Error(response.message || 'Upload failed');
+    }
 
     return response;
   };
 
-  const uploadMedia = async (payload: { talentId: number; fileName: string; type: TalentMediaType }) => {
-    await wait(400);
-
-    const media: TalentMedia = {
-      id: Date.now(),
-      media_url: `https://storage.caritalent.id/media/${encodeURIComponent(payload.fileName)}`,
-      type: payload.type,
-    };
-
-    const response: ApiResponse<TalentMedia> = {
-      success: true,
-      message: 'Media berhasil diunggah',
-      data: media,
-    };
-
-    return response;
-  };
-
-  const deleteMedia = async (payload: { talentId: number; mediaId: number }) => {
-    await wait(300);
-
-    const response: ApiResponse<null> = {
-      success: true,
-      message: 'Media berhasil dihapus',
-      data: null,
-    };
-
+  const deleteMedia = async (talent_id: number, media_id: number) => {
+    const response = await api.delete<null>(`/talents/${talent_id}/media/${media_id}`);
     return response;
   };
 

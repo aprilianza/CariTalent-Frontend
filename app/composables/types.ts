@@ -135,7 +135,6 @@ export type EventsData = {
   pagination?: PaginationMeta;
 };
 
-
 // ─── EO-specific types ────────────────────────────────────────────────────────
 
 export type Genre = {
@@ -317,4 +316,32 @@ export type AdminModeratePayload = {
 
 export type AdminVerifyPayload = {
   verified: boolean;
+};
+
+// ─── API Integration Types ────────────────────────────────────────────────────
+
+export type ApiErrorResponse = {
+  success: false;
+  message: string;
+  errors?: Record<string, string[]>;
+};
+
+export type UpdateProfilePayload = {
+  name: string;
+  phone: string;
+};
+
+export type ChangePasswordPayload = {
+  current_password: string;
+  new_password: string;
+  new_password_confirmation: string;
+};
+
+export type RespondToInvitationPayload = {
+  status: 'accepted' | 'rejected';
+};
+
+export type UploadMediaPayload = {
+  file: File;
+  type: TalentMediaType;
 };

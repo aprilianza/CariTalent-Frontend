@@ -142,7 +142,7 @@ useState('talent-layout-title', () => 'Talent Dashboard').value = 'Profile';
 
 const toast = useToast();
 
-const { data: profile, response: profileResponse, pending } = useProfile();
+const { data: profile, pending, refresh: refreshProfile } = useProfile();
 const { updateProfile, changePassword, uploadMedia, deleteMedia } = useProfileSettings();
 
 const profileForm = reactive({
@@ -156,8 +156,8 @@ const passwordForm = reactive({
   new_password_confirmation: '',
 });
 
-const uploadForm = reactive<{ fileName: string; type: TalentMediaType }>({
-  fileName: '',
+const uploadForm = reactive<{ file: File | null; type: TalentMediaType }>({
+  file: null,
   type: 'image',
 });
 
@@ -196,7 +196,7 @@ const mediaItems = computed(() =>
 const handleFileChange = (event: Event) => {
   const input = event.target as HTMLInputElement;
   const file = input.files?.[0];
-  uploadForm.fileName = file?.name || '';
+  uploadForm.file = file || null;
 };
 
 const handleUpdateProfile = async () => {
@@ -217,13 +217,8 @@ const handleUpdateProfile = async () => {
       phone: profileForm.phone.trim(),
     });
 
-    if (profileResponse.value?.data) {
-      profileResponse.value.data = {
-        ...profileResponse.value.data,
-        name: response.data.name,
-        phone: response.data.phone,
-      };
-    }
+    // Refresh profile data from server
+    await refreshProfile();
 
     toast.add({
       title: 'Profile updated',
@@ -277,7 +272,7 @@ const handleChangePassword = async () => {
 };
 
 const handleUploadMedia = async () => {
-  if (!uploadForm.fileName) {
+  if (!uploadForm.file) {
     toast.add({
       title: 'File belum dipilih',
       description: 'Pilih file sebelum upload media.',
@@ -290,20 +285,16 @@ const handleUploadMedia = async () => {
 
   try {
     const response = await uploadMedia({
-      talentId: profile.value.talent_id || profile.value.id,
-      fileName: uploadForm.fileName,
+      file: uploadForm.file,
       type: uploadForm.type,
     });
 
     mediaList.value = [response.data, ...mediaList.value];
-    if (profileResponse.value?.data) {
-      profileResponse.value.data = {
-        ...profileResponse.value.data,
-        media: mediaList.value as any, // Ignore strict typing here
-      };
-    }
+    
+    // Refresh profile data from server
+    await refreshProfile();
 
-    uploadForm.fileName = '';
+    uploadForm.file = null;
 
     toast.add({
       title: 'Media uploaded',
@@ -325,18 +316,13 @@ const handleDeleteMedia = async (mediaId: number) => {
   deletingMediaId.value = mediaId;
 
   try {
-    const response = await deleteMedia({
-      talentId: profile.value.talent_id || profile.value.id,
-      mediaId,
-    });
+    const talentId = profile.value.talent_id || profile.value.id;
+    const response = await deleteMedia(talentId, mediaId);
 
     mediaList.value = mediaList.value.filter((item) => item.id !== mediaId);
-    if (profileResponse.value?.data) {
-      profileResponse.value.data = {
-        ...profileResponse.value.data,
-        media: mediaList.value as any, // Ignore strict typing here
-      };
-    }
+    
+    // Refresh profile data from server
+    await refreshProfile();
 
     toast.add({
       title: 'Media deleted',

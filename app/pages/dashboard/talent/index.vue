@@ -61,9 +61,9 @@ definePageMeta({
 const toast = useToast();
 
 const { data: profile, pending: profilePending } = useProfile();
-const { data: applications, pending: applicationsPending } = useApplications();
+const { data: applications, pending: applicationsPending, refresh: refreshApplications } = useApplications();
 const { data: bookings, pending: bookingsPending } = useBookings();
-const { data: invitationsRaw, pending: invitationsPending } = useInvitations();
+const { data: invitationsRaw, pending: invitationsPending, respondToInvitation } = useInvitations();
 
 const invitations = ref<Invitation[]>([]);
 
@@ -127,7 +127,7 @@ const goTo = async (to: string) => {
   await navigateTo(to);
 };
 
-const handleInvitation = (action: 'accept' | 'reject', invitationId: number) => {
+const handleInvitation = async (action: 'accept' | 'reject', invitationId: number) => {
   const invitationIndex = invitations.value.findIndex((item) => item.id === invitationId);
   const current = invitations.value[invitationIndex];
 
@@ -135,17 +135,21 @@ const handleInvitation = (action: 'accept' | 'reject', invitationId: number) => 
     return;
   }
 
-  const nextStatus = action === 'accept' ? 'accepted' : 'rejected';
+  try {
+    const status = action === 'accept' ? 'accepted' : 'rejected';
+    await respondToInvitation(invitationId, status);
 
-  invitations.value[invitationIndex] = {
-    ...current,
-    status: nextStatus,
-  };
-
-  toast.add({
-    title: action === 'accept' ? 'Invitation accepted' : 'Invitation rejected',
-    description: `${current.event.title} telah di-${action === 'accept' ? 'accept' : 'reject'} (dummy update).`,
-    color: action === 'accept' ? 'success' : 'error',
-  });
+    toast.add({
+      title: action === 'accept' ? 'Invitation accepted' : 'Invitation rejected',
+      description: `${current.event.title} has been ${action}ed successfully.`,
+      color: action === 'accept' ? 'success' : 'error',
+    });
+  } catch (error: any) {
+    toast.add({
+      title: 'Action failed',
+      description: error.message || 'Failed to respond to invitation',
+      color: 'error',
+    });
+  }
 };
 </script>

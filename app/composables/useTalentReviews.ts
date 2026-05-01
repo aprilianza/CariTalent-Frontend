@@ -1,61 +1,96 @@
-import type { ApiResponse, TalentReviewsData } from '~/composables/types';
-import { useMockResource } from '~/composables/useMockResource';
+import type { TalentReviewsData, PaginationMeta } from '~/composables/types';
 
-const reviewsPayload: ApiResponse<TalentReviewsData> = {
-  success: true,
-  message: 'Talent reviews fetched successfully',
-  data: {
-    talent_id: 3,
-    stage_name: 'The Broken Strings',
-    average_rating: 4.5,
-    total_reviews: 12,
-    reviews: [
-      {
-        id: 8,
-        organizer_name: 'Kafe Kota',
-        event_title: 'Punk Night Vol. 3',
-        rating: 5,
-        comment: 'The Broken Strings tampil luar biasa, penonton sangat antusias. Sangat profesional dan tepat waktu.',
-        created_at: '2026-04-16T10:00:00Z',
-      },
-      {
-        id: 9,
-        organizer_name: 'Bandung Creative Space',
-        event_title: 'Alternative Friday Session',
-        rating: 4,
-        comment: 'Performance rapi dan energi panggung bagus. Komunikasi saat persiapan juga cepat.',
-        created_at: '2026-04-02T20:00:00Z',
-      },
-      {
-        id: 10,
-        organizer_name: 'Jakarta Music Hall',
-        event_title: 'Indie Summer Showcase',
-        rating: 5,
-        comment: 'Setlist sangat cocok dengan audiens, teknis soundcheck lancar, dan tampil sangat solid.',
-        created_at: '2026-03-22T18:30:00Z',
-      },
-    ],
+export interface TalentReviewsFilters {
+  page?: number;
+  per_page?: number;
+}
+
+export const useTalentReviews = (talentId: Ref<number | null> | number | null, filters?: TalentReviewsFilters) => {
+  const api = useApiClient();
+
+  // Convert talentId to a ref if it's not already
+  const talentIdRef = isRef(talentId) ? talentId : ref(talentId);
+
+  // Build query parameters
+  const queryParams: Record<string, any> = {};
+  if (filters?.page) queryParams.page = filters.page;
+  if (filters?.per_page) queryParams.per_page = filters.per_page;
+
+  // Create dynamic cache key
+  const filterKey = JSON.stringify(queryParams);
+  const cacheKey = () => `talent-reviews-${talentIdRef.value}-${filterKey}`;
+
+  // Default empty data structure
+  const defaultData: TalentReviewsData = {
+    talent_id: 0,
+    stage_name: '',
+    average_rating: 0,
+    total_reviews: 0,
+    reviews: [],
     pagination: {
       current_page: 1,
       per_page: 15,
-      total: 3,
+      total: 0,
       last_page: 1,
     },
-  },
-};
+  };
 
-export const useTalentReviews = () => {
-  const resource = useMockResource('talent-reviews', reviewsPayload);
+  // Use useAsyncData with conditional execution based on talent_id availability
+  const {
+    data: response,
+    pending,
+    error,
+    refresh,
+  } = useAsyncData(
+    cacheKey,
+    async () => {
+      // Only fetch if talent_id is available
+      if (!talentIdRef.value) {
+        return {
+          success: true,
+          message: 'Waiting for talent ID',
+          data: defaultData,
+        };
+      }
+
+      try {
+        const result = await api.get<TalentReviewsData>(`/talents/${talentIdRef.value}/reviews`, queryParams);
+        return result;
+      } catch (err: any) {
+        throw err;
+      }
+    },
+    {
+      lazy: false,
+      server: true,
+      default: () => ({
+        success: false,
+        message: '',
+        data: defaultData,
+      }),
+      // Watch talent_id and refetch when it changes
+      watch: [talentIdRef],
+    },
+  );
+
+  // Transform data for easier consumption
+  const data = computed(() => response.value?.data?.reviews ?? []);
+
+  const meta = computed(() => ({
+    talentId: response.value?.data?.talent_id ?? 0,
+    stageName: response.value?.data?.stage_name ?? '',
+    averageRating: response.value?.data?.average_rating ?? 0,
+    totalReviews: response.value?.data?.total_reviews ?? 0,
+  }));
+
+  const pagination = computed<PaginationMeta | undefined>(() => response.value?.data?.pagination);
 
   return {
-    ...resource,
-    data: computed(() => resource.data.value.reviews),
-    meta: computed(() => ({
-      talentId: resource.data.value.talent_id,
-      stageName: resource.data.value.stage_name,
-      averageRating: resource.data.value.average_rating,
-      totalReviews: resource.data.value.total_reviews,
-      pagination: resource.data.value.pagination,
-    })),
+    data,
+    meta,
+    pagination,
+    pending,
+    error,
+    refresh,
   };
 };
