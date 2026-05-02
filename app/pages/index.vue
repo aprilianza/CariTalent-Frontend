@@ -223,30 +223,55 @@
       </div>
     </section>
 
-    <!-- ═══════════════════════════ TESTIMONIALS ═══════════════════════════ -->
-    <section class="py-28 px-6 relative overflow-hidden">
+    <!-- ═══════════════════════════ TEAM ═══════════════════════════ -->
+    <section class="min-h-screen py-28 px-6 relative overflow-hidden flex items-center">
+      <span id="tim-kami" class="absolute top-20 left-0 h-px w-px" aria-hidden="true"></span>
       <div class="absolute inset-0 bg-ui-dark/50 pointer-events-none"></div>
-      <div class="max-w-6xl mx-auto relative z-10">
+      <div class="absolute -top-24 left-1/2 h-80 w-80 -translate-x-1/2 rounded-full bg-highlight/10 blur-3xl pointer-events-none"></div>
+      <div class="max-w-6xl mx-auto w-full relative z-10">
         <div class="text-center mb-16">
-          <span class="text-xs font-semibold tracking-widest text-highlight uppercase">Testimoni</span>
-          <h2 class="font-display text-4xl md:text-5xl font-black mt-3 text-ui-light">Cerita dari komunitas</h2>
+          <span class="text-xs font-semibold tracking-widest text-highlight uppercase">Tim Kami</span>
+          <h2 class="font-display text-4xl md:text-5xl font-black mt-3 text-ui-light">Tim Kami</h2>
+          <p class="text-neutral-medium mt-4 max-w-xl mx-auto">Orang-orang di balik pengalaman CariTalent yang cepat, rapi, dan mudah dipakai.</p>
         </div>
 
-        <div class="grid md:grid-cols-3 gap-6">
-          <div v-for="testi in testimonials" :key="testi.name" class="bg-white/5 border border-white/10 rounded-2xl p-6 hover:border-highlight/20 transition-colors">
-            <div class="flex gap-1 mb-4">
-              <span v-for="n in 5" :key="n" class="text-yellow-400 text-sm">★</span>
-            </div>
-            <p class="text-neutral-medium text-sm leading-relaxed mb-6 italic">"{{ testi.quote }}"</p>
-            <div class="flex items-center gap-3">
-              <div class="w-10 h-10 rounded-full flex items-center justify-center text-white font-bold text-sm" :class="testi.avatarBg">{{ testi.initials }}</div>
-              <div>
-                <div class="text-ui-light font-semibold text-sm">{{ testi.name }}</div>
-                <div class="text-neutral-medium text-xs">{{ testi.role }}</div>
+        <UCarousel
+          :items="teamMembers"
+          arrows
+          dots
+          loop
+          :ui="{
+            viewport: 'overflow-visible',
+            container: '-ms-4',
+            item: 'basis-[86%] ps-4 sm:basis-1/2 lg:basis-1/3',
+            controls: 'mt-8',
+            arrows: 'justify-center gap-3',
+            dots: 'mt-5',
+          }"
+          :prev="{ class: 'rounded-full border-white/10 bg-white/5 text-ui-light hover:bg-white/10' }"
+          :next="{ class: 'rounded-full border-white/10 bg-white/5 text-ui-light hover:bg-white/10' }"
+        >
+          <template #default="{ item: member }">
+            <article class="group overflow-hidden rounded-[28px] border border-white/10 bg-white/[0.04] shadow-2xl shadow-black/10 transition-all duration-300 hover:-translate-y-1 hover:border-highlight/30 hover:bg-white/[0.07]">
+              <div class="relative aspect-[4/3] overflow-hidden">
+                <div class="absolute inset-0" :class="member.avatarBg"></div>
+                <div class="absolute inset-0 bg-[radial-gradient(circle_at_30%_20%,rgba(255,255,255,0.35),transparent_30%),linear-gradient(180deg,transparent,rgba(10,10,18,0.45))]"></div>
+                <div class="absolute -right-10 -top-10 h-36 w-36 rounded-full bg-white/20 blur-2xl transition-transform duration-500 group-hover:scale-125"></div>
+                <div class="absolute inset-x-0 bottom-0 flex items-end justify-between p-5">
+                  <div class="flex h-16 w-16 items-center justify-center rounded-2xl border border-white/20 bg-neutral-dark/35 font-display text-2xl font-black text-white shadow-glow-sm backdrop-blur-md">
+                    {{ member.initials }}
+                  </div>
+                  <Icon name="mdi:account-music-outline" class="h-8 w-8 text-white/70" />
+                </div>
               </div>
-            </div>
-          </div>
-        </div>
+
+              <div class="px-6 py-5">
+                <p class="text-xs font-semibold uppercase tracking-[0.28em] text-accent">{{ member.role }}</p>
+                <h3 class="mt-2 font-display text-xl font-bold text-ui-light">{{ member.name }}</h3>
+              </div>
+            </article>
+          </template>
+        </UCarousel>
       </div>
     </section>
 
@@ -275,6 +300,7 @@ const navLinks = [
   { label: 'Fitur', to: '/#fitur' },
   { label: 'Untuk Talent', to: '/#talent' },
   { label: 'Untuk EO', to: '/#eo' },
+  { label: 'Tim Kami', to: '/#tim-kami' },
 ];
 
 const stats = [
@@ -337,27 +363,48 @@ const pillars = [
   { icon: 'mdi:earth', title: 'Lokal Fokus', desc: 'Dirancang khusus untuk ekosistem musik independen Indonesia.' },
 ];
 
-const testimonials = [
+const teamMembers = [
   {
-    quote: 'CariTalent mengubah cara saya mendapat gig. Dulu harus promosi manual, sekarang klien datang sendiri lewat platform.',
-    name: 'Rizky Saputra',
-    role: 'Solo Guitarist, Bandung',
-    initials: 'RS',
+    name: 'Alya Prameswari',
+    role: 'Frontend Developer',
+    focus: 'Mengembangkan UI interaktif dan komponen yang konsisten untuk seluruh aplikasi.',
+    initials: 'AP',
     avatarBg: 'bg-highlight',
   },
   {
-    quote: 'Sebagai pengelola kafe, saya selalu susah cari musisi yang pas. Dengan CariTalent, dalam 2 jam sudah dapat 10 pelamar!',
-    name: 'Siti Rahma',
-    role: 'Owner Kafe Senja, Jakarta',
-    initials: 'SR',
+    name: 'Kevin Santoso',
+    role: 'Frontend Developer',
+    focus: 'Fokus pada performa, responsivitas, dan aksesibilitas tampilan web.',
+    initials: 'KS',
     avatarBg: 'bg-accent/60',
   },
   {
-    quote: 'Fitur undangan langsung sangat membantu. Kami bisa proaktif mencari talent yang benar-benar sesuai konsep event kami.',
-    name: 'Budi Hartono',
-    role: 'Event Organizer, Surabaya',
-    initials: 'BH',
+    name: 'Nadia Puspita',
+    role: 'Frontend Developer',
+    focus: 'Membangun design system dan integrasi antarmuka dengan API.',
+    initials: 'NP',
     avatarBg: 'bg-purple-600',
+  },
+  {
+    name: 'Rafi Mahendra',
+    role: 'Backend Developer',
+    focus: 'Merancang arsitektur layanan, autentikasi, dan integrasi data.',
+    initials: 'RM',
+    avatarBg: 'bg-emerald-500',
+  },
+  {
+    name: 'Citra Wulandari',
+    role: 'Backend Developer',
+    focus: 'Mengembangkan API, optimasi query, serta keamanan layanan.',
+    initials: 'CW',
+    avatarBg: 'bg-sky-500',
+  },
+  {
+    name: 'Dimas Prakoso',
+    role: 'Backend Developer',
+    focus: 'Menjaga skalabilitas sistem dan monitoring layanan produksi.',
+    initials: 'DP',
+    avatarBg: 'bg-orange-500',
   },
 ];
 </script>

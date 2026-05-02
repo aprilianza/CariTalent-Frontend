@@ -38,6 +38,7 @@ withDefaults(
       { label: 'Fitur', to: '/#fitur' },
       { label: 'Untuk Talent', to: '/#talent' },
       { label: 'Untuk EO', to: '/#eo' },
+      { label: 'Tim Kami', to: '/#tim-kami' },
     ],
   },
 );
