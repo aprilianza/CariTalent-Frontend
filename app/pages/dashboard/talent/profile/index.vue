@@ -57,36 +57,40 @@
       </div>
     </UiCard>
 
-    <section class="grid gap-4 xl:grid-cols-2">
-      <UiCard title="Update Profile" description="Implementasi endpoint PUT /users/profile.">
-        <form class="space-y-4" @submit.prevent="handleUpdateProfile">
-          <UFormField label="Name" required>
-            <UInput v-model="profileForm.name" placeholder="Masukkan nama lengkap" :ui="{ base: 'rounded-xl border-white/20 bg-white/8 text-ui-light' }" />
-          </UFormField>
+    <section class="grid gap-5 xl:grid-cols-2">
+      <UiCard title="Update Profile" description="Implementasi endpoint PUT /users/profile." card-class="h-full">
+        <form class="flex h-full flex-col gap-5" @submit.prevent="handleUpdateProfile">
+          <div class="grid gap-4">
+            <UFormField label="Name" required class="w-full">
+              <UInput v-model="profileForm.name" size="lg" placeholder="Masukkan nama lengkap" class="w-full" :ui="{ base: 'w-full rounded-xl border-white/20 bg-white/8 text-ui-light' }" />
+            </UFormField>
 
-          <UFormField label="Phone" required>
-            <UInput v-model="profileForm.phone" placeholder="08xxxxxxxxxx" :ui="{ base: 'rounded-xl border-white/20 bg-white/8 text-ui-light' }" />
-          </UFormField>
+            <UFormField label="Phone" required class="w-full">
+              <UInput v-model="profileForm.phone" size="lg" placeholder="08xxxxxxxxxx" class="w-full" :ui="{ base: 'w-full rounded-xl border-white/20 bg-white/8 text-ui-light' }" />
+            </UFormField>
+          </div>
 
-          <UiButton type="submit" color="primary" :loading="isSavingProfile">Simpan Perubahan</UiButton>
+          <UiButton type="submit" color="primary" block class="mt-auto" :loading="isSavingProfile">Simpan Perubahan</UiButton>
         </form>
       </UiCard>
 
-      <UiCard title="Change Password" description="Implementasi endpoint PUT /users/password.">
-        <form class="space-y-4" @submit.prevent="handleChangePassword">
-          <UFormField label="Current Password" required>
-            <UInput v-model="passwordForm.current_password" type="password" placeholder="Password saat ini" :ui="{ base: 'rounded-xl border-white/20 bg-white/8 text-ui-light' }" />
-          </UFormField>
+      <UiCard title="Change Password" description="Implementasi endpoint PUT /users/password." card-class="h-full">
+        <form class="flex h-full flex-col gap-5" @submit.prevent="handleChangePassword">
+          <div class="grid gap-4">
+            <UFormField label="Current Password" required class="w-full">
+              <UInput v-model="passwordForm.current_password" type="password" size="lg" placeholder="Password saat ini" class="w-full" :ui="{ base: 'w-full rounded-xl border-white/20 bg-white/8 text-ui-light' }" />
+            </UFormField>
 
-          <UFormField label="New Password" required>
-            <UInput v-model="passwordForm.new_password" type="password" placeholder="Password baru" :ui="{ base: 'rounded-xl border-white/20 bg-white/8 text-ui-light' }" />
-          </UFormField>
+            <UFormField label="New Password" required class="w-full">
+              <UInput v-model="passwordForm.new_password" type="password" size="lg" placeholder="Password baru" class="w-full" :ui="{ base: 'w-full rounded-xl border-white/20 bg-white/8 text-ui-light' }" />
+            </UFormField>
 
-          <UFormField label="Confirm New Password" required>
-            <UInput v-model="passwordForm.new_password_confirmation" type="password" placeholder="Konfirmasi password baru" :ui="{ base: 'rounded-xl border-white/20 bg-white/8 text-ui-light' }" />
-          </UFormField>
+            <UFormField label="Confirm New Password" required class="w-full">
+              <UInput v-model="passwordForm.new_password_confirmation" type="password" size="lg" placeholder="Konfirmasi password baru" class="w-full" :ui="{ base: 'w-full rounded-xl border-white/20 bg-white/8 text-ui-light' }" />
+            </UFormField>
+          </div>
 
-          <UiButton type="submit" color="secondary" :loading="isChangingPassword">Update Password</UiButton>
+          <UiButton type="submit" color="secondary" block class="mt-auto" :loading="isChangingPassword">Update Password</UiButton>
         </form>
       </UiCard>
     </section>
