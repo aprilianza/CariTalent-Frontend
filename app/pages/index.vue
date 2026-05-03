@@ -43,9 +43,7 @@
             <Icon name="mdi:arrow-right" class="w-4 h-4 group-hover:translate-x-1 transition-transform" />
           </NuxtLink>
         </div>
-
       </div>
-
     </section>
 
     <!-- ═══════════════════════════ HOW IT WORKS ═══════════════════════════ -->
