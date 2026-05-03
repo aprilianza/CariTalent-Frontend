@@ -110,9 +110,9 @@
     </div>
 
     <!-- Moderate Modal -->
-    <UModal v-model:open="showModerateModal">
+    <UModal v-model:open="showModerateModal" :ui="{ content: 'rounded-2xl border border-white/10 bg-neutral-dark shadow-xl overflow-hidden sm:rounded-2xl sm:p-0 ring-0' }">
       <template #content>
-        <div class="rounded-2xl border border-white/10 bg-neutral-dark p-6 shadow-2xl space-y-5">
+        <div class="p-6 space-y-5">
           <div class="flex items-start gap-4">
             <div class="rounded-xl border border-highlight/30 bg-highlight/10 p-3 text-accent">
               <Icon name="mdi:gavel" class="h-6 w-6" />
