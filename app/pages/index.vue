@@ -251,14 +251,15 @@
         >
           <template #default="{ item: member }">
             <article class="group overflow-hidden rounded-[28px] border border-white/10 bg-white/[0.04] shadow-2xl shadow-black/10 transition-all duration-300 hover:-translate-y-1 hover:border-highlight/30 hover:bg-white/[0.07]">
-              <div class="relative aspect-[4/3] overflow-hidden">
+              <div class="relative aspect-[4/5] overflow-hidden">
                 <div class="absolute inset-0" :class="member.avatarBg"></div>
+                <img v-if="member.avatar" :src="member.avatar" :alt="member.name" class="absolute inset-0 h-full w-full object-contain object-bottom" />
+                <div v-else class="absolute inset-0 flex items-center justify-center bg-neutral-dark/35">
+                  <span class="font-display text-5xl font-black text-white">{{ member.initials }}</span>
+                </div>
                 <div class="absolute inset-0 bg-[radial-gradient(circle_at_30%_20%,rgba(255,255,255,0.35),transparent_30%),linear-gradient(180deg,transparent,rgba(10,10,18,0.45))]"></div>
                 <div class="absolute -right-10 -top-10 h-36 w-36 rounded-full bg-white/20 blur-2xl transition-transform duration-500 group-hover:scale-125"></div>
-                <div class="absolute inset-x-0 bottom-0 flex items-end justify-between p-5">
-                  <div class="flex h-16 w-16 items-center justify-center rounded-2xl border border-white/20 bg-neutral-dark/35 font-display text-2xl font-black text-white shadow-glow-sm backdrop-blur-md">
-                    {{ member.initials }}
-                  </div>
+                <div class="absolute bottom-4 right-5">
                   <Icon name="mdi:account-music-outline" class="h-8 w-8 text-white/70" />
                 </div>
               </div>
@@ -294,6 +295,13 @@
 </template>
 
 <script setup lang="ts">
+import aprilianzaAvatar from '~/assets/member/aprilianza.png';
+import billAvatar from '~/assets/member/bill.png';
+import jeanyAvatar from '~/assets/member/jeany.png';
+import athilaAvatar from '~/assets/member/athila.png';
+import irgiAvatar from '~/assets/member/irgi.png';
+import arfianAvatar from '~/assets/member/arfian.png';
+
 const navLinks = [
   { label: 'Fitur', to: '/#fitur' },
   { label: 'Untuk Talent', to: '/#talent' },
@@ -363,46 +371,52 @@ const pillars = [
 
 const teamMembers = [
   {
-    name: 'Alya Prameswari',
+    name: 'Aprilianza M Yusup',
     role: 'Frontend Developer',
     focus: 'Mengembangkan UI interaktif dan komponen yang konsisten untuk seluruh aplikasi.',
     initials: 'AP',
     avatarBg: 'bg-highlight',
+    avatar: aprilianzaAvatar,
   },
   {
-    name: 'Kevin Santoso',
+    name: 'Bill Stephen Sembiring',
     role: 'Frontend Developer',
     focus: 'Fokus pada performa, responsivitas, dan aksesibilitas tampilan web.',
     initials: 'KS',
     avatarBg: 'bg-accent/60',
+    avatar: billAvatar,
   },
   {
-    name: 'Nadia Puspita',
+    name: 'Jeany Ferliza Nayla',
     role: 'Frontend Developer',
     focus: 'Membangun design system dan integrasi antarmuka dengan API.',
     initials: 'NP',
     avatarBg: 'bg-purple-600',
+    avatar: jeanyAvatar,
   },
   {
-    name: 'Rafi Mahendra',
+    name: 'Athila Ramdani Saputra',
     role: 'Backend Developer',
     focus: 'Merancang arsitektur layanan, autentikasi, dan integrasi data.',
     initials: 'RM',
     avatarBg: 'bg-emerald-500',
+    avatar: athilaAvatar,
   },
   {
-    name: 'Citra Wulandari',
+    name: 'Muhammad Irgiansyah',
     role: 'Backend Developer',
     focus: 'Mengembangkan API, optimasi query, serta keamanan layanan.',
     initials: 'CW',
     avatarBg: 'bg-sky-500',
+    avatar: irgiAvatar,
   },
   {
-    name: 'Dimas Prakoso',
+    name: 'Arfian Ghifari Mahya',
     role: 'Backend Developer',
     focus: 'Menjaga skalabilitas sistem dan monitoring layanan produksi.',
     initials: 'DP',
     avatarBg: 'bg-orange-500',
+    avatar: arfianAvatar,
   },
 ];
 </script>
