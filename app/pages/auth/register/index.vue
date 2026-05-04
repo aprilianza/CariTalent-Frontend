@@ -20,15 +20,6 @@
           </h1>
           <p class="max-w-xl text-base leading-relaxed text-neutral-light/75 md:text-lg">Daftar sebagai talent atau event organizer, lengkapi profilmu, lalu temukan partner musik terbaik untuk setiap momen.</p>
         </div>
-
-        <UCard class="rounded-3xl border border-white/10 bg-white/5 p-1 backdrop-blur-sm">
-          <div class="grid gap-3 p-4 sm:grid-cols-3">
-            <div v-for="metric in metrics" :key="metric.label" class="rounded-2xl border border-white/10 bg-white/5 p-4 text-center">
-              <p class="font-display text-2xl font-black text-white">{{ metric.value }}</p>
-              <p class="mt-1 text-xs uppercase tracking-wider text-neutral-light/70">{{ metric.label }}</p>
-            </div>
-          </div>
-        </UCard>
       </section>
 
       <section>
@@ -181,12 +172,6 @@ const isSubmitting = ref(false);
 
 const toast = useToast();
 const { register } = useAuth();
-
-const metrics = [
-  { value: '2.400+', label: 'Talent Aktif' },
-  { value: '890+', label: 'Event Terbuka' },
-  { value: '12rb+', label: 'Booking Sukses' },
-];
 
 const getRegisterErrorMessage = (error: any) => {
   const validationErrors = error?.errors;
