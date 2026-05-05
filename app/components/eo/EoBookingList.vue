@@ -1,19 +1,22 @@
 <template>
-  <UiCard title="Bookings" :description="detailed ? 'Detail booking event beserta talent, harga deal, dan status' : 'Ringkasan booking terkini'" card-class="h-full">
+  <UiCard title="Bookings" :description="detailed ? 'Detail booking event beserta talent, harga deal, dan status' : 'Ringkasan booking terkini'" card-class="h-full flex flex-col" body-class="flex-1 flex flex-col">
     <div v-if="loading" class="space-y-3">
       <USkeleton v-for="n in 3" :key="`booking-skeleton-${n}`" class="h-24 w-full rounded-xl" />
     </div>
 
-    <UiList v-else :items="mappedItems" empty-text="Belum ada booking.">
+    <UiList v-else :items="mappedItems" empty-text="Belum ada booking." root-class="flex-1 flex flex-col" list-class="flex-1 flex flex-col space-y-0 gap-2" item-class="flex-1 flex flex-col justify-center min-h-[96px]">
       <template #item="{ item }">
-        <div class="space-y-3">
+        <div class="space-y-3 w-full">
           <!-- Header row -->
           <div class="flex flex-wrap items-start justify-between gap-2">
             <div class="min-w-0 flex-1">
               <p class="text-sm font-semibold text-neutral-900 dark:text-neutral-100">{{ item.eventTitle }}</p>
               <p class="mt-1 text-xs text-neutral-500 dark:text-neutral-400">{{ item.eventDate }} · {{ item.venue }}</p>
             </div>
-            <UiBadge :label="item.statusLabel" :color="item.statusColor" variant="soft" />
+            <div class="flex items-center gap-2">
+              <UiBadge :label="item.statusLabel" :color="item.statusColor" variant="soft" />
+              <UiBadge v-if="item.resolution" :label="item.resolution === 'done' ? 'Done' : 'Reject'" :color="item.resolution === 'done' ? 'success' : 'error'" variant="soft" class="font-bold border border-current/20" />
+            </div>
           </div>
 
           <!-- Talent & price info -->
@@ -33,7 +36,7 @@
           </div>
 
           <!-- Actions -->
-          <div v-if="item.canComplete || item.canCancel" class="flex flex-wrap gap-2">
+          <div v-if="(item.canComplete || item.canCancel) && detailed" class="flex flex-wrap gap-2">
             <UiButton v-if="item.canComplete" size="sm" color="primary" variant="soft" icon="mdi:check-circle-outline" :loading="completingId === item.rawId" @click="emit('complete', item.rawId)"> Tandai Selesai </UiButton>
             <UiButton v-if="item.canCancel" size="sm" color="error" variant="ghost" icon="mdi:close-circle-outline" @click="emit('cancel', item.rawId)"> Batalkan </UiButton>
           </div>
@@ -102,6 +105,7 @@ const mappedItems = computed(() =>
       createdAt: formatDateSafe(b.created_at),
       statusLabel: status.label,
       statusColor: status.color,
+      resolution: (b as any).resolution,
       canComplete: b.status === 'confirmed',
       canCancel: b.status === 'confirmed',
     };

@@ -20,95 +20,139 @@
     <div class="grid gap-6 lg:grid-cols-2">
       <!-- Edit Profile Card -->
       <UiCard title="Informasi Akun" description="Perbarui nama dan nomor telepon kamu">
-        <form class="space-y-4" @submit.prevent="handleUpdateProfile">
-          <div class="space-y-1.5">
-            <label class="text-sm font-medium text-neutral-light">Nama <span class="text-error">*</span></label>
+        <!-- View Mode -->
+        <div v-if="!isEditingProfile" class="space-y-6">
+          <div class="grid gap-5 sm:grid-cols-2">
+            <div class="flex flex-col gap-1">
+              <span class="text-xs font-medium text-neutral-light/60 uppercase tracking-wider">Nama</span>
+              <span class="text-base text-ui-light font-medium">{{ originalProfile.name }}</span>
+            </div>
+            <div class="flex flex-col gap-1">
+              <span class="text-xs font-medium text-neutral-light/60 uppercase tracking-wider">Email</span>
+              <span class="text-base text-ui-light font-medium">eo@kafekota.com</span>
+            </div>
+            <div class="flex flex-col gap-1 sm:col-span-2">
+              <span class="text-xs font-medium text-neutral-light/60 uppercase tracking-wider">Nomor Telepon</span>
+              <span class="text-base text-ui-light font-medium">{{ originalProfile.phone || '-' }}</span>
+            </div>
+          </div>
+          <div class="pt-4 border-t border-white/5">
+            <UiButton color="primary" variant="soft" icon="mdi:pencil-outline" class="bg-violet-500/10 hover:bg-violet-500/20 text-violet-300" @click="isEditingProfile = true">
+              Edit Profil
+            </UiButton>
+          </div>
+        </div>
+
+        <!-- Edit Mode -->
+        <form v-else class="space-y-5" @submit.prevent="handleUpdateProfile">
+          <div class="flex flex-col gap-2">
+            <label class="text-sm font-semibold text-neutral-light">Nama <span class="text-error">*</span></label>
             <UInput
               v-model="profileForm.name"
               placeholder="Nama EO kamu"
-              :ui="{ base: 'rounded-xl border-white/20 bg-white/8 text-ui-light' }"
+              :ui="{ base: 'w-full rounded-xl border border-white/10 bg-white/5 text-neutral-light focus:border-violet-500/50 focus:ring-1 focus:ring-violet-500/50 transition-all' }"
             />
           </div>
 
-          <div class="space-y-1.5">
-            <label class="text-sm font-medium text-neutral-light">Email</label>
+          <div class="flex flex-col gap-2">
+            <label class="text-sm font-semibold text-neutral-light">Email</label>
             <UInput
               value="eo@kafekota.com"
               disabled
               placeholder="email@domain.com"
-              :ui="{ base: 'rounded-xl border-white/10 bg-white/4 text-neutral-light/50 cursor-not-allowed' }"
+              :ui="{ base: 'w-full rounded-xl border border-white/5 bg-white/4 text-neutral-light/40 cursor-not-allowed' }"
             />
             <p class="text-xs text-neutral-light/40">Email tidak dapat diubah.</p>
           </div>
 
-          <div class="space-y-1.5">
-            <label class="text-sm font-medium text-neutral-light">Nomor Telepon</label>
+          <div class="flex flex-col gap-2">
+            <label class="text-sm font-semibold text-neutral-light">Nomor Telepon</label>
             <UInput
               v-model="profileForm.phone"
               placeholder="081234567890"
-              :ui="{ base: 'rounded-xl border-white/20 bg-white/8 text-ui-light' }"
+              :ui="{ base: 'w-full rounded-xl border border-white/10 bg-white/5 text-neutral-light focus:border-violet-500/50 focus:ring-1 focus:ring-violet-500/50 transition-all' }"
             />
           </div>
 
-          <UiButton
-            type="submit"
-            color="primary"
-            variant="soft"
-            block
-            icon="mdi:content-save-outline"
-            :loading="savingProfile"
-            :disabled="!profileChanged"
-          >
-            Simpan Perubahan
-          </UiButton>
+          <div class="flex justify-end gap-3 pt-4 border-t border-white/5">
+            <UiButton color="neutral" variant="ghost" type="button" class="hover:bg-white/5" @click="cancelEditProfile">Batal</UiButton>
+            <UiButton
+              type="submit"
+              color="primary"
+              variant="soft"
+              icon="mdi:content-save-outline"
+              :loading="savingProfile"
+              :disabled="!profileChanged"
+              class="bg-gradient-to-r from-violet-500 to-fuchsia-500 hover:from-violet-400 hover:to-fuchsia-400 text-white shadow-lg shadow-violet-500/25 border-0"
+            >
+              Simpan Perubahan
+            </UiButton>
+          </div>
         </form>
       </UiCard>
 
       <!-- Change Password Card -->
       <UiCard title="Keamanan Akun" description="Ubah password untuk menjaga keamanan akun kamu">
-        <form class="space-y-4" @submit.prevent="handleChangePassword">
-          <div class="space-y-1.5">
-            <label class="text-sm font-medium text-neutral-light">Password Saat Ini <span class="text-error">*</span></label>
+        <!-- View Mode -->
+        <div v-if="!isEditingPassword" class="space-y-6">
+          <div class="flex flex-col gap-1">
+            <span class="text-xs font-medium text-neutral-light/60 uppercase tracking-wider">Password Saat Ini</span>
+            <span class="text-2xl text-ui-light font-bold tracking-[0.3em] mt-1">••••••••</span>
+          </div>
+          <div class="pt-4 border-t border-white/5">
+            <UiButton color="secondary" variant="soft" icon="mdi:lock-reset" class="bg-indigo-500/10 hover:bg-indigo-500/20 text-indigo-300" @click="isEditingPassword = true">
+              Ubah Password
+            </UiButton>
+          </div>
+        </div>
+
+        <!-- Edit Mode -->
+        <form v-else class="space-y-5" @submit.prevent="handleChangePassword">
+          <div class="flex flex-col gap-2">
+            <label class="text-sm font-semibold text-neutral-light">Password Saat Ini <span class="text-error">*</span></label>
             <UInput
               v-model="passwordForm.current_password"
               type="password"
               placeholder="Password lama"
-              :ui="{ base: 'rounded-xl border-white/20 bg-white/8 text-ui-light' }"
+              :ui="{ base: 'w-full rounded-xl border border-white/10 bg-white/5 text-neutral-light focus:border-indigo-500/50 focus:ring-1 focus:ring-indigo-500/50 transition-all' }"
             />
           </div>
 
-          <div class="space-y-1.5">
-            <label class="text-sm font-medium text-neutral-light">Password Baru <span class="text-error">*</span></label>
+          <div class="flex flex-col gap-2">
+            <label class="text-sm font-semibold text-neutral-light">Password Baru <span class="text-error">*</span></label>
             <UInput
               v-model="passwordForm.new_password"
               type="password"
               placeholder="Min. 8 karakter"
-              :ui="{ base: 'rounded-xl border-white/20 bg-white/8 text-ui-light' }"
+              :ui="{ base: 'w-full rounded-xl border border-white/10 bg-white/5 text-neutral-light focus:border-indigo-500/50 focus:ring-1 focus:ring-indigo-500/50 transition-all' }"
             />
           </div>
 
-          <div class="space-y-1.5">
-            <label class="text-sm font-medium text-neutral-light">Konfirmasi Password Baru <span class="text-error">*</span></label>
+          <div class="flex flex-col gap-2">
+            <label class="text-sm font-semibold text-neutral-light">Konfirmasi Password Baru <span class="text-error">*</span></label>
             <UInput
               v-model="passwordForm.new_password_confirmation"
               type="password"
               placeholder="Ulangi password baru"
-              :ui="{ base: 'rounded-xl border-white/20 bg-white/8 text-ui-light' }"
+              :ui="{ base: 'w-full rounded-xl border border-white/10 bg-white/5 text-neutral-light focus:border-error/50 focus:ring-1 focus:ring-error/50 transition-all' }"
             />
-            <p v-if="passwordMismatch" class="text-xs text-error">Password konfirmasi tidak cocok.</p>
+            <p v-if="passwordMismatch" class="text-xs text-error mt-1">Password konfirmasi tidak cocok.</p>
           </div>
 
-          <UiButton
-            type="submit"
-            color="secondary"
-            variant="soft"
-            block
-            icon="mdi:lock-reset"
-            :loading="savingPassword"
-            :disabled="!isPasswordFormValid"
-          >
-            Ganti Password
-          </UiButton>
+          <div class="flex justify-end gap-3 pt-4 border-t border-white/5">
+            <UiButton color="neutral" variant="ghost" type="button" class="hover:bg-white/5" @click="cancelEditPassword">Batal</UiButton>
+            <UiButton
+              type="submit"
+              color="secondary"
+              variant="soft"
+              icon="mdi:check-circle-outline"
+              :loading="savingPassword"
+              :disabled="!isPasswordFormValid"
+              class="bg-gradient-to-r from-indigo-500 to-blue-500 hover:from-indigo-400 hover:to-blue-400 text-white shadow-lg shadow-indigo-500/25 border-0"
+            >
+              Ganti Password
+            </UiButton>
+          </div>
         </form>
       </UiCard>
 
@@ -147,6 +191,9 @@ const toast = useToast();
 const { data: events } = useEoEvents();
 const { data: bookings } = useEoBookings();
 
+// Profile state
+const isEditingProfile = ref(false);
+
 // Profile form
 const profileForm = reactive({
   name: 'Kafe Kota',
@@ -159,6 +206,12 @@ const savingProfile = ref(false);
 const profileChanged = computed(
   () => profileForm.name !== originalProfile.name || profileForm.phone !== originalProfile.phone,
 );
+
+const cancelEditProfile = () => {
+  profileForm.name = originalProfile.name;
+  profileForm.phone = originalProfile.phone;
+  isEditingProfile.value = false;
+};
 
 const handleUpdateProfile = async () => {
   if (!profileForm.name.trim()) return;
@@ -174,13 +227,11 @@ const handleUpdateProfile = async () => {
   const userName = useState('eo-layout-username');
   userName.value = profileForm.name;
 
-  toast.add({
-    title: 'Profil diperbarui!',
-    description: 'Informasi akun kamu berhasil disimpan.',
-    color: 'success',
-    icon: 'mdi:account-check-outline',
-  });
+  isEditingProfile.value = false;
 };
+
+// Password state
+const isEditingPassword = ref(false);
 
 // Password form
 const passwordForm = reactive({
@@ -204,6 +255,13 @@ const isPasswordFormValid = computed(
     passwordForm.new_password === passwordForm.new_password_confirmation,
 );
 
+const cancelEditPassword = () => {
+  passwordForm.current_password = '';
+  passwordForm.new_password = '';
+  passwordForm.new_password_confirmation = '';
+  isEditingPassword.value = false;
+};
+
 const handleChangePassword = async () => {
   if (!isPasswordFormValid.value) return;
   savingPassword.value = true;
@@ -215,12 +273,7 @@ const handleChangePassword = async () => {
   passwordForm.new_password = '';
   passwordForm.new_password_confirmation = '';
 
-  toast.add({
-    title: 'Password berhasil diubah!',
-    description: 'Gunakan password baru kamu untuk login berikutnya.',
-    color: 'success',
-    icon: 'mdi:lock-check-outline',
-  });
+  isEditingPassword.value = false;
 };
 
 // Account info

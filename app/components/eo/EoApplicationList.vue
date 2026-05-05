@@ -49,22 +49,31 @@
     </UiList>
 
     <!-- Accept Modal: input agreed_price -->
-    <UModal v-model:open="showAcceptModal">
+    <UModal v-model:open="showAcceptModal" :ui="{ content: 'bg-transparent ring-0 shadow-none sm:max-w-md w-full mx-auto' }">
       <template #content>
-        <div class="rounded-2xl border border-white/10 bg-ui-dark p-6 space-y-5">
-          <div>
-            <h3 class="text-lg font-bold bg-gradient-to-r from-violet-400 to-fuchsia-400 bg-clip-text text-transparent">Terima Lamaran</h3>
-            <p class="mt-1 text-sm text-neutral-light/70">Masukkan harga yang disepakati untuk booking ini.</p>
-          </div>
+        <div class="relative overflow-hidden rounded-2xl border border-white/10 bg-[#1e1e2e]/95 backdrop-blur-xl p-7 shadow-2xl">
+          <!-- Background decoration -->
+          <div class="absolute -top-24 -right-24 h-48 w-48 rounded-full bg-emerald-500/20 blur-3xl pointer-events-none"></div>
+          <div class="absolute -bottom-24 -left-24 h-48 w-48 rounded-full bg-teal-500/20 blur-3xl pointer-events-none"></div>
 
-          <div class="space-y-2">
-            <label class="text-sm font-medium text-neutral-light">Harga Disepakati (Rp)</label>
-            <UInput v-model="agreedPriceInput" type="number" placeholder="Contoh: 1500000" :ui="{ base: 'rounded-xl border-white/20 bg-white/8 text-ui-light' }" />
-          </div>
+          <div class="relative z-10 space-y-6">
+            <!-- Header -->
+            <div>
+              <h3 class="text-2xl font-bold bg-gradient-to-r from-emerald-400 to-teal-400 bg-clip-text text-transparent">Terima Lamaran</h3>
+              <p class="mt-1.5 text-sm text-neutral-light/70">Masukkan harga yang disepakati untuk booking ini.</p>
+            </div>
 
-          <div class="flex gap-3 justify-end">
-            <UiButton color="neutral" variant="ghost" @click="showAcceptModal = false">Batal</UiButton>
-            <UiButton color="success" variant="soft" :loading="!!acceptingId" :disabled="!agreedPriceInput || Number(agreedPriceInput) <= 0" @click="confirmAccept"> Konfirmasi </UiButton>
+            <!-- Input Harga -->
+            <div class="flex flex-col gap-2">
+              <label class="text-sm font-semibold text-neutral-light">Harga Disepakati (Rp)</label>
+              <UInput v-model="agreedPriceInput" type="number" placeholder="Contoh: 1500000" :ui="{ base: 'w-full rounded-xl border border-white/10 bg-white/5 text-neutral-light placeholder-neutral-light/40 focus:border-emerald-500/50 focus:ring-1 focus:ring-emerald-500/50 transition-all' }" />
+            </div>
+
+            <!-- Actions -->
+            <div class="flex justify-end gap-3 pt-2">
+              <UiButton color="neutral" variant="ghost" class="hover:bg-white/5" @click="showAcceptModal = false">Batal</UiButton>
+              <UiButton color="success" variant="soft" :loading="!!acceptingId" :disabled="!agreedPriceInput || Number(agreedPriceInput) <= 0" @click="confirmAccept" class="bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-400 hover:to-teal-400 text-white shadow-lg shadow-emerald-500/25 border-0"> Konfirmasi </UiButton>
+            </div>
           </div>
         </div>
       </template>

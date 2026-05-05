@@ -13,6 +13,7 @@
     :menu-button-class="menuButtonClass"
     :menu-button-icon="menuButtonIcon"
     @toggle-sidebar="$emit('toggle-sidebar')"
+    @profile-click="navigateTo('/dashboard/eo/profile')"
   >
     <template #actions="slotProps">
       <slot name="actions" v-bind="slotProps" />
