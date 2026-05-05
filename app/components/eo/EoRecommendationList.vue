@@ -73,8 +73,13 @@
           </div>
 
           <!-- Invite button -->
-          <div class="flex justify-end">
+          <div class="flex items-center justify-end">
+            <div v-if="invitedIds.includes(rec.talent.id)" class="inline-flex items-center gap-1.5 rounded-lg bg-green-500/20 px-3 py-1.5 text-xs font-semibold text-green-400 border border-green-500/30">
+              <Icon name="mdi:check-circle" class="h-4 w-4" />
+              Sudah diundang
+            </div>
             <UiButton
+              v-else
               size="sm"
               color="primary"
               variant="soft"
@@ -99,10 +104,12 @@ const props = withDefaults(
     recommendations: TalentRecommendation[];
     loading?: boolean;
     invitingId?: number | null;
+    invitedIds?: number[];
   }>(),
   {
     loading: false,
     invitingId: null,
+    invitedIds: () => [],
   },
 );
 
@@ -111,5 +118,6 @@ const emit = defineEmits<{
 }>();
 
 const invitingId = computed(() => props.invitingId);
+const invitedIds = computed(() => props.invitedIds);
 const recommendations = computed(() => props.recommendations);
 </script>

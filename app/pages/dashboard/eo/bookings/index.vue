@@ -28,32 +28,41 @@
     <EoBookingList :bookings="filteredBookings" :loading="pending" :detailed="true" :completing-id="completingId" @complete="handleComplete" @cancel="handleCancel" />
 
     <!-- Review modal -->
-    <UModal v-model:open="showReviewModal">
+    <UModal v-model:open="showReviewModal" :ui="{ content: 'bg-transparent ring-0 shadow-none sm:max-w-md w-full mx-auto' }">
       <template #content>
-        <div class="rounded-2xl border border-white/10 bg-ui-dark p-6 space-y-5 max-w-md w-full mx-auto">
-          <div>
-            <h3 class="text-xl font-bold bg-gradient-to-r from-violet-400 to-fuchsia-400 bg-clip-text text-transparent">Berikan Review</h3>
-            <p class="mt-1 text-sm text-neutral-light/70">Bagaimana penampilan talent di event ini?</p>
-          </div>
+        <div class="relative overflow-hidden rounded-2xl border border-white/10 bg-[#1e1e2e]/95 backdrop-blur-xl p-7 shadow-2xl">
+          <!-- Background decoration -->
+          <div class="absolute -top-24 -right-24 h-48 w-48 rounded-full bg-violet-500/20 blur-3xl pointer-events-none"></div>
+          <div class="absolute -bottom-24 -left-24 h-48 w-48 rounded-full bg-fuchsia-500/20 blur-3xl pointer-events-none"></div>
 
-          <!-- Star rating -->
-          <div class="space-y-2">
-            <label class="text-sm font-medium text-neutral-light">Rating</label>
-            <div class="flex gap-2">
-              <button v-for="star in 5" :key="star" @click="reviewForm.rating = star">
-                <Icon :name="star <= reviewForm.rating ? 'mdi:star' : 'mdi:star-outline'" :class="star <= reviewForm.rating ? 'text-yellow-400' : 'text-neutral-light/30'" class="h-7 w-7 transition-colors" />
-              </button>
+          <div class="relative z-10 space-y-6">
+            <!-- Header -->
+            <div>
+              <h3 class="text-2xl font-bold bg-gradient-to-r from-violet-400 to-fuchsia-400 bg-clip-text text-transparent">Berikan Review</h3>
+              <p class="mt-1.5 text-sm text-neutral-light/70">Bagaimana penampilan talent di event ini?</p>
             </div>
-          </div>
 
-          <div class="space-y-1.5">
-            <label class="text-sm font-medium text-neutral-light">Komentar</label>
-            <UTextarea v-model="reviewForm.comment" placeholder="Ceritakan pengalaman kamu dengan talent ini..." :rows="4" :ui="{ base: 'rounded-xl border-white/20 bg-white/8 text-ui-light' }" />
-          </div>
+            <!-- Star rating -->
+            <div class="flex flex-col gap-2">
+              <label class="text-sm font-semibold text-neutral-light">Rating Penampilan</label>
+              <div class="flex gap-2.5">
+                <button v-for="star in 5" :key="star" @click="reviewForm.rating = star" class="transform transition-all duration-200 hover:scale-110 focus:outline-none">
+                  <Icon :name="star <= reviewForm.rating ? 'mdi:star' : 'mdi:star-outline'" :class="star <= reviewForm.rating ? 'text-amber-400 drop-shadow-[0_0_8px_rgba(251,191,36,0.5)]' : 'text-neutral-light/20'" class="h-9 w-9 transition-colors" />
+                </button>
+              </div>
+            </div>
 
-          <div class="flex justify-end gap-3">
-            <UiButton color="neutral" variant="ghost" @click="showReviewModal = false">Batal</UiButton>
-            <UiButton color="primary" variant="soft" :loading="submittingReview" :disabled="reviewForm.rating === 0 || !reviewForm.comment.trim()" icon="mdi:send-outline" @click="submitReview"> Kirim Review </UiButton>
+            <!-- Komentar -->
+            <div class="flex flex-col gap-2">
+              <label class="text-sm font-semibold text-neutral-light">Komentar Tambahan</label>
+              <UTextarea v-model="reviewForm.comment" placeholder="Ceritakan pengalaman kamu dengan talent ini..." :rows="4" :ui="{ base: 'w-full rounded-xl border border-white/10 bg-white/5 text-neutral-light placeholder-neutral-light/40 focus:border-violet-500/50 focus:ring-1 focus:ring-violet-500/50 transition-all resize-none' }" />
+            </div>
+
+            <!-- Actions -->
+            <div class="flex justify-end gap-3 pt-2">
+              <UiButton color="neutral" variant="ghost" class="hover:bg-white/5" @click="showReviewModal = false">Batal</UiButton>
+              <UiButton color="primary" variant="soft" :loading="submittingReview" :disabled="reviewForm.rating === 0 || !reviewForm.comment.trim()" icon="mdi:send-outline" @click="submitReview" class="bg-gradient-to-r from-violet-500 to-fuchsia-500 hover:from-violet-400 hover:to-fuchsia-400 text-white shadow-lg shadow-violet-500/25 border-0"> Kirim Review </UiButton>
+            </div>
           </div>
         </div>
       </template>
@@ -115,7 +124,7 @@ const handleComplete = async (id: number) => {
   // Optimistic update
   const idx = bookings.value.findIndex((b) => b.id === id);
   if (idx !== -1) {
-    bookings.value[idx] = { ...bookings.value[idx], status: 'completed' } as EoBooking;
+    bookings.value[idx] = { ...bookings.value[idx], status: 'completed', resolution: 'done' } as any;
   }
 
   await new Promise((resolve) => setTimeout(resolve, 600));
@@ -138,8 +147,8 @@ const handleComplete = async (id: number) => {
 const handleCancel = async (id: number) => {
   const idx = bookings.value.findIndex((b) => b.id === id);
   if (idx !== -1) {
-    // Remove from list (pessimistic)
-    bookings.value.splice(idx, 1);
+    // Update instead of removing so user can see Completed - Reject
+    bookings.value[idx] = { ...bookings.value[idx], status: 'completed', resolution: 'reject' } as any;
   }
 
   await new Promise((resolve) => setTimeout(resolve, 400));

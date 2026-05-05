@@ -58,6 +58,7 @@
       :recommendations="recommendations"
       :loading="pending"
       :inviting-id="invitingId"
+      :invited-ids="invitedIds"
       @invite="handleInvite"
     />
   </div>

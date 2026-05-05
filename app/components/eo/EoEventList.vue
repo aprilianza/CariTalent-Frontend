@@ -62,7 +62,7 @@
           </div>
 
           <!-- Action buttons -->
-          <div class="flex flex-wrap gap-2">
+          <div v-if="detailed" class="flex flex-wrap gap-2">
             <UiButton
               size="sm"
               color="primary"

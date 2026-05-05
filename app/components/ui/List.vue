@@ -1,5 +1,5 @@
 <template>
-  <div class="space-y-3">
+  <div class="space-y-3" :class="rootClass">
     <div v-if="title || subtitle || $slots.actions" class="flex items-start justify-between gap-3">
       <div>
         <h4 v-if="title" class="text-sm font-semibold text-neutral-900 dark:text-neutral-100">
@@ -16,8 +16,8 @@
       {{ emptyText }}
     </div>
 
-    <ul v-else class="space-y-2">
-      <li v-for="item in items" :key="item.id" class="rounded-xl border border-neutral-200 bg-white px-4 py-3 transition-colors hover:border-primary/40 dark:border-white/10 dark:bg-white/5">
+    <ul v-else class="space-y-2" :class="listClass">
+      <li v-for="item in items" :key="item.id" class="rounded-xl border border-neutral-200 bg-white px-4 py-3 transition-colors hover:border-primary/40 dark:border-white/10 dark:bg-white/5" :class="itemClass">
         <slot name="item" :item="item">
           <div class="flex items-center justify-between gap-3">
             <div>
@@ -47,11 +47,17 @@ withDefaults(
     subtitle?: string;
     emptyText?: string;
     items: UiListItem[];
+    rootClass?: string;
+    listClass?: string;
+    itemClass?: string;
   }>(),
   {
     title: '',
     subtitle: '',
     emptyText: 'Tidak ada data untuk ditampilkan.',
+    rootClass: '',
+    listClass: '',
+    itemClass: '',
   },
 );
 </script>
