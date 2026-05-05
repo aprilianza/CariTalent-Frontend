@@ -96,9 +96,9 @@
     </UiCard>
 
     <!-- Delete Confirm Modal -->
-    <UModal v-model:open="showDeleteModal">
+    <UModal v-model:open="showDeleteModal" :ui="{ content: 'rounded-2xl border border-white/10 bg-neutral-dark shadow-xl overflow-hidden sm:rounded-2xl sm:p-0 ring-0' }">
       <template #content>
-        <div class="rounded-2xl border border-white/10 bg-neutral-dark p-6 shadow-2xl">
+        <div class="p-6">
           <div class="flex items-start gap-4">
             <div class="rounded-xl border border-error/30 bg-error/10 p-3 text-error">
               <Icon name="mdi:alert-outline" class="h-6 w-6" />
