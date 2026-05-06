@@ -1,9 +1,9 @@
 <template>
   <UCard
-    :class="['rounded-2xl border border-white/10 bg-white/5 shadow-sm backdrop-blur-sm transition-colors', noPadding ? '' : 'p-1', cardClass]"
+    :class="['rounded-2xl border border-white/10 bg-white/5 shadow-sm backdrop-blur-sm transition-colors flex flex-col', noPadding ? '' : 'p-1', cardClass]"
     :ui="{
       header: ['px-5 pt-5 pb-3', title || description || $slots.header ? '' : 'hidden'],
-      body: [noPadding ? '' : 'px-5 pb-5'],
+      body: [noPadding ? '' : 'px-5 pb-5', bodyClass],
       footer: ['px-5 pb-5 pt-0'],
     }"
   >
@@ -33,6 +33,7 @@ defineProps<{
   title?: string;
   description?: string;
   cardClass?: string;
+  bodyClass?: string;
   noPadding?: boolean;
 }>();
 </script>

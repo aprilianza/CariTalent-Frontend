@@ -42,7 +42,7 @@
     </section>
 
     <!-- Main content -->
-    <section class="flex flex-col gap-4 xl:grid xl:grid-cols-3 xl:items-start">
+    <section class="flex flex-col gap-4 xl:grid xl:grid-cols-3 xl:items-stretch">
       <!-- My Events (latest 3) -->
       <div class="min-w-0 space-y-4 xl:col-span-2">
         <EoEventList
