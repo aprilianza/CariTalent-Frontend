@@ -53,6 +53,7 @@ import { useApplications } from '~/composables/useApplications';
 import { useBookings } from '~/composables/useBookings';
 import { useInvitations } from '~/composables/useInvitations';
 import { useProfile } from '~/composables/useProfile';
+import { useTalentReviews } from '~/composables/useTalentReviews';
 
 definePageMeta({
   layout: 'talent',
@@ -61,6 +62,7 @@ definePageMeta({
 const toast = useToast();
 
 const { data: profile, pending: profilePending } = useProfile();
+const { meta: reviewMeta, pending: reviewPending, error: reviewError } = useTalentReviews({ page: 1, per_page: 1 });
 const { data: applications, pending: applicationsPending, refresh: refreshApplications } = useApplications();
 const { data: bookings, pending: bookingsPending } = useBookings();
 const { data: invitationsRaw, pending: invitationsPending, respondToInvitation } = useInvitations();
@@ -74,6 +76,21 @@ watch(
   },
   { immediate: true },
 );
+
+const averageRatingLabel = computed(() => {
+  if (profilePending.value && reviewPending.value) {
+    return '-';
+  }
+
+  const ratingSource = reviewPending.value || reviewError.value ? profile.value.average_rating : reviewMeta.value.averageRating;
+  const rating = Number(ratingSource);
+
+  if (!Number.isFinite(rating)) {
+    return '-';
+  }
+
+  return `${rating.toFixed(1)} / 5`;
+});
 
 const statsCards = computed(() => [
   {
@@ -96,7 +113,7 @@ const statsCards = computed(() => [
   },
   {
     title: 'Average Rating',
-    value: profilePending.value ? '-' : `${profile.value.average_rating.toFixed(1)} / 5`,
+    value: averageRatingLabel.value,
     hint: 'Berdasarkan perform terakhir',
     icon: 'mdi:star-circle-outline',
   },

@@ -7,17 +7,17 @@
 
     <div class="relative z-10 flex h-full">
       <div :class="desktopSidebarClasses">
-        <TalentSidebar @navigate="handleSidebarNavigate" @logout="openLogoutModal" />
+        <TalentSidebar :header-title="sidebarHeaderTitle" :header-subtitle="sidebarHeaderSubtitle" @navigate="handleSidebarNavigate" @logout="openLogoutModal" />
       </div>
 
       <UDrawer v-model:open="isSidebarOpen" side="left" :ui="{ content: 'max-w-72' }" @update:open="onDrawerOpenChange">
         <template #content>
-          <TalentSidebar @navigate="handleSidebarNavigate" @logout="openLogoutModal" />
+          <TalentSidebar :header-title="sidebarHeaderTitle" :header-subtitle="sidebarHeaderSubtitle" @navigate="handleSidebarNavigate" @logout="openLogoutModal" />
         </template>
       </UDrawer>
 
       <div class="flex min-h-0 flex-1 flex-col overflow-hidden">
-        <TalentNavbar :title="pageTitle" :subtitle="todayLabel" :notifications="notificationCount" :user-name="userName" user-role="Talent" :menu-button-icon="menuButtonIcon" @toggle-sidebar="handleToggleSidebar" />
+        <TalentNavbar :title="pageTitle" :subtitle="todayLabel" :notifications="notificationCount" :user-name="displayName" :user-role="displayRole" :menu-button-icon="menuButtonIcon" @toggle-sidebar="handleToggleSidebar" />
 
         <main class="flex-1 min-h-0 overflow-y-auto px-4 py-6 sm:px-6">
           <slot />
@@ -66,10 +66,33 @@ const isLogoutModalOpen = ref(false);
 const isLoggingOut = ref(false);
 let mediaQuery: MediaQueryList | null = null;
 let updateDeviceState: (() => void) | null = null;
+const { token, user, fetchUser, logout } = useAuth();
 const userName = useState('talent-layout-username', () => 'The Broken Strings');
 const pageTitle = useState('talent-layout-title', () => 'Talent Dashboard');
 const notificationCount = ref(3);
-const { logout } = useAuth();
+
+const displayName = computed(() => user.value?.name || user.value?.stage_name || userName.value);
+const displayRole = computed(() => {
+  const role = user.value?.role;
+  if (role === 'admin') return 'Administrator';
+  if (role === 'eo') return 'Event Organizer';
+  if (role === 'talent') return 'Talent';
+  return 'Talent';
+});
+
+const sidebarHeaderTitle = computed(() => user.value?.name || user.value?.stage_name || 'CariTalent');
+const sidebarHeaderSubtitle = computed(() => displayRole.value);
+
+watch(
+  user,
+  (value) => {
+    const nextName = value?.name || value?.stage_name;
+    if (nextName) {
+      userName.value = nextName;
+    }
+  },
+  { immediate: true },
+);
 
 const desktopSidebarClasses = computed(() => {
   if (isDesktopSidebarCollapsed.value) {
@@ -153,6 +176,10 @@ onMounted(() => {
 
   updateDeviceState();
   mq.addEventListener('change', updateDeviceState);
+
+  if (token.value && !user.value) {
+    void fetchUser();
+  }
 });
 
 onBeforeUnmount(() => {

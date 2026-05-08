@@ -18,6 +18,49 @@
       </div>
     </UiCard>
 
+    <UiCard title="Filter Events" description="Filter event sesuai parameter GET /events pada API spec.">
+      <div class="grid gap-4 lg:grid-cols-4">
+        <UFormField label="Search" class="w-full">
+          <UInput v-model="filterForm.search" placeholder="Judul event" class="w-full" :ui="{ base: 'w-full rounded-xl border-white/20 bg-white/8 text-ui-light' }" @keyup.enter="applyFilters" />
+        </UFormField>
+
+        <UFormField label="Status" class="w-full">
+          <USelectMenu v-model="selectedStatusOption" :items="statusOptions" placeholder="Semua status" class="w-full" :ui="{ base: 'w-full rounded-xl border-white/20 bg-white/8 text-ui-light' }" />
+        </UFormField>
+
+        <UFormField label="Genre" class="w-full">
+          <USelectMenu v-model="selectedGenreOption" :items="genreOptions" placeholder="Semua genre" class="w-full" :ui="{ base: 'w-full rounded-xl border-white/20 bg-white/8 text-ui-light' }" />
+        </UFormField>
+
+        <UFormField label="City" class="w-full">
+          <UInput v-model="filterForm.city" placeholder="Bandung" class="w-full" :ui="{ base: 'w-full rounded-xl border-white/20 bg-white/8 text-ui-light' }" @keyup.enter="applyFilters" />
+        </UFormField>
+      </div>
+
+      <div class="mt-4 grid gap-4 lg:grid-cols-4">
+        <UFormField label="Budget Min" class="w-full">
+          <UInput v-model="filterForm.budget_min" type="number" placeholder="1000000" class="w-full" :ui="{ base: 'w-full rounded-xl border-white/20 bg-white/8 text-ui-light' }" @keyup.enter="applyFilters" />
+        </UFormField>
+
+        <UFormField label="Budget Max" class="w-full">
+          <UInput v-model="filterForm.budget_max" type="number" placeholder="5000000" class="w-full" :ui="{ base: 'w-full rounded-xl border-white/20 bg-white/8 text-ui-light' }" @keyup.enter="applyFilters" />
+        </UFormField>
+
+        <UFormField label="Date From" class="w-full">
+          <UInput v-model="filterForm.date_from" type="date" class="w-full" :ui="{ base: 'w-full rounded-xl border-white/20 bg-white/8 text-ui-light' }" />
+        </UFormField>
+
+        <UFormField label="Date To" class="w-full">
+          <UInput v-model="filterForm.date_to" type="date" class="w-full" :ui="{ base: 'w-full rounded-xl border-white/20 bg-white/8 text-ui-light' }" />
+        </UFormField>
+      </div>
+
+      <div class="mt-4 flex justify-end gap-2">
+        <UiButton color="neutral" variant="ghost" icon="mdi:filter-remove-outline" @click="resetFilters">Reset</UiButton>
+        <UiButton color="primary" variant="soft" icon="mdi:filter-check-outline" @click="applyFilters">Terapkan Filter</UiButton>
+      </div>
+    </UiCard>
+
     <EventList :events="events" :loading="pending" :applied-event-ids="appliedEventIds" :applying-event-ids="applyingEventIds" @apply="handleApply" />
 
     <!-- Apply Modal -->
@@ -98,6 +141,7 @@ import EventList from '~/components/talent/EventList.vue';
 import type { Event } from '~/composables/types';
 import { useApplications } from '~/composables/useApplications';
 import { useEvents } from '~/composables/useEvents';
+import { useGenres } from '~/composables/useGenres';
 
 definePageMeta({
   layout: 'talent',
@@ -107,9 +151,37 @@ useState('talent-layout-title', () => 'Talent Dashboard').value = 'Events';
 
 const toast = useToast();
 const { formatCurrency, formatDate } = useFormatters();
+const { data: genres } = useGenres();
 
 const currentPage = ref(1);
-const { data: events, pending, pagination, refresh: refreshEvents } = useEvents({ page: currentPage.value });
+const appliedFilters = reactive({
+  status: '',
+  genre: '',
+  city: '',
+  budget_min: '',
+  budget_max: '',
+  date_from: '',
+  date_to: '',
+  search: '',
+});
+
+const filterForm = reactive({ ...appliedFilters });
+const selectedStatusOption = ref<{ label: string; value: string } | undefined>();
+const selectedGenreOption = ref<{ label: string; value: string } | undefined>();
+
+const eventFilters = computed(() => ({
+  page: currentPage.value,
+  status: appliedFilters.status || undefined,
+  genre: appliedFilters.genre || undefined,
+  city: appliedFilters.city.trim() || undefined,
+  budget_min: appliedFilters.budget_min ? Number(appliedFilters.budget_min) : undefined,
+  budget_max: appliedFilters.budget_max ? Number(appliedFilters.budget_max) : undefined,
+  date_from: appliedFilters.date_from || undefined,
+  date_to: appliedFilters.date_to || undefined,
+  search: appliedFilters.search.trim() || undefined,
+}));
+
+const { data: events, pending, pagination } = useEvents(eventFilters);
 const { data: applications, applyToEvent } = useApplications();
 
 const appliedEventIds = ref<number[]>([]);
@@ -124,11 +196,38 @@ const applyForm = reactive({
   proposed_price: 0,
 });
 
-// Watch page changes and refetch events
-watch(currentPage, async (newPage) => {
-  const { refresh } = useEvents({ page: newPage });
-  await refresh();
-});
+const statusOptions = [
+  { label: 'Semua Status', value: '' },
+  { label: 'Draft', value: 'draft' },
+  { label: 'Open', value: 'open' },
+  { label: 'Closed', value: 'closed' },
+  { label: 'Completed', value: 'completed' },
+  { label: 'Cancelled', value: 'cancelled' },
+];
+
+const genreOptions = computed(() => [{ label: 'Semua Genre', value: '' }, ...genres.value.map((genre) => ({ label: genre.name, value: genre.name }))]);
+
+const applyFilters = () => {
+  appliedFilters.status = selectedStatusOption.value?.value ?? '';
+  appliedFilters.genre = selectedGenreOption.value?.value ?? '';
+  appliedFilters.city = filterForm.city.trim();
+  appliedFilters.budget_min = filterForm.budget_min;
+  appliedFilters.budget_max = filterForm.budget_max;
+  appliedFilters.date_from = filterForm.date_from;
+  appliedFilters.date_to = filterForm.date_to;
+  appliedFilters.search = filterForm.search.trim();
+  currentPage.value = 1;
+};
+
+const resetFilters = () => {
+  for (const key of Object.keys(filterForm) as (keyof typeof filterForm)[]) {
+    filterForm[key] = '';
+    appliedFilters[key] = '';
+  }
+  selectedStatusOption.value = undefined;
+  selectedGenreOption.value = undefined;
+  currentPage.value = 1;
+};
 
 watch(
   applications,

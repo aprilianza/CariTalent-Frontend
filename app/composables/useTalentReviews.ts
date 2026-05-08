@@ -5,20 +5,22 @@ export interface TalentReviewsFilters {
   per_page?: number;
 }
 
-export const useTalentReviews = (talentId: Ref<number | null> | number | null, filters?: TalentReviewsFilters) => {
+export const useTalentReviews = (filters?: MaybeRef<TalentReviewsFilters | undefined>) => {
   const api = useApiClient();
 
-  // Convert talentId to a ref if it's not already
-  const talentIdRef = isRef(talentId) ? talentId : ref(talentId);
+  const queryParams = computed<Record<string, any>>(() => {
+    const activeFilters = unref(filters);
+    const params: Record<string, any> = {};
 
-  // Build query parameters
-  const queryParams: Record<string, any> = {};
-  if (filters?.page) queryParams.page = filters.page;
-  if (filters?.per_page) queryParams.per_page = filters.per_page;
+    if (activeFilters?.page) params.page = activeFilters.page;
+    if (activeFilters?.per_page) params.per_page = activeFilters.per_page;
+
+    return params;
+  });
 
   // Create dynamic cache key
-  const filterKey = JSON.stringify(queryParams);
-  const cacheKey = () => `talent-reviews-${talentIdRef.value}-${filterKey}`;
+  const filterKey = computed(() => JSON.stringify(queryParams.value));
+  const cacheKey = computed(() => `my-reviews-${filterKey.value}`);
 
   // Default empty data structure
   const defaultData: TalentReviewsData = {
@@ -35,7 +37,6 @@ export const useTalentReviews = (talentId: Ref<number | null> | number | null, f
     },
   };
 
-  // Use useAsyncData with conditional execution based on talent_id availability
   const {
     data: response,
     pending,
@@ -44,17 +45,8 @@ export const useTalentReviews = (talentId: Ref<number | null> | number | null, f
   } = useAsyncData(
     cacheKey,
     async () => {
-      // Only fetch if talent_id is available
-      if (!talentIdRef.value) {
-        return {
-          success: true,
-          message: 'Waiting for talent ID',
-          data: defaultData,
-        };
-      }
-
       try {
-        const result = await api.get<TalentReviewsData>(`/talents/${talentIdRef.value}/reviews`, queryParams);
+        const result = await api.get<TalentReviewsData>('/reviews/my', queryParams.value);
         return result;
       } catch (err: any) {
         throw err;
@@ -68,8 +60,7 @@ export const useTalentReviews = (talentId: Ref<number | null> | number | null, f
         message: '',
         data: defaultData,
       }),
-      // Watch talent_id and refetch when it changes
-      watch: [talentIdRef],
+      watch: [queryParams],
     },
   );
 

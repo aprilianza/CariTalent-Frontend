@@ -1,4 +1,4 @@
-import type { ApiResponse, TalentMedia, TalentMediaType } from '~/composables/types';
+import type { ApiResponse, TalentMedia, TalentMediaType, TalentProfile, UpdateTalentProfilePayload } from '~/composables/types';
 
 export const useProfileSettings = () => {
   const api = useApiClient();
@@ -10,6 +10,11 @@ export const useProfileSettings = () => {
 
   const changePassword = async (payload: { current_password: string; new_password: string; new_password_confirmation: string }) => {
     const response = await api.put<null>('/users/password', payload);
+    return response;
+  };
+
+  const updateTalentProfile = async (talentId: number, payload: UpdateTalentProfilePayload) => {
+    const response = await api.put<TalentProfile>(`/talents/${talentId}`, payload);
     return response;
   };
 
@@ -55,6 +60,7 @@ export const useProfileSettings = () => {
 
   return {
     updateProfile,
+    updateTalentProfile,
     changePassword,
     uploadMedia,
     deleteMedia,

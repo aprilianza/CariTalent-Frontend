@@ -31,7 +31,6 @@
 <script setup lang="ts">
 import ReviewList from '~/components/talent/ReviewList.vue';
 import { useTalentReviews } from '~/composables/useTalentReviews';
-import { useProfile } from '~/composables/useProfile';
 
 definePageMeta({
   layout: 'talent',
@@ -39,18 +38,9 @@ definePageMeta({
 
 useState('talent-layout-title', () => 'Talent Dashboard').value = 'Reviews';
 
-// Get talent_id from profile
-const { data: profile } = useProfile();
-const talentId = computed(() => profile.value?.talent_id ?? null);
-
 const currentPage = ref(1);
-const { data: reviews, pending, meta, pagination } = useTalentReviews(talentId, { page: currentPage.value });
-
-// Watch page changes and refetch reviews
-watch(currentPage, async (newPage) => {
-  const { refresh } = useTalentReviews(talentId, { page: newPage });
-  await refresh();
-});
+const reviewFilters = computed(() => ({ page: currentPage.value }));
+const { data: reviews, pending, meta, pagination } = useTalentReviews(reviewFilters);
 
 const averageRatingLabel = computed(() => `${meta.value.averageRating.toFixed(1)} / 5`);
 </script>

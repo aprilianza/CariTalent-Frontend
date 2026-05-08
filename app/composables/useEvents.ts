@@ -7,6 +7,10 @@ export interface EventFilters {
   status?: string;
   genre?: string;
   city?: string;
+  budget_min?: number;
+  budget_max?: number;
+  date_from?: string;
+  date_to?: string;
   search?: string;
   page?: number;
   per_page?: number;
@@ -16,21 +20,30 @@ export interface EventFilters {
  * Composable for fetching and managing events
  * Supports filtering by status, genre, city, search term, and pagination
  */
-export const useEvents = (filters?: EventFilters) => {
+export const useEvents = (filters?: MaybeRef<EventFilters | undefined>) => {
   const api = useApiClient();
 
-  // Build query parameters, filtering out undefined values
-  const queryParams: Record<string, any> = {};
-  if (filters?.status) queryParams.status = filters.status;
-  if (filters?.genre) queryParams.genre = filters.genre;
-  if (filters?.city) queryParams.city = filters.city;
-  if (filters?.search) queryParams.search = filters.search;
-  if (filters?.page) queryParams.page = filters.page;
-  if (filters?.per_page) queryParams.per_page = filters.per_page;
+  const queryParams = computed<Record<string, any>>(() => {
+    const activeFilters = unref(filters);
+    const params: Record<string, any> = {};
+
+    if (activeFilters?.status) params.status = activeFilters.status;
+    if (activeFilters?.genre) params.genre = activeFilters.genre;
+    if (activeFilters?.city) params.city = activeFilters.city;
+    if (activeFilters?.budget_min) params.budget_min = activeFilters.budget_min;
+    if (activeFilters?.budget_max) params.budget_max = activeFilters.budget_max;
+    if (activeFilters?.date_from) params.date_from = activeFilters.date_from;
+    if (activeFilters?.date_to) params.date_to = activeFilters.date_to;
+    if (activeFilters?.search) params.search = activeFilters.search;
+    if (activeFilters?.page) params.page = activeFilters.page;
+    if (activeFilters?.per_page) params.per_page = activeFilters.per_page;
+
+    return params;
+  });
 
   // Create a dynamic key based on filter params for proper caching
-  const filterKey = JSON.stringify(queryParams);
-  const cacheKey = `talent-events-${filterKey}`;
+  const filterKey = computed(() => JSON.stringify(queryParams.value));
+  const cacheKey = computed(() => `talent-events-${filterKey.value}`);
 
   // Fetch events with filters
   const {
@@ -41,7 +54,7 @@ export const useEvents = (filters?: EventFilters) => {
   } = useAsyncData(
     cacheKey,
     async () => {
-      const result = await api.get<EventsData>('/events', queryParams);
+      const result = await api.get<EventsData>('/events', queryParams.value);
       return result;
     },
     {
@@ -52,6 +65,7 @@ export const useEvents = (filters?: EventFilters) => {
         message: '',
         data: { events: [], pagination: undefined },
       }),
+      watch: [queryParams],
     },
   );
 
