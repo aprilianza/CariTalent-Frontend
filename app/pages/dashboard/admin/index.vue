@@ -1,5 +1,8 @@
 <template>
   <div class="space-y-6">
+    <!-- Error Alert for Debugging -->
+    <UAlert v-if="error" color="red" variant="soft" title="API Error" :description="error.message || String(error)" class="mb-4" />
+
     <!-- Welcome Card -->
     <UiCard card-class="overflow-hidden border-white/10 bg-gradient-to-br from-highlight/12 via-white/5 to-accent/12 shadow-md">
       <div class="flex flex-col gap-5 md:flex-row md:items-center md:justify-between">
@@ -111,7 +114,7 @@ definePageMeta({
 const pageTitle = useState('admin-layout-title');
 pageTitle.value = 'Overview';
 
-const { data: stats, pending } = useAdminDashboard();
+const { data: stats, pending, error } = useAdminDashboard();
 
 const statsCards = computed(() => [
   {
