@@ -40,6 +40,7 @@
           </template>
 
           <form class="space-y-4 px-3 pb-3" @submit.prevent="onSubmit">
+            <UAlert v-if="errorMessage" color="red" variant="soft" :title="errorMessage" class="mb-4" />
             <UFormField label="Email" required>
               <UInput
                 v-model="email"
@@ -74,7 +75,7 @@
               />
             </UFormField>
 
-            <UButton type="submit" color="primary" size="xl" block class="!mt-2 !justify-center !rounded-xl !py-3 text-sm font-semibold !bg-gradient-to-r !from-accent !to-highlight hover:!opacity-90" variant="solid">
+            <UButton :loading="isLoading" type="submit" color="primary" size="xl" block class="!mt-2 !justify-center !rounded-xl !py-3 text-sm font-semibold !bg-gradient-to-r !from-accent !to-highlight hover:!opacity-90" variant="solid">
               Masuk Sekarang
             </UButton>
           </form>
@@ -95,6 +96,10 @@
 const email = ref('');
 const password = ref('');
 const rememberMe = ref(false);
+const isLoading = ref(false);
+const errorMessage = ref('');
+
+const auth = useAuth();
 
 const sideFeatures = [
   {
@@ -116,19 +121,25 @@ const sideFeatures = [
 
 const onSubmit = async () => {
   if (email.value && password.value) {
-    // Mock login - in production this would call your auth API
-    console.log('Login submitted', {
+    isLoading.value = true;
+    errorMessage.value = '';
+
+    const result = await auth.login({
       email: email.value,
       password: password.value,
-      rememberMe: rememberMe.value,
     });
 
-    // Clear form
-    email.value = '';
-    password.value = '';
+    isLoading.value = false;
 
-    // Redirect to talent dashboard after successful login
-    await navigateTo('/dashboard/talent');
+    if (result.success) {
+      if (result.role === 'admin') {
+        await navigateTo('/dashboard/admin/users');
+      } else {
+        await navigateTo(`/dashboard/${result.role}`);
+      }
+    } else {
+      errorMessage.value = result.message || 'Login gagal, periksa email dan password Anda.';
+    }
   }
 };
 </script>
