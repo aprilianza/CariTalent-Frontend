@@ -4,7 +4,7 @@
     <slot name="header">
       <NuxtLink :to="headerLink" class="mb-8 flex items-center gap-3 px-2">
         <div :class="headerIconClasses">
-          <Icon :name="headerIcon" class="h-6 w-6" />
+          <img :src="logoImage" alt="Logo CariTalent" class="h-6 w-6 object-contain" />
         </div>
         <div>
           <p class="text-sm font-semibold text-neutral-900 dark:text-neutral-100">{{ headerTitle }}</p>
@@ -46,6 +46,8 @@
 </template>
 
 <script setup lang="ts">
+import logoImage from '~/assets/logo.png';
+
 type SidebarLink = {
   label: string;
   to: string;

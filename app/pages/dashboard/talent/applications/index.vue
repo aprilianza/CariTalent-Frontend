@@ -11,7 +11,10 @@
             <UiBadge :label="`Rejected ${statusSummary.rejected}`" color="error" variant="soft" />
           </div>
         </div>
-        <UiBadge :label="`${applications.length} total`" color="primary" variant="soft" />
+        <div class="flex items-center gap-2">
+          <UiBadge :label="`${applications.length} total`" color="primary" variant="soft" />
+          <UPagination v-if="pagination && pagination.last_page > 1" v-model="currentPage" :page-count="pagination.per_page" :total="pagination.total" />
+        </div>
       </div>
     </UiCard>
 
@@ -21,7 +24,6 @@
 
 <script setup lang="ts">
 import ApplicationList from '~/components/talent/ApplicationList.vue';
-import type { Application } from '~/composables/types';
 import { useApplications } from '~/composables/useApplications';
 
 definePageMeta({
@@ -32,16 +34,14 @@ useState('talent-layout-title', () => 'Talent Dashboard').value = 'Applications'
 
 const toast = useToast();
 
-const { data: applicationsRaw, pending } = useApplications();
-const applications = ref<Application[]>([]);
+const currentPage = ref(1);
+const { data: applications, pending, pagination, cancelApplication } = useApplications({ page: currentPage.value });
 
-watch(
-  applicationsRaw,
-  (value) => {
-    applications.value = value.map((item) => ({ ...item }));
-  },
-  { immediate: true },
-);
+// Watch page changes and refetch applications
+watch(currentPage, async (newPage) => {
+  const { refresh } = useApplications({ page: newPage });
+  await refresh();
+});
 
 const handleCancelApplication = async (applicationId: number) => {
   const target = applications.value.find((item) => item.id === applicationId);
@@ -59,13 +59,21 @@ const handleCancelApplication = async (applicationId: number) => {
     return;
   }
 
-  applications.value = applications.value.filter((item) => item.id !== applicationId);
+  try {
+    await cancelApplication(applicationId);
 
-  toast.add({
-    title: 'Lamaran dibatalkan',
-    description: `${target.event.title} berhasil dihapus dari daftar lamaran (dummy update).`,
-    color: 'success',
-  });
+    toast.add({
+      title: 'Lamaran dibatalkan',
+      description: `${target.event.title} berhasil dihapus dari daftar lamaran.`,
+      color: 'success',
+    });
+  } catch (error: any) {
+    toast.add({
+      title: 'Cancel gagal',
+      description: error.message || 'Terjadi kendala saat membatalkan lamaran.',
+      color: 'error',
+    });
+  }
 };
 
 const statusSummary = computed(() => ({

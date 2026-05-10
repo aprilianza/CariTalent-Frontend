@@ -4,7 +4,7 @@
       <USkeleton v-for="n in 2" :key="n" class="h-24 w-full rounded-xl" />
     </div>
 
-    <UiList v-else :items="mappedItems" empty-text="Belum ada booking terjadwal.">
+    <UiList v-else :items="displayedItems" :list-class="listClass" empty-text="Belum ada booking terjadwal.">
       <template #item="{ item }">
         <div class="space-y-3">
           <div class="flex flex-wrap items-start justify-between gap-3">
@@ -52,6 +52,7 @@ const props = withDefaults(
 );
 
 const detailed = computed(() => props.detailed);
+const listClass = computed(() => (detailed.value ? '' : 'max-h-[26rem] overflow-y-auto pr-1'));
 
 const { formatCurrency, formatDate } = useFormatters();
 
@@ -95,4 +96,12 @@ const mappedItems = computed(() =>
     statusColor: statusMap[booking.status].color,
   })),
 );
+
+const displayedItems = computed(() => {
+  if (detailed.value) {
+    return mappedItems.value;
+  }
+
+  return mappedItems.value.slice(0, 3);
+});
 </script>

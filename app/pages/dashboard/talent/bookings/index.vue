@@ -10,7 +10,10 @@
             <UiBadge :label="`Completed ${statusSummary.completed}`" color="primary" variant="soft" />
           </div>
         </div>
-        <UiBadge :label="`${bookings.length} total`" color="secondary" variant="soft" />
+        <div class="flex items-center gap-2">
+          <UiBadge :label="`${bookings.length} total`" color="secondary" variant="soft" />
+          <UPagination v-if="pagination && pagination.last_page > 1" v-model="currentPage" :page-count="pagination.per_page" :total="pagination.total" />
+        </div>
       </div>
     </UiCard>
 
@@ -28,7 +31,14 @@ definePageMeta({
 
 useState('talent-layout-title', () => 'Talent Dashboard').value = 'Bookings';
 
-const { data: bookings, pending } = useBookings();
+const currentPage = ref(1);
+const { data: bookings, pending, pagination } = useBookings({ page: currentPage.value });
+
+// Watch page changes and refetch bookings
+watch(currentPage, async (newPage) => {
+  const { refresh } = useBookings({ page: newPage });
+  await refresh();
+});
 
 const statusSummary = computed(() => ({
   confirmed: bookings.value.filter((item) => item.status === 'confirmed').length,

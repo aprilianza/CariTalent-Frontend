@@ -6,7 +6,7 @@
     <div class="pointer-events-none absolute -bottom-24 -left-12 h-80 w-80 rounded-full bg-accent/15 blur-3xl"></div>
 
     <div class="relative z-10 mx-auto grid min-h-screen w-full max-w-7xl items-center gap-10 px-6 py-12 lg:grid-cols-2">
-      <section class="order-2 space-y-6 lg:order-1">
+      <section class="space-y-6 lg:order-1">
         <NuxtLink to="/" class="inline-flex items-center gap-2 text-sm text-neutral-light/80 transition-colors hover:text-white">
           <Icon name="mdi:arrow-left" class="h-4 w-4" />
           Kembali ke Landing Page
@@ -30,7 +30,7 @@
         </div>
       </section>
 
-      <section class="order-1 lg:order-2">
+      <section class="order-2 lg:order-2">
         <UCard class="auth-card mx-auto w-full max-w-md rounded-3xl border border-white/10 bg-white/5 p-2 shadow-glow-sm backdrop-blur-xl">
           <template #header>
             <div class="space-y-2 px-3 pt-2 text-center">
@@ -75,7 +75,7 @@
               />
             </UFormField>
 
-            <UButton :loading="isLoading" type="submit" color="primary" size="xl" block class="!mt-2 !justify-center !rounded-xl !py-3 text-sm font-semibold !bg-gradient-to-r !from-accent !to-highlight hover:!opacity-90" variant="solid">
+            <UButton type="submit" color="primary" size="xl" block :loading="isSubmitting" class="!mt-2 !justify-center !rounded-xl !py-3 text-sm font-semibold !bg-gradient-to-r !from-accent !to-highlight hover:!opacity-90" variant="solid">
               Masuk Sekarang
             </UButton>
           </form>
@@ -93,13 +93,13 @@
 </template>
 
 <script setup lang="ts">
+import { useAuth } from '~/composables/useAuth';
 const email = ref('');
 const password = ref('');
-const rememberMe = ref(false);
-const isLoading = ref(false);
-const errorMessage = ref('');
+const isSubmitting = ref(false);
 
-const auth = useAuth();
+const toast = useToast();
+const { login } = useAuth();
 
 const sideFeatures = [
   {
@@ -120,26 +120,38 @@ const sideFeatures = [
 ];
 
 const onSubmit = async () => {
-  if (email.value && password.value) {
-    isLoading.value = true;
-    errorMessage.value = '';
+  if (!email.value || !password.value || isSubmitting.value) {
+    return;
+  }
 
-    const result = await auth.login({
+  isSubmitting.value = true;
+  try {
+    const response = await login({
       email: email.value,
       password: password.value,
     });
 
-    isLoading.value = false;
+    toast.add({
+      title: 'Login berhasil',
+      description: `Selamat datang kembali, ${response.data.user.name}.`,
+      color: 'success',
+    });
 
-    if (result.success) {
-      if (result.role === 'admin') {
-        await navigateTo('/dashboard/admin/users');
-      } else {
-        await navigateTo(`/dashboard/${result.role}`);
-      }
-    } else {
-      errorMessage.value = result.message || 'Login gagal, periksa email dan password Anda.';
-    }
+    email.value = '';
+    password.value = '';
+
+    const role = response.data.user.role;
+    const target = role === 'eo' ? '/dashboard/eo' : role === 'admin' ? '/dashboard/admin' : '/dashboard/talent';
+    await navigateTo(target);
+  } catch (error: any) {
+    const message = error?.message || 'Login gagal. Periksa kembali email dan password.';
+    toast.add({
+      title: 'Login gagal',
+      description: message,
+      color: 'error',
+    });
+  } finally {
+    isSubmitting.value = false;
   }
 };
 </script>

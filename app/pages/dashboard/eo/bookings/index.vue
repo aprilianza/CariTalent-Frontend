@@ -83,7 +83,8 @@ const pageTitle = useState('eo-layout-title');
 pageTitle.value = 'My Bookings';
 
 const toast = useToast();
-const { data: rawBookings, pending, refresh, completeBooking, cancelBooking, submitReview: apiSubmitReview } = useEoBookings();
+const api = useApiClient();
+const { data: rawBookings, pending, refresh, completeBooking, cancelBooking } = useEoBookings();
 
 const bookings = ref<EoBooking[]>([]);
 watch(
@@ -121,18 +122,17 @@ const filteredBookings = computed(() => {
 const handleComplete = async (id: number) => {
   completingId.value = id;
 
-  const res = await completeBooking(id);
+  const idx = bookings.value.findIndex((b) => b.id === id);
+  const previousBooking = idx !== -1 ? { ...bookings.value[idx] } : null;
 
-  completingId.value = null;
+  if (idx !== -1) {
+    bookings.value[idx] = { ...bookings.value[idx], status: 'completed' };
+  }
 
-  if (res.success) {
-    // Optimistic update
-    const idx = bookings.value.findIndex((b) => b.id === id);
-    if (idx !== -1) {
-      bookings.value[idx] = { ...bookings.value[idx], status: 'completed', resolution: 'done' } as any;
-    }
-    
-    // Prompt review
+  try {
+    await completeBooking(id);
+    await refresh();
+
     reviewTargetBookingId.value = id;
     reviewForm.rating = 0;
     reviewForm.comment = '';
@@ -144,25 +144,26 @@ const handleComplete = async (id: number) => {
       color: 'success',
       icon: 'mdi:check-decagram-outline',
     });
-    
-    refresh();
-  } else {
+  } catch (error: any) {
+    if (idx !== -1 && previousBooking) {
+      bookings.value[idx] = previousBooking;
+    }
+
     toast.add({
       title: 'Gagal menyelesaikan booking',
-      description: res.message || 'Terjadi kesalahan.',
-      color: 'error'
+      description: error?.message || 'Backend belum menerima perubahan booking.',
+      color: 'error',
+      icon: 'mdi:alert-circle-outline',
     });
+  } finally {
+    completingId.value = null;
   }
 };
 
 const handleCancel = async (id: number) => {
-  const res = await cancelBooking(id);
-  
-  if (res.success) {
-    const idx = bookings.value.findIndex((b) => b.id === id);
-    if (idx !== -1) {
-      bookings.value[idx] = { ...bookings.value[idx], status: 'completed', resolution: 'reject' } as any;
-    }
+  try {
+    await cancelBooking(id);
+    await refresh();
 
     toast.add({
       title: 'Booking dibatalkan',
@@ -170,13 +171,12 @@ const handleCancel = async (id: number) => {
       color: 'warning',
       icon: 'mdi:close-circle-outline',
     });
-    
-    refresh();
-  } else {
+  } catch (error: any) {
     toast.add({
       title: 'Gagal membatalkan booking',
-      description: res.message || 'Terjadi kesalahan.',
-      color: 'error'
+      description: error?.message || 'Backend belum menerima pembatalan booking.',
+      color: 'error',
+      icon: 'mdi:alert-circle-outline',
     });
   }
 };
@@ -185,24 +185,32 @@ const submitReview = async () => {
   if (!reviewTargetBookingId.value || reviewForm.rating === 0) return;
   submittingReview.value = true;
 
-  const res = await apiSubmitReview(reviewTargetBookingId.value, reviewForm.rating, reviewForm.comment);
+  try {
+    await api.post('/reviews', {
+      booking_id: reviewTargetBookingId.value,
+      rating: reviewForm.rating,
+      comment: reviewForm.comment.trim(),
+    });
 
-  submittingReview.value = false;
+    await refresh();
 
-  if (res.success) {
     showReviewModal.value = false;
+
     toast.add({
       title: 'Review terkirim!',
       description: `Rating ${reviewForm.rating}/5 berhasil dikirim. Terima kasih atas ulasannya!`,
       color: 'success',
       icon: 'mdi:star-check-outline',
     });
-  } else {
+  } catch (error: any) {
     toast.add({
       title: 'Gagal mengirim review',
-      description: res.message || 'Terjadi kesalahan.',
-      color: 'error'
+      description: error?.message || 'Review belum tersimpan di backend.',
+      color: 'error',
+      icon: 'mdi:alert-circle-outline',
     });
+  } finally {
+    submittingReview.value = false;
   }
 };
 </script>

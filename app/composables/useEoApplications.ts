@@ -1,25 +1,29 @@
-import type { ApiResponse, EoApplication, EventApplicationsData } from '~/composables/types';
+import type { EoApplication, EventApplicationsData } from '~/composables/types';
 
 export const useEoApplications = (eventId?: number) => {
-  const { $api } = useNuxtApp();
+  const api = useApiClient();
   const key = `eo-applications-${eventId ?? 'all'}`;
-  
-  const { data: response, pending, error, refresh } = useAsyncData<ApiResponse<EventApplicationsData>>(
+
+  const { data: response, pending, error, refresh } = useAsyncData(
     key,
-    () => $api(`/events/${eventId}/applications`),
+    () => api.get<EventApplicationsData>(`/events/${eventId}/applications`),
     {
       immediate: !!eventId,
-    }
+      default: () => ({
+        success: false,
+        message: '',
+        data: { applications: [] },
+      }),
+    },
   );
 
   const updateApplicationStatus = async (id: number, status: 'accepted' | 'rejected', agreedPrice?: number) => {
-    return await $api<ApiResponse<any>>(`/applications/${id}/status`, {
-      method: 'PUT',
-      body: { 
-        status,
-        agreed_price: agreedPrice
-      },
+    const response = await api.put(`/applications/${id}/status`, {
+      status,
+      agreed_price: agreedPrice,
     });
+    await refresh();
+    return response;
   };
 
   return {
@@ -28,6 +32,6 @@ export const useEoApplications = (eventId?: number) => {
     error,
     refresh,
     updateApplicationStatus,
-    data: computed<EoApplication[]>(() => response.value?.data?.applications || []),
+    data: computed<EoApplication[]>(() => response.value?.data?.applications ?? []),
   };
 };

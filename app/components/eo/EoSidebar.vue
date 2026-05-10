@@ -67,17 +67,11 @@ const emit = defineEmits<{
 
 const eoLinks = computed(() => props.links);
 
-const eoSidebarClass = computed(
-  () => 'flex h-full w-72 flex-col border-r border-white/10 bg-ui-dark/70 px-4 py-5 backdrop-blur-xl',
-);
+const eoSidebarClass = computed(() => 'flex h-full w-72 flex-col border-r border-white/10 bg-ui-dark/70 px-4 py-5 backdrop-blur-xl');
 
-const eoHeaderIconClasses = computed(
-  () => 'flex h-10 w-10 items-center justify-center rounded-xl border border-violet-500/30 bg-violet-500/10 text-fuchsia-400 shadow-lg shadow-violet-500/25',
-);
+const eoHeaderIconClasses = computed(() => 'flex h-10 w-10 items-center justify-center rounded-xl border border-violet-500/30 bg-violet-500/10 text-fuchsia-400 shadow-lg shadow-violet-500/25');
 
-const eoActiveItemClass = computed(
-  () => 'bg-gradient-to-r from-violet-500/20 to-fuchsia-500/15 border border-violet-500/30 text-ui-light shadow-sm font-medium',
-);
+const eoActiveItemClass = computed(() => 'bg-gradient-to-r from-violet-500/20 to-fuchsia-500/15 border border-violet-500/30 text-ui-light shadow-sm font-medium');
 
 const eoInactiveItemClass = computed(() => 'text-neutral-light/80 hover:bg-white/8 hover:text-ui-light');
 

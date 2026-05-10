@@ -11,7 +11,10 @@
             <UiBadge :label="`Rejected ${statusSummary.rejected}`" color="error" variant="soft" />
           </div>
         </div>
-        <UiBadge :label="`${invitations.length} total`" color="primary" variant="soft" />
+        <div class="flex items-center gap-2">
+          <UiBadge :label="`${invitations.length} total`" color="primary" variant="soft" />
+          <UPagination v-if="pagination && pagination.last_page > 1" v-model="currentPage" :page-count="pagination.per_page" :total="pagination.total" />
+        </div>
       </div>
     </UiCard>
 
@@ -21,7 +24,6 @@
 
 <script setup lang="ts">
 import InvitationList from '~/components/talent/InvitationList.vue';
-import type { Invitation } from '~/composables/types';
 import { useInvitations } from '~/composables/useInvitations';
 
 definePageMeta({
@@ -32,16 +34,14 @@ useState('talent-layout-title', () => 'Talent Dashboard').value = 'Invitations';
 
 const toast = useToast();
 
-const { data: invitationsRaw, pending } = useInvitations();
-const invitations = ref<Invitation[]>([]);
+const currentPage = ref(1);
+const { data: invitations, pending, pagination, respondToInvitation } = useInvitations({ page: currentPage.value });
 
-watch(
-  invitationsRaw,
-  (value) => {
-    invitations.value = value.map((item) => ({ ...item }));
-  },
-  { immediate: true },
-);
+// Watch page changes and refetch invitations
+watch(currentPage, async (newPage) => {
+  const { refresh } = useInvitations({ page: newPage });
+  await refresh();
+});
 
 const statusSummary = computed(() => ({
   pending: invitations.value.filter((item) => item.status === 'pending').length,
@@ -49,25 +49,28 @@ const statusSummary = computed(() => ({
   rejected: invitations.value.filter((item) => item.status === 'rejected').length,
 }));
 
-const handleInvitation = (action: 'accept' | 'reject', invitationId: number) => {
-  const invitationIndex = invitations.value.findIndex((item) => item.id === invitationId);
-  const current = invitations.value[invitationIndex];
+const handleInvitation = async (action: 'accept' | 'reject', invitationId: number) => {
+  const current = invitations.value.find((item) => item.id === invitationId);
 
   if (!current) {
     return;
   }
 
-  const nextStatus = action === 'accept' ? 'accepted' : 'rejected';
+  try {
+    const status = action === 'accept' ? 'accepted' : 'rejected';
+    await respondToInvitation(invitationId, status);
 
-  invitations.value[invitationIndex] = {
-    ...current,
-    status: nextStatus,
-  };
-
-  toast.add({
-    title: action === 'accept' ? 'Invitation accepted' : 'Invitation rejected',
-    description: `${current.event.title} telah di-${action === 'accept' ? 'accept' : 'reject'} (dummy update).`,
-    color: action === 'accept' ? 'success' : 'error',
-  });
+    toast.add({
+      title: action === 'accept' ? 'Invitation accepted' : 'Invitation rejected',
+      description: `${current.event.title} has been ${action}ed successfully.`,
+      color: action === 'accept' ? 'success' : 'error',
+    });
+  } catch (error: any) {
+    toast.add({
+      title: 'Action failed',
+      description: error.message || 'Failed to respond to invitation',
+      color: 'error',
+    });
+  }
 };
 </script>

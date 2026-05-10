@@ -7,7 +7,10 @@
           <h1 class="font-display bg-gradient-to-r from-highlight to-accent bg-clip-text text-2xl font-bold text-transparent md:text-3xl">Talent Reviews</h1>
           <p class="mt-2 text-sm text-neutral-light/80">Ulasan dari organizer setelah booking selesai, sesuai endpoint review pada API spec.</p>
         </div>
-        <UiBadge :label="meta.stageName || 'Talent'" color="secondary" variant="soft" />
+        <div class="flex items-center gap-2">
+          <UiBadge :label="meta.stageName || 'Talent'" color="secondary" variant="soft" />
+          <UPagination v-if="pagination && pagination.last_page > 1" v-model="currentPage" :page-count="pagination.per_page" :total="pagination.total" />
+        </div>
       </div>
     </UiCard>
 
@@ -35,7 +38,9 @@ definePageMeta({
 
 useState('talent-layout-title', () => 'Talent Dashboard').value = 'Reviews';
 
-const { data: reviews, pending, meta } = useTalentReviews();
+const currentPage = ref(1);
+const reviewFilters = computed(() => ({ page: currentPage.value }));
+const { data: reviews, pending, meta, pagination } = useTalentReviews(reviewFilters);
 
 const averageRatingLabel = computed(() => `${meta.value.averageRating.toFixed(1)} / 5`);
 </script>

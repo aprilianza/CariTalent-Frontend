@@ -8,11 +8,75 @@
       </div>
     </UiCard>
 
-    <UiCard title="Profile Overview" description="Ringkasan data profil aktif.">
+    <UiCard>
+      <template #header>
+        <div class="flex flex-wrap items-start justify-between gap-3">
+          <div class="space-y-1">
+            <h3 class="text-base font-semibold text-ui-light">Profile Overview</h3>
+            <p class="text-sm text-neutral-light/70">Ringkasan data profil aktif.</p>
+          </div>
+
+          <div class="flex items-center gap-2">
+            <UiButton v-if="isEditingOverview" color="neutral" variant="ghost" size="sm" @click="cancelOverviewEdit">Batal</UiButton>
+            <UiButton :color="isEditingOverview ? 'primary' : 'secondary'" variant="soft" size="sm" :loading="isSavingOverview" @click="isEditingOverview ? handleUpdateOverview() : toggleOverviewEdit()">
+              {{ isEditingOverview ? 'Simpan' : 'Edit' }}
+            </UiButton>
+          </div>
+        </div>
+      </template>
+
       <div v-if="pending" class="space-y-3">
         <USkeleton class="h-6 w-1/3 rounded-lg" />
         <USkeleton class="h-20 w-full rounded-xl" />
       </div>
+
+      <form v-else-if="isEditingOverview" class="space-y-5" @submit.prevent="handleUpdateOverview">
+        <div class="grid gap-4 sm:grid-cols-2">
+          <UFormField label="Name" required class="w-full">
+            <UInput v-model="profileForm.name" size="lg" placeholder="Masukkan nama lengkap" class="w-full" :ui="{ base: 'w-full rounded-xl border-white/20 bg-white/8 text-ui-light' }" />
+          </UFormField>
+
+          <UFormField label="Phone" required class="w-full">
+            <UInput v-model="profileForm.phone" size="lg" placeholder="08xxxxxxxxxx" class="w-full" :ui="{ base: 'w-full rounded-xl border-white/20 bg-white/8 text-ui-light' }" />
+          </UFormField>
+        </div>
+
+        <div class="grid gap-4 sm:grid-cols-2">
+          <UFormField label="Stage Name" required class="w-full">
+            <UInput v-model="talentForm.stage_name" size="lg" placeholder="Nama panggung" class="w-full" :ui="{ base: 'w-full rounded-xl border-white/20 bg-white/8 text-ui-light' }" />
+          </UFormField>
+
+          <UFormField label="City" class="w-full">
+            <UInput v-model="talentForm.city" size="lg" placeholder="Bandung" class="w-full" :ui="{ base: 'w-full rounded-xl border-white/20 bg-white/8 text-ui-light' }" />
+          </UFormField>
+        </div>
+
+        <div class="grid gap-4 sm:grid-cols-2">
+          <UFormField label="Price Min" class="w-full">
+            <UInput v-model="talentForm.price_min" type="number" size="lg" placeholder="500000" class="w-full" :ui="{ base: 'w-full rounded-xl border-white/20 bg-white/8 text-ui-light' }" />
+          </UFormField>
+
+          <UFormField label="Price Max" class="w-full">
+            <UInput v-model="talentForm.price_max" type="number" size="lg" placeholder="2000000" class="w-full" :ui="{ base: 'w-full rounded-xl border-white/20 bg-white/8 text-ui-light' }" />
+          </UFormField>
+        </div>
+
+        <UFormField label="Genres" class="w-full">
+          <USelectMenu v-model="selectedTalentGenreIds" :items="genreOptions" multiple value-key="value" placeholder="Pilih genre" class="w-full" :ui="{ base: 'w-full rounded-xl border-white/20 bg-white/8 text-ui-light' }" />
+        </UFormField>
+
+        <UFormField label="Portfolio Link" class="w-full">
+          <UInput v-model="talentForm.portfolio_link" size="lg" placeholder="https://..." class="w-full" :ui="{ base: 'w-full rounded-xl border-white/20 bg-white/8 text-ui-light' }" />
+        </UFormField>
+
+        <UFormField label="Bio" class="w-full">
+          <UTextarea v-model="talentForm.bio" :rows="4" placeholder="Ceritakan profil talent..." class="w-full" :ui="{ base: 'w-full rounded-xl border-white/20 bg-white/8 text-ui-light' }" />
+        </UFormField>
+
+        <div class="flex justify-end">
+          <UiButton type="submit" color="primary" :loading="isSavingOverview">Simpan Perubahan</UiButton>
+        </div>
+      </form>
 
       <div v-else class="space-y-5">
         <div class="grid gap-3 sm:grid-cols-2">
@@ -37,6 +101,28 @@
           </div>
         </div>
 
+        <div class="grid gap-3 sm:grid-cols-2">
+          <div class="rounded-xl border border-white/10 bg-white/5 p-4">
+            <p class="text-xs uppercase tracking-wide text-neutral-light/70">City</p>
+            <p class="mt-1 text-base font-semibold text-ui-light">{{ profile.city || '-' }}</p>
+          </div>
+          <div class="rounded-xl border border-white/10 bg-white/5 p-4">
+            <p class="text-xs uppercase tracking-wide text-neutral-light/70">Portfolio</p>
+            <p class="mt-1 truncate text-base font-semibold text-ui-light">{{ profile.portfolio_link || '-' }}</p>
+          </div>
+        </div>
+
+        <div class="grid gap-3 sm:grid-cols-2">
+          <div class="rounded-xl border border-white/10 bg-white/5 p-4">
+            <p class="text-xs uppercase tracking-wide text-neutral-light/70">Price Min</p>
+            <p class="mt-1 text-base font-semibold text-ui-light">{{ profile.price_min ? formatCurrency(profile.price_min) : '-' }}</p>
+          </div>
+          <div class="rounded-xl border border-white/10 bg-white/5 p-4">
+            <p class="text-xs uppercase tracking-wide text-neutral-light/70">Price Max</p>
+            <p class="mt-1 text-base font-semibold text-ui-light">{{ profile.price_max ? formatCurrency(profile.price_max) : '-' }}</p>
+          </div>
+        </div>
+
         <div>
           <p class="text-xs uppercase tracking-wide text-neutral-light/70">Genres</p>
           <div class="mt-2 flex flex-wrap gap-2">
@@ -51,42 +137,35 @@
           </div>
           <div class="rounded-xl border border-white/10 bg-white/5 p-4">
             <p class="text-xs uppercase tracking-wide text-neutral-light/70">Average Rating</p>
-            <p class="mt-2 text-lg font-semibold text-ui-light">{{ profile.average_rating.toFixed(1) }} / 5</p>
+            <p class="mt-2 text-lg font-semibold text-ui-light">{{ averageRatingLabel }}</p>
           </div>
+        </div>
+
+        <div class="rounded-xl border border-white/10 bg-white/5 p-4">
+          <p class="text-xs uppercase tracking-wide text-neutral-light/70">Bio</p>
+          <p class="mt-2 text-sm leading-relaxed text-neutral-light/80">{{ profile.bio || '-' }}</p>
         </div>
       </div>
     </UiCard>
 
-    <section class="grid gap-4 xl:grid-cols-2">
-      <UiCard title="Update Profile" description="Implementasi endpoint PUT /users/profile.">
-        <form class="space-y-4" @submit.prevent="handleUpdateProfile">
-          <UFormField label="Name" required>
-            <UInput v-model="profileForm.name" placeholder="Masukkan nama lengkap" :ui="{ base: 'rounded-xl border-white/20 bg-white/8 text-ui-light' }" />
-          </UFormField>
+    <section class="grid gap-5">
+      <UiCard title="Change Password" description="Implementasi endpoint PUT /users/password." card-class="h-full">
+        <form class="flex h-full flex-col gap-5" @submit.prevent="handleChangePassword">
+          <div class="grid gap-4">
+            <UFormField label="Current Password" required class="w-full">
+              <UInput v-model="passwordForm.current_password" type="password" size="lg" placeholder="Password saat ini" class="w-full" :ui="{ base: 'w-full rounded-xl border-white/20 bg-white/8 text-ui-light' }" />
+            </UFormField>
 
-          <UFormField label="Phone" required>
-            <UInput v-model="profileForm.phone" placeholder="08xxxxxxxxxx" :ui="{ base: 'rounded-xl border-white/20 bg-white/8 text-ui-light' }" />
-          </UFormField>
+            <UFormField label="New Password" required class="w-full">
+              <UInput v-model="passwordForm.new_password" type="password" size="lg" placeholder="Password baru" class="w-full" :ui="{ base: 'w-full rounded-xl border-white/20 bg-white/8 text-ui-light' }" />
+            </UFormField>
 
-          <UiButton type="submit" color="primary" :loading="isSavingProfile">Simpan Perubahan</UiButton>
-        </form>
-      </UiCard>
+            <UFormField label="Confirm New Password" required class="w-full">
+              <UInput v-model="passwordForm.new_password_confirmation" type="password" size="lg" placeholder="Konfirmasi password baru" class="w-full" :ui="{ base: 'w-full rounded-xl border-white/20 bg-white/8 text-ui-light' }" />
+            </UFormField>
+          </div>
 
-      <UiCard title="Change Password" description="Implementasi endpoint PUT /users/password.">
-        <form class="space-y-4" @submit.prevent="handleChangePassword">
-          <UFormField label="Current Password" required>
-            <UInput v-model="passwordForm.current_password" type="password" placeholder="Password saat ini" :ui="{ base: 'rounded-xl border-white/20 bg-white/8 text-ui-light' }" />
-          </UFormField>
-
-          <UFormField label="New Password" required>
-            <UInput v-model="passwordForm.new_password" type="password" placeholder="Password baru" :ui="{ base: 'rounded-xl border-white/20 bg-white/8 text-ui-light' }" />
-          </UFormField>
-
-          <UFormField label="Confirm New Password" required>
-            <UInput v-model="passwordForm.new_password_confirmation" type="password" placeholder="Konfirmasi password baru" :ui="{ base: 'rounded-xl border-white/20 bg-white/8 text-ui-light' }" />
-          </UFormField>
-
-          <UiButton type="submit" color="secondary" :loading="isChangingPassword">Update Password</UiButton>
+          <UiButton type="submit" color="secondary" block class="mt-auto" :loading="isChangingPassword">Update Password</UiButton>
         </form>
       </UiCard>
     </section>
@@ -133,6 +212,7 @@
 import type { TalentMedia, TalentMediaType } from '~/composables/types';
 import { useProfile } from '~/composables/useProfile';
 import { useProfileSettings } from '~/composables/useProfileSettings';
+import { useTalentReviews } from '~/composables/useTalentReviews';
 
 definePageMeta({
   layout: 'talent',
@@ -141,14 +221,28 @@ definePageMeta({
 useState('talent-layout-title', () => 'Talent Dashboard').value = 'Profile';
 
 const toast = useToast();
+const { formatCurrency } = useFormatters();
 
-const { data: profile, response: profileResponse, pending } = useProfile();
-const { updateProfile, changePassword, uploadMedia, deleteMedia } = useProfileSettings();
+const { data: profile, pending, refresh: refreshProfile } = useProfile();
+const talentId = computed(() => profile.value?.talent_id ?? null);
+const { meta: reviewMeta, pending: reviewPending, error: reviewError } = useTalentReviews({ page: 1, per_page: 1 });
+const { updateProfile, updateTalentProfile, changePassword, uploadMedia, deleteMedia } = useProfileSettings();
 
 const profileForm = reactive({
   name: '',
   phone: '',
 });
+
+const talentForm = reactive({
+  stage_name: '',
+  price_min: '',
+  price_max: '',
+  city: '',
+  bio: '',
+  portfolio_link: '',
+});
+
+const selectedTalentGenreIds = ref<number[]>([]);
 
 const passwordForm = reactive({
   current_password: '',
@@ -156,14 +250,15 @@ const passwordForm = reactive({
   new_password_confirmation: '',
 });
 
-const uploadForm = reactive<{ fileName: string; type: TalentMediaType }>({
-  fileName: '',
+const uploadForm = reactive<{ file: File | null; type: TalentMediaType }>({
+  file: null,
   type: 'image',
 });
 
 const mediaList = ref<TalentMedia[]>([]);
 
-const isSavingProfile = ref(false);
+const isEditingOverview = ref(false);
+const isSavingOverview = ref(false);
 const isChangingPassword = ref(false);
 const isUploadingMedia = ref(false);
 const deletingMediaId = ref<number | null>(null);
@@ -174,12 +269,45 @@ const mediaTypeOptions = [
   { label: 'Audio', value: 'audio' },
 ];
 
+const { data: genres } = useGenres();
+
+const genreOptions = computed(() => genres.value.map((genre) => ({ label: genre.name, value: genre.id })));
+
+const averageRatingLabel = computed(() => {
+  if (pending.value && reviewPending.value) {
+    return '-';
+  }
+
+  const ratingSource = reviewPending.value || reviewError.value ? profile.value.average_rating : reviewMeta.value.averageRating;
+  const rating = Number(ratingSource);
+
+  if (!Number.isFinite(rating)) {
+    return '-';
+  }
+
+  return `${rating.toFixed(1)} / 5`;
+});
+
+const syncOverviewForm = () => {
+  const value = profile.value;
+  profileForm.name = value.name || '';
+  profileForm.phone = value.phone || '';
+  talentForm.stage_name = value.stage_name || '';
+  talentForm.price_min = value.price_min ? String(value.price_min) : '';
+  talentForm.price_max = value.price_max ? String(value.price_max) : '';
+  talentForm.city = value.city || '';
+  talentForm.bio = value.bio || '';
+  talentForm.portfolio_link = value.portfolio_link || '';
+  selectedTalentGenreIds.value = value.genre_ids?.length
+    ? [...value.genre_ids]
+    : value.genre.map((genreName) => genres.value.find((genre) => genre.name === genreName)?.id).filter((id): id is number => Boolean(id));
+};
+
 watch(
   profile,
-  (value) => {
-    profileForm.name = value.name || '';
-    profileForm.phone = value.phone || '';
-    mediaList.value = value.media ? value.media.map((item) => ({ ...item })) : [];
+  () => {
+    syncOverviewForm();
+    mediaList.value = profile.value.media ? profile.value.media.map((item) => ({ ...item })) : [];
   },
   { immediate: true },
 );
@@ -196,10 +324,29 @@ const mediaItems = computed(() =>
 const handleFileChange = (event: Event) => {
   const input = event.target as HTMLInputElement;
   const file = input.files?.[0];
-  uploadForm.fileName = file?.name || '';
+  uploadForm.file = file || null;
 };
 
-const handleUpdateProfile = async () => {
+const toggleOverviewEdit = () => {
+  syncOverviewForm();
+  isEditingOverview.value = true;
+};
+
+const cancelOverviewEdit = () => {
+  syncOverviewForm();
+  isEditingOverview.value = false;
+};
+
+const handleUpdateOverview = async () => {
+  if (!talentId.value) {
+    toast.add({
+      title: 'Profil talent belum tersedia',
+      description: 'Backend belum mengirim data talent untuk akun ini.',
+      color: 'warning',
+    });
+    return;
+  }
+
   if (!profileForm.name.trim() || !profileForm.phone.trim()) {
     toast.add({
       title: 'Data belum lengkap',
@@ -209,35 +356,49 @@ const handleUpdateProfile = async () => {
     return;
   }
 
-  isSavingProfile.value = true;
+  if (!talentForm.stage_name.trim()) {
+    toast.add({
+      title: 'Data belum lengkap',
+      description: 'Stage name wajib diisi.',
+      color: 'warning',
+    });
+    return;
+  }
+
+  isSavingOverview.value = true;
 
   try {
-    const response = await updateProfile({
+    await updateProfile({
       name: profileForm.name.trim(),
       phone: profileForm.phone.trim(),
     });
 
-    if (profileResponse.value?.data) {
-      profileResponse.value.data = {
-        ...profileResponse.value.data,
-        name: response.data.name,
-        phone: response.data.phone,
-      };
-    }
+    const response = await updateTalentProfile(talentId.value, {
+      stage_name: talentForm.stage_name.trim(),
+      price_min: talentForm.price_min ? Number(talentForm.price_min) : undefined,
+      price_max: talentForm.price_max ? Number(talentForm.price_max) : undefined,
+      city: talentForm.city.trim() || undefined,
+      bio: talentForm.bio.trim() || undefined,
+      portfolio_link: talentForm.portfolio_link.trim() || undefined,
+      genre_ids: selectedTalentGenreIds.value,
+    });
+
+    await refreshProfile();
+    isEditingOverview.value = false;
 
     toast.add({
       title: 'Profile updated',
       description: response.message,
       color: 'success',
     });
-  } catch {
+  } catch (error) {
     toast.add({
       title: 'Update gagal',
-      description: 'Terjadi kendala saat memperbarui profil.',
+      description: error instanceof Error ? error.message : 'Terjadi kendala saat memperbarui profil.',
       color: 'error',
     });
   } finally {
-    isSavingProfile.value = false;
+    isSavingOverview.value = false;
   }
 };
 
@@ -277,7 +438,7 @@ const handleChangePassword = async () => {
 };
 
 const handleUploadMedia = async () => {
-  if (!uploadForm.fileName) {
+  if (!uploadForm.file) {
     toast.add({
       title: 'File belum dipilih',
       description: 'Pilih file sebelum upload media.',
@@ -290,20 +451,16 @@ const handleUploadMedia = async () => {
 
   try {
     const response = await uploadMedia({
-      talentId: profile.value.talent_id || profile.value.id,
-      fileName: uploadForm.fileName,
+      file: uploadForm.file,
       type: uploadForm.type,
     });
 
     mediaList.value = [response.data, ...mediaList.value];
-    if (profileResponse.value?.data) {
-      profileResponse.value.data = {
-        ...profileResponse.value.data,
-        media: mediaList.value as any, // Ignore strict typing here
-      };
-    }
 
-    uploadForm.fileName = '';
+    // Refresh profile data from server
+    await refreshProfile();
+
+    uploadForm.file = null;
 
     toast.add({
       title: 'Media uploaded',
@@ -325,18 +482,13 @@ const handleDeleteMedia = async (mediaId: number) => {
   deletingMediaId.value = mediaId;
 
   try {
-    const response = await deleteMedia({
-      talentId: profile.value.talent_id || profile.value.id,
-      mediaId,
-    });
+    const talentId = profile.value.talent_id || profile.value.id;
+    const response = await deleteMedia(talentId, mediaId);
 
     mediaList.value = mediaList.value.filter((item) => item.id !== mediaId);
-    if (profileResponse.value?.data) {
-      profileResponse.value.data = {
-        ...profileResponse.value.data,
-        media: mediaList.value as any, // Ignore strict typing here
-      };
-    }
+
+    // Refresh profile data from server
+    await refreshProfile();
 
     toast.add({
       title: 'Media deleted',

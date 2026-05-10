@@ -15,6 +15,7 @@
     :footer-title-class="adminFooterTitleClass"
     :footer-content-class="adminFooterContentClass"
     @navigate="emit('navigate')"
+    @logout="emit('logout')"
   />
 </template>
 
@@ -53,32 +54,20 @@ const props = withDefaults(
 
 const emit = defineEmits<{
   navigate: [];
+  logout: [];
 }>();
 
 const adminLinks = computed(() => props.links);
 
-const adminSidebarClass = computed(
-  () =>
-    'flex h-full w-72 flex-col border-r border-white/10 bg-ui-dark/70 px-4 py-5 backdrop-blur-xl',
-);
+const adminSidebarClass = computed(() => 'flex h-full w-72 flex-col border-r border-white/10 bg-ui-dark/70 px-4 py-5 backdrop-blur-xl');
 
-const adminHeaderIconClasses = computed(
-  () =>
-    'flex h-10 w-10 items-center justify-center rounded-xl border border-highlight/30 bg-highlight/10 text-accent shadow-lg shadow-highlight/25',
-);
+const adminHeaderIconClasses = computed(() => 'flex h-10 w-10 items-center justify-center rounded-xl border border-highlight/30 bg-highlight/10 text-accent shadow-lg shadow-highlight/25');
 
-const adminActiveItemClass = computed(
-  () =>
-    'bg-gradient-to-r from-highlight/20 to-accent/15 border border-highlight/30 text-ui-light shadow-sm font-medium',
-);
+const adminActiveItemClass = computed(() => 'bg-gradient-to-r from-highlight/20 to-accent/15 border border-highlight/30 text-ui-light shadow-sm font-medium');
 
-const adminInactiveItemClass = computed(
-  () => 'text-neutral-light/80 hover:bg-white/8 hover:text-ui-light',
-);
+const adminInactiveItemClass = computed(() => 'text-neutral-light/80 hover:bg-white/8 hover:text-ui-light');
 
-const adminFooterClass = computed(
-  () => 'mt-auto rounded-2xl border border-highlight/30 bg-highlight/10 p-4 backdrop-blur-sm',
-);
+const adminFooterClass = computed(() => 'mt-auto rounded-2xl border border-highlight/30 bg-highlight/10 p-4 backdrop-blur-sm');
 const adminFooterTitleClass = computed(() => 'text-accent');
 const adminFooterContentClass = computed(() => 'text-neutral-light/80');
 </script>

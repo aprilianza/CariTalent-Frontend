@@ -20,13 +20,13 @@
               <component :is="notificationBadgeComponent" :count="notifications" v-bind="notificationBadgeProps" />
             </UButton>
 
-            <template #panel>
+            <template #content>
               <div class="p-4 w-80 bg-[#1e1e2e]/95 backdrop-blur-xl border border-white/10 rounded-2xl shadow-2xl space-y-4">
                 <div class="flex items-center justify-between border-b border-white/10 pb-2">
                   <h4 class="font-semibold text-neutral-light">Notifikasi</h4>
                   <span v-if="notifications > 0" class="text-xs text-violet-400 bg-violet-400/10 px-2 py-1 rounded-md">{{ notifications }} Baru</span>
                 </div>
-                
+
                 <div class="space-y-3 max-h-[60vh] overflow-y-auto pr-1">
                   <!-- Notifikasi 1: Info Event -->
                   <div class="flex gap-3 items-start p-3 rounded-xl bg-white/5 border border-white/5 hover:bg-white/10 transition-colors cursor-pointer">
@@ -57,10 +57,8 @@
                       <p class="text-xs text-neutral-400">Profil EO kamu telah berhasil diverifikasi oleh admin CariTalent.</p>
                     </div>
                   </div>
-                  
-                  <div v-if="notifications === 0" class="text-center py-6 text-sm text-neutral-500">
-                    Tidak ada notifikasi baru.
-                  </div>
+
+                  <div v-if="notifications === 0" class="text-center py-6 text-sm text-neutral-500">Tidak ada notifikasi baru.</div>
                 </div>
               </div>
             </template>

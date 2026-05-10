@@ -52,7 +52,7 @@ const route = useRoute();
 const toast = useToast();
 
 const eventId = computed(() => Number(route.params.id));
-const { data: rawApplications, pending, updateApplicationStatus, refresh } = useEoApplications(eventId.value);
+const { data: rawApplications, pending, updateApplicationStatus } = useEoApplications(eventId.value);
 
 // Local reactive copy for optimistic updates
 const applications = ref<EoApplication[]>([]);
@@ -84,8 +84,8 @@ const filteredApplications = computed(() => {
 });
 
 const handleAccept = async (applicationId: number, agreedPrice: number) => {
-  const res = await updateApplicationStatus(applicationId, 'accepted', agreedPrice);
-  if (res.success) {
+  try {
+    await updateApplicationStatus(applicationId, 'accepted', agreedPrice);
     const idx = applications.value.findIndex((a) => a.id === applicationId);
     if (idx !== -1) {
       applications.value[idx] = { ...applications.value[idx], status: 'accepted' } as EoApplication;
@@ -96,19 +96,18 @@ const handleAccept = async (applicationId: number, agreedPrice: number) => {
       color: 'success',
       icon: 'mdi:check-circle-outline',
     });
-    refresh();
-  } else {
+  } catch (error: any) {
     toast.add({
       title: 'Gagal menerima',
-      description: res.message || 'Terjadi kesalahan sistem.',
+      description: error?.message || 'Terjadi kesalahan sistem.',
       color: 'error',
     });
   }
 };
 
 const handleReject = async (applicationId: number) => {
-  const res = await updateApplicationStatus(applicationId, 'rejected');
-  if (res.success) {
+  try {
+    await updateApplicationStatus(applicationId, 'rejected');
     const idx = applications.value.findIndex((a) => a.id === applicationId);
     if (idx !== -1) {
       applications.value[idx] = { ...applications.value[idx], status: 'rejected' } as EoApplication;
@@ -119,11 +118,10 @@ const handleReject = async (applicationId: number) => {
       color: 'warning',
       icon: 'mdi:close-circle-outline',
     });
-    refresh();
-  } else {
+  } catch (error: any) {
     toast.add({
       title: 'Gagal menolak',
-      description: res.message || 'Terjadi kesalahan sistem.',
+      description: error?.message || 'Terjadi kesalahan sistem.',
       color: 'error',
     });
   }

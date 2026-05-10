@@ -20,15 +20,6 @@
           </h1>
           <p class="max-w-xl text-base leading-relaxed text-neutral-light/75 md:text-lg">Daftar sebagai talent atau event organizer, lengkapi profilmu, lalu temukan partner musik terbaik untuk setiap momen.</p>
         </div>
-
-        <UCard class="rounded-3xl border border-white/10 bg-white/5 p-1 backdrop-blur-sm">
-          <div class="grid gap-3 p-4 sm:grid-cols-3">
-            <div v-for="metric in metrics" :key="metric.label" class="rounded-2xl border border-white/10 bg-white/5 p-4 text-center">
-              <p class="font-display text-2xl font-black text-white">{{ metric.value }}</p>
-              <p class="mt-1 text-xs uppercase tracking-wider text-neutral-light/70">{{ metric.label }}</p>
-            </div>
-          </div>
-        </UCard>
       </section>
 
       <section>
@@ -151,7 +142,7 @@
             </div>
 
             <!-- Button -->
-            <UButton type="submit" size="xl" block class="!justify-center !rounded-xl !py-3 text-sm font-semibold !bg-gradient-to-r !from-accent !to-highlight hover:!opacity-90"> Daftar Sekarang </UButton>
+            <UButton type="submit" size="xl" block :loading="isSubmitting" class="!justify-center !rounded-xl !py-3 text-sm font-semibold !bg-gradient-to-r !from-accent !to-highlight hover:!opacity-90"> Daftar Sekarang </UButton>
 
             <p class="text-center text-xs leading-relaxed text-neutral-light/60">Dengan mendaftar, kamu setuju menerima notifikasi terkait event, update akun, dan informasi penting platform.</p>
           </form>
@@ -168,6 +159,7 @@
 </template>
 
 <script setup lang="ts">
+import { useAuth } from '~/composables/useAuth';
 const roles = ['Talent / Musisi', 'Event Organizer'];
 
 const fullName = ref('');
@@ -176,21 +168,86 @@ const email = ref('');
 const phone = ref('');
 const password = ref('');
 const confirmPassword = ref('');
-const agreeTerms = ref(false);
+const isSubmitting = ref(false);
 
-const metrics = [
-  { value: '2.400+', label: 'Talent Aktif' },
-  { value: '890+', label: 'Event Terbuka' },
-  { value: '12rb+', label: 'Booking Sukses' },
-];
+const toast = useToast();
+const { register } = useAuth();
 
-const onSubmit = () => {
-  console.log('Register submitted', {
-    fullName: fullName.value,
-    role: role.value,
-    email: email.value,
-    agreeTerms: agreeTerms.value,
-  });
+const getRegisterErrorMessage = (error: any) => {
+  const validationErrors = error?.errors;
+
+  if (validationErrors && typeof validationErrors === 'object') {
+    const firstError = Object.values(validationErrors).find((messages) => Array.isArray(messages) && messages.length > 0);
+
+    if (Array.isArray(firstError)) {
+      return String(firstError[0]);
+    }
+  }
+
+  return error?.message || 'Registrasi gagal. Periksa kembali data yang kamu masukkan.';
+};
+
+const onSubmit = async () => {
+  if (isSubmitting.value) {
+    return;
+  }
+
+  if (!fullName.value || !role.value || !email.value || !phone.value || !password.value) {
+    toast.add({
+      title: 'Lengkapi data',
+      description: 'Semua field wajib diisi sebelum mendaftar.',
+      color: 'warning',
+    });
+    return;
+  }
+
+  if (password.value !== confirmPassword.value) {
+    toast.add({
+      title: 'Password tidak cocok',
+      description: 'Pastikan password dan konfirmasi password sama.',
+      color: 'error',
+    });
+    return;
+  }
+
+  const roleValue = role.value === 'Event Organizer' ? 'eo' : 'talent';
+
+  isSubmitting.value = true;
+  try {
+    const response = await register({
+      name: fullName.value,
+      email: email.value,
+      phone: phone.value,
+      password: password.value,
+      password_confirmation: confirmPassword.value,
+      role: roleValue,
+    });
+
+    toast.add({
+      title: 'Registrasi berhasil',
+      description: `Selamat datang, ${response.data.user.name}.`,
+      color: 'success',
+    });
+
+    fullName.value = '';
+    role.value = '';
+    email.value = '';
+    phone.value = '';
+    password.value = '';
+    confirmPassword.value = '';
+
+    const target = roleValue === 'eo' ? '/dashboard/eo' : '/dashboard/talent';
+    await navigateTo(target);
+  } catch (error: any) {
+    const message = getRegisterErrorMessage(error);
+    toast.add({
+      title: 'Registrasi gagal',
+      description: message,
+      color: 'error',
+    });
+  } finally {
+    isSubmitting.value = false;
+  }
 };
 </script>
 

@@ -1,9 +1,18 @@
-# CariTalent API Specification V1.0
+# CariTalent API Specification V1.1
 
 **Base URL:** `https://api.caritalent.id/api/v1`
 **Format:** JSON
 **Auth:** Bearer Token (Laravel Sanctum)
 **Content-Type:** `application/json`
+
+---
+
+## Perubahan V1.1
+- Register talent otomatis membuat talent profile.
+- `stage_name` pada register talent bersifat opsional. Jika tidak dikirim, backend memakai `name` sebagai nilai awal.
+- Identitas talent profile disamakan dengan identitas user: `talents.id = talents.user_id = users.id`.
+- Endpoint baru untuk talent login: `GET /talents/my`.
+- Endpoint baru untuk review talent login: `GET /reviews/my`.
 
 ---
 
@@ -80,10 +89,12 @@ Response error:
   "password": "password123",
   "password_confirmation": "password123",
   "phone": "081234567890",
-  "role": "talent"
+  "role": "talent",
+  "stage_name": "The Broken Strings"
 }
 ```
 > `role` hanya boleh: `talent` atau `eo`. Role `admin` tidak bisa diregistrasi via endpoint ini.
+> `stage_name` opsional dan hanya digunakan untuk role `talent`. Jika talent tidak mengirim `stage_name`, backend memakai `name` sebagai nama panggung awal. Role `eo` tidak perlu mengirim `stage_name`.
 
 **Response 201:**
 ```json
@@ -92,12 +103,19 @@ Response error:
   "message": "Registrasi berhasil",
   "data": {
     "user": {
-      "id": 1,
+      "id": 4,
       "name": "Budi Santoso",
       "email": "budi@email.com",
       "phone": "081234567890",
       "role": "talent",
       "created_at": "2026-03-08T10:00:00Z"
+    },
+    "talent": {
+      "id": 4,
+      "user_id": 4,
+      "stage_name": "The Broken Strings",
+      "city": "",
+      "verified": false
     },
     "token": "1|abc123tokenhere"
   }
@@ -263,8 +281,8 @@ Response error:
   "data": {
     "talents": [
       {
-        "id": 1,
-        "user_id": 1,
+        "id": 4,
+        "user_id": 4,
         "stage_name": "The Broken Strings",
         "genre": ["Pop Punk", "Alternative"],
         "price_min": 500000,
@@ -303,8 +321,8 @@ Response error:
   "success": true,
   "message": "OK",
   "data": {
-    "id": 1,
-    "user_id": 1,
+    "id": 4,
+    "user_id": 4,
     "stage_name": "The Broken Strings",
     "genre": ["Pop Punk", "Alternative"],
     "price_min": 500000,
@@ -342,7 +360,44 @@ Response error:
 }
 ```
 
-### 3.3 Create Talent Profile
+### 3.3 Get My Talent Profile
+`GET /talents/my`
+**Access:** talent
+**Headers:** `Authorization: Bearer {token}`
+
+Mengambil data talent profile milik user talent yang sedang login. Frontend tidak perlu mengirim `talent_id`.
+
+**Response 200:**
+```json
+{
+  "success": true,
+  "message": "OK",
+  "data": {
+    "id": 4,
+    "user_id": 4,
+    "stage_name": "The Broken Strings",
+    "price_min": 500000,
+    "price_max": 2000000,
+    "city": "Bandung",
+    "bio": "Band pop punk asal Bandung dengan 5 tahun pengalaman.",
+    "portfolio_link": "https://youtube.com/thebrokenstrings",
+    "verified": true,
+    "average_rating": 4.5,
+    "total_reviews": 12,
+    "genres": [],
+    "media": []
+  }
+}
+```
+**Response 404:**
+```json
+{
+  "success": false,
+  "message": "Profil talent tidak ditemukan"
+}
+```
+
+### 3.4 Create Talent Profile
 `POST /talents`
 **Access:** talent
 **Request Body:**
@@ -363,7 +418,8 @@ Response error:
   "success": true,
   "message": "Profil talent berhasil dibuat",
   "data": {
-    "id": 1,
+    "id": 4,
+    "user_id": 4,
     "stage_name": "The Broken Strings",
     "genre": ["Pop Punk", "Heavy Metal"],
     "price_min": 500000,
@@ -374,7 +430,7 @@ Response error:
 }
 ```
 
-### 3.4 Update Talent Profile
+### 3.5 Update Talent Profile
 `PUT /talents/{id}`
 **Access:** talent (owner), admin
 **Request Body:**
@@ -396,7 +452,7 @@ Response error:
 }
 ```
 
-### 3.5 Delete Talent Profile
+### 3.6 Delete Talent Profile
 `DELETE /talents/{id}`
 **Access:** admin
 **Response 200:**
@@ -407,7 +463,7 @@ Response error:
 }
 ```
 
-### 3.6 Upload Portfolio Media
+### 3.7 Upload Portfolio Media
 `POST /talents/{id}/media`
 **Access:** talent (owner)
 **Content-Type:** `multipart/form-data`
@@ -430,7 +486,7 @@ Response error:
 }
 ```
 
-### 3.7 Delete Portfolio Media
+### 3.8 Delete Portfolio Media
 `DELETE /talents/{talent_id}/media/{media_id}`
 **Access:** talent (owner), admin
 **Response 200:**
@@ -1031,6 +1087,45 @@ Response error:
     ],
     "pagination": { ... }
   }
+}
+```
+
+### 8.3 Get My Reviews
+`GET /reviews/my`
+**Access:** talent
+**Headers:** `Authorization: Bearer {token}`
+
+Mengambil review untuk talent yang sedang login. Frontend tidak perlu mengirim `talent_id`.
+
+**Response 200:**
+```json
+{
+  "success": true,
+  "message": "OK",
+  "data": {
+    "talent_id": 4,
+    "stage_name": "The Broken Strings",
+    "average_rating": 4.5,
+    "total_reviews": 12,
+    "reviews": [
+      {
+        "id": 8,
+        "organizer_name": "Kafe Kota",
+        "event_title": "Punk Night Vol. 3",
+        "rating": 5,
+        "comment": "The Broken Strings tampil luar biasa...",
+        "created_at": "2026-04-16T10:00:00Z"
+      }
+    ],
+    "pagination": { ... }
+  }
+}
+```
+**Response 404:**
+```json
+{
+  "success": false,
+  "message": "Profil talent tidak ditemukan"
 }
 ```
 

@@ -15,12 +15,20 @@ export type TalentMedia = {
 export type TalentProfile = {
   id: number;
   talent_id?: number;
+  user_id?: number;
   name?: string;
   email?: string;
   phone?: string;
   role?: 'admin' | 'eo' | 'talent';
   stage_name: string;
   genre: string[];
+  genre_ids?: number[];
+  price_min?: number;
+  price_max?: number;
+  city?: string;
+  bio?: string;
+  portfolio_link?: string;
+  total_reviews?: number;
   verified: boolean;
   average_rating: number;
   media?: TalentMedia[];
@@ -134,7 +142,6 @@ export type EventsData = {
   events: Event[];
   pagination?: PaginationMeta;
 };
-
 
 // ─── EO-specific types ────────────────────────────────────────────────────────
 
@@ -256,6 +263,17 @@ export type CreateReviewPayload = {
   rating: number;
   comment: string;
 };
+
+export type UpdateTalentProfilePayload = {
+  stage_name: string;
+  price_min?: number;
+  price_max?: number;
+  city?: string;
+  bio?: string;
+  portfolio_link?: string;
+  genre_ids?: number[];
+};
+
 export type TalentReviewsData = {
   talent_id: number;
   stage_name: string;
@@ -317,4 +335,32 @@ export type AdminModeratePayload = {
 
 export type AdminVerifyPayload = {
   verified: boolean;
+};
+
+// ─── API Integration Types ────────────────────────────────────────────────────
+
+export type ApiErrorResponse = {
+  success: false;
+  message: string;
+  errors?: Record<string, string[]>;
+};
+
+export type UpdateProfilePayload = {
+  name: string;
+  phone: string;
+};
+
+export type ChangePasswordPayload = {
+  current_password: string;
+  new_password: string;
+  new_password_confirmation: string;
+};
+
+export type RespondToInvitationPayload = {
+  status: 'accepted' | 'rejected';
+};
+
+export type UploadMediaPayload = {
+  file: File;
+  type: TalentMediaType;
 };
