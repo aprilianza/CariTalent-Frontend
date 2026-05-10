@@ -15,6 +15,7 @@
     :footer-title-class="eoFooterTitleClass"
     :footer-content-class="eoFooterContentClass"
     @navigate="emit('navigate')"
+    @logout="emit('logout')"
   >
     <template #header="slotProps">
       <slot name="header" v-bind="slotProps" />
@@ -61,6 +62,7 @@ const props = withDefaults(
 
 const emit = defineEmits<{
   navigate: [];
+  logout: [];
 }>();
 
 const eoLinks = computed(() => props.links);

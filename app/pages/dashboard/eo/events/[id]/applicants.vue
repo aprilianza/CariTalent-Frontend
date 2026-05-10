@@ -52,7 +52,7 @@ const route = useRoute();
 const toast = useToast();
 
 const eventId = computed(() => Number(route.params.id));
-const { data: rawApplications, pending } = useEoApplications(eventId.value);
+const { data: rawApplications, pending, updateApplicationStatus, refresh } = useEoApplications(eventId.value);
 
 // Local reactive copy for optimistic updates
 const applications = ref<EoApplication[]>([]);
@@ -84,36 +84,48 @@ const filteredApplications = computed(() => {
 });
 
 const handleAccept = async (applicationId: number, agreedPrice: number) => {
-  // Optimistic update
-  const idx = applications.value.findIndex((a) => a.id === applicationId);
-  if (idx !== -1) {
-    applications.value[idx] = { ...applications.value[idx], status: 'accepted' } as EoApplication;
+  const res = await updateApplicationStatus(applicationId, 'accepted', agreedPrice);
+  if (res.success) {
+    const idx = applications.value.findIndex((a) => a.id === applicationId);
+    if (idx !== -1) {
+      applications.value[idx] = { ...applications.value[idx], status: 'accepted' } as EoApplication;
+    }
+    toast.add({
+      title: 'Lamaran diterima!',
+      description: `Booking telah dibuat dengan harga deal Rp ${agreedPrice.toLocaleString('id-ID')}.`,
+      color: 'success',
+      icon: 'mdi:check-circle-outline',
+    });
+    refresh();
+  } else {
+    toast.add({
+      title: 'Gagal menerima',
+      description: res.message || 'Terjadi kesalahan sistem.',
+      color: 'error',
+    });
   }
-
-  await new Promise((resolve) => setTimeout(resolve, 400));
-
-  toast.add({
-    title: 'Lamaran diterima!',
-    description: `Booking telah dibuat dengan harga deal Rp ${agreedPrice.toLocaleString('id-ID')}.`,
-    color: 'success',
-    icon: 'mdi:check-circle-outline',
-  });
 };
 
 const handleReject = async (applicationId: number) => {
-  // Optimistic update
-  const idx = applications.value.findIndex((a) => a.id === applicationId);
-  if (idx !== -1) {
-    applications.value[idx] = { ...applications.value[idx], status: 'rejected' } as EoApplication;
+  const res = await updateApplicationStatus(applicationId, 'rejected');
+  if (res.success) {
+    const idx = applications.value.findIndex((a) => a.id === applicationId);
+    if (idx !== -1) {
+      applications.value[idx] = { ...applications.value[idx], status: 'rejected' } as EoApplication;
+    }
+    toast.add({
+      title: 'Lamaran ditolak',
+      description: `Talent telah diberi tahu bahwa lamarannya tidak diterima.`,
+      color: 'warning',
+      icon: 'mdi:close-circle-outline',
+    });
+    refresh();
+  } else {
+    toast.add({
+      title: 'Gagal menolak',
+      description: res.message || 'Terjadi kesalahan sistem.',
+      color: 'error',
+    });
   }
-
-  await new Promise((resolve) => setTimeout(resolve, 400));
-
-  toast.add({
-    title: 'Lamaran ditolak',
-    description: `Talent telah diberi tahu bahwa lamarannya tidak diterima.`,
-    color: 'warning',
-    icon: 'mdi:close-circle-outline',
-  });
 };
 </script>

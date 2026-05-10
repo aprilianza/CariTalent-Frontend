@@ -58,7 +58,7 @@ export const useAuth = () => {
     return null;
   };
 
-  const logout = async () => {
+  const logout = async (redirectPath = '/') => {
     try {
       if (token.value) {
         await $api('/auth/logout', { method: 'POST' });
@@ -69,8 +69,34 @@ export const useAuth = () => {
       token.value = null;
       user.value = null;
       if (process.client) {
-        navigateTo('/auth/login');
+        navigateTo(redirectPath);
       }
+    }
+  };
+
+  const updateProfile = async (data: { name?: string; phone?: string }) => {
+    try {
+      const response = await $api<ApiResponse<any>>('/users/profile', {
+        method: 'PUT',
+        body: data,
+      });
+      if (response.success && response.data) {
+        user.value = { ...user.value, ...response.data };
+      }
+      return response;
+    } catch (error: any) {
+      return { success: false, message: error.data?.message || 'Gagal memperbarui profil', errors: error.data?.errors };
+    }
+  };
+
+  const updatePassword = async (data: any) => {
+    try {
+      return await $api<ApiResponse<any>>('/users/password', {
+        method: 'PUT',
+        body: data,
+      });
+    } catch (error: any) {
+      return { success: false, message: error.data?.message || 'Gagal mengubah password', errors: error.data?.errors };
     }
   };
 
@@ -82,5 +108,7 @@ export const useAuth = () => {
     register,
     logout,
     fetchMe,
+    updateProfile,
+    updatePassword,
   };
 };

@@ -67,6 +67,7 @@
 <script setup lang="ts">
 import EoRecommendationList from '~/components/eo/EoRecommendationList.vue';
 import { useRecommendations } from '~/composables/useRecommendations';
+import { useInvitations } from '~/composables/useInvitations';
 
 definePageMeta({
   layout: 'eo',
@@ -80,6 +81,7 @@ const toast = useToast();
 
 const eventId = computed(() => Number(route.params.id));
 const { data: recommendations, pending } = useRecommendations(eventId.value);
+const { inviteTalent } = useInvitations();
 
 const invitingId = ref<number | null>(null);
 const invitedIds = ref<number[]>([]);
@@ -96,19 +98,26 @@ const handleInvite = async (talentId: number) => {
 
   invitingId.value = talentId;
 
-  // Simulate API: POST /invitations
-  await new Promise((resolve) => setTimeout(resolve, 700));
+  const talent = recommendations.value.find((r) => r.talent.id === talentId)?.talent;
+  // Default offering price using dummy 2,000,000 for now. In a real app this might come from a modal input.
+  const response = await inviteTalent(eventId.value, talentId, 2000000);
 
-  invitedIds.value.push(talentId);
   invitingId.value = null;
 
-  const talent = recommendations.value.find((r) => r.talent.id === talentId)?.talent;
-
-  toast.add({
-    title: 'Undangan terkirim!',
-    description: `${talent?.stage_name ?? 'Talent'} berhasil diundang ke event ini.`,
-    color: 'success',
-    icon: 'mdi:send-check-outline',
-  });
+  if (response.success) {
+    invitedIds.value.push(talentId);
+    toast.add({
+      title: 'Undangan terkirim!',
+      description: `${talent?.stage_name ?? 'Talent'} berhasil diundang ke event ini.`,
+      color: 'success',
+      icon: 'mdi:send-check-outline',
+    });
+  } else {
+    toast.add({
+      title: 'Gagal mengundang',
+      description: response.message || 'Terjadi kesalahan sistem.',
+      color: 'error',
+    });
+  }
 };
 </script>
