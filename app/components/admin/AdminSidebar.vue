@@ -15,6 +15,7 @@
     :footer-title-class="adminFooterTitleClass"
     :footer-content-class="adminFooterContentClass"
     @navigate="emit('navigate')"
+    @logout="emit('logout')"
   />
 </template>
 
@@ -53,6 +54,7 @@ const props = withDefaults(
 
 const emit = defineEmits<{
   navigate: [];
+  logout: [];
 }>();
 
 const adminLinks = computed(() => props.links);

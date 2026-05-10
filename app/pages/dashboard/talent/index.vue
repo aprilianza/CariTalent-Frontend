@@ -28,15 +28,17 @@
     </section>
 
     <!-- Main Content Section -->
-    <section class="flex flex-col gap-4 xl:grid xl:grid-cols-3 xl:items-start">
-      <div class="min-w-0 space-y-4 xl:col-span-2" id="bookings">
+    <section class="grid gap-4 xl:grid-cols-2 xl:items-start">
+      <div class="min-w-0 xl:h-[25rem]" id="bookings">
         <BookingList :bookings="bookings" :loading="bookingsPending" :detailed="false" />
-        <ApplicationList id="applications" :applications="applications" :loading="applicationsPending" :detailed="false" />
       </div>
 
-      <div class="min-w-0 space-y-4">
+      <div class="min-w-0 xl:h-[25rem]">
         <InvitationList :invitations="invitations" :loading="invitationsPending" :detailed="false" @accept="handleInvitation('accept', $event)" @reject="handleInvitation('reject', $event)" />
-        <RecommendationList />
+      </div>
+
+      <div class="min-w-0 xl:col-span-2 xl:h-[23rem]" id="applications">
+        <ApplicationList :applications="applications" :loading="applicationsPending" :detailed="false" />
       </div>
     </section>
   </div>
@@ -46,7 +48,6 @@
 import ApplicationList from '~/components/talent/ApplicationList.vue';
 import BookingList from '~/components/talent/BookingList.vue';
 import InvitationList from '~/components/talent/InvitationList.vue';
-import RecommendationList from '~/components/talent/RecommendationList.vue';
 import TalentStatsCard from '~/components/talent/TalentStatsCard.vue';
 import type { Invitation } from '~/composables/types';
 import { useApplications } from '~/composables/useApplications';
@@ -63,7 +64,7 @@ const toast = useToast();
 
 const { data: profile, pending: profilePending } = useProfile();
 const { meta: reviewMeta, pending: reviewPending, error: reviewError } = useTalentReviews({ page: 1, per_page: 1 });
-const { data: applications, pending: applicationsPending, refresh: refreshApplications } = useApplications();
+const { data: applications, pending: applicationsPending } = useApplications();
 const { data: bookings, pending: bookingsPending } = useBookings();
 const { data: invitationsRaw, pending: invitationsPending, respondToInvitation } = useInvitations();
 
