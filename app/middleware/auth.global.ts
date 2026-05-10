@@ -1,6 +1,6 @@
 export default defineNuxtRouteMiddleware(async (to) => {
   const token = useCookie('auth_token');
-  const { user, fetchMe } = useAuth();
+  const { user, fetchUser } = useAuth();
 
   const isAuthRoute = to.path.startsWith('/auth/login') || to.path.startsWith('/auth/register');
   const isDashboardRoute = to.path.startsWith('/dashboard');
@@ -10,7 +10,7 @@ export default defineNuxtRouteMiddleware(async (to) => {
   }
 
   if (token.value && !user.value) {
-    await fetchMe();
+    await fetchUser();
   }
 
   if (isAuthRoute && token.value && user.value) {

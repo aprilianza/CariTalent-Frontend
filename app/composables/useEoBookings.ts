@@ -16,8 +16,17 @@ export const useEoBookings = () => {
     }),
   });
 
-  const completeBooking = (bookingId: number) => api.put<{ id: number; status: BookingStatus }>(`/bookings/${bookingId}/complete`);
-  const cancelBooking = (bookingId: number) => api.put<null>(`/bookings/${bookingId}/cancel`);
+  const completeBooking = async (bookingId: number) => {
+    const response = await api.put<{ id: number; status: BookingStatus }>(`/bookings/${bookingId}/complete`);
+    await refresh();
+    return response;
+  };
+
+  const cancelBooking = async (bookingId: number) => {
+    const response = await api.put<null>(`/bookings/${bookingId}/cancel`);
+    await refresh();
+    return response;
+  };
 
   return {
     response,

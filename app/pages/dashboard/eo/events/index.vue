@@ -108,7 +108,7 @@ pageTitle.value = 'My Events';
 
 const toast = useToast();
 
-const { data: events, pending: eventsPending, createEvent, updateEvent, deleteEvent, refresh } = useEoEvents();
+const { data: events, pending: eventsPending, createEvent, updateEvent, deleteEvent } = useEoEvents();
 const { data: genres } = useGenres();
 
 const showCreateModal = ref(false);
@@ -150,46 +150,36 @@ const openCreateModal = () => {
 const handleEventSubmit = async (payload: CreateEventPayload) => {
   creating.value = true;
 
-  if (modalMode.value === 'edit' && editingEventId.value) {
-    const res = await updateEvent(editingEventId.value, payload);
-    creating.value = false;
-    showCreateModal.value = false;
-    
-    if (res.success) {
+  try {
+    if (modalMode.value === 'edit' && editingEventId.value) {
+      await updateEvent(editingEventId.value, payload);
+      showCreateModal.value = false;
+
       toast.add({
         title: 'Perubahan disimpan!',
         description: `Event "${payload.title}" berhasil diperbarui.`,
         color: 'success',
         icon: 'mdi:check-circle-outline',
       });
-      refresh();
     } else {
-      toast.add({
-        title: 'Gagal memperbarui event',
-        description: res.message || 'Terjadi kesalahan sistem',
-        color: 'error',
-      });
-    }
-  } else {
-    const res = await createEvent(payload);
-    creating.value = false;
-    showCreateModal.value = false;
-    
-    if (res.success) {
+      await createEvent(payload);
+      showCreateModal.value = false;
+
       toast.add({
         title: 'Event berhasil dibuat!',
         description: `"${payload.title}" berhasil dibuat dengan status ${payload.status}.`,
         color: 'success',
         icon: 'mdi:check-circle-outline',
       });
-      refresh();
-    } else {
-      toast.add({
-        title: 'Gagal membuat event',
-        description: res.message || 'Terjadi kesalahan sistem',
-        color: 'error',
-      });
     }
+  } catch (error: any) {
+    toast.add({
+      title: modalMode.value === 'edit' ? 'Gagal memperbarui event' : 'Gagal membuat event',
+      description: error?.message || 'Terjadi kesalahan sistem',
+      color: 'error',
+    });
+  } finally {
+    creating.value = false;
   }
 };
 
@@ -224,26 +214,25 @@ const confirmCancelEvent = async () => {
   if (!cancellingEventId.value) return;
   cancelling.value = true;
 
-  const res = await deleteEvent(cancellingEventId.value);
-  
-  cancelling.value = false;
-  showCancelModal.value = false;
+  try {
+    await deleteEvent(cancellingEventId.value);
+    showCancelModal.value = false;
 
-  if (res.success) {
     toast.add({
       title: 'Event dibatalkan',
       description: `Event berhasil dihapus/dibatalkan.`,
       color: 'warning',
       icon: 'mdi:delete-outline',
     });
-    refresh();
-  } else {
+  } catch (error: any) {
     toast.add({
       title: 'Gagal membatalkan event',
-      description: res.message || 'Terjadi kesalahan sistem',
+      description: error?.message || 'Terjadi kesalahan sistem',
       color: 'error',
     });
+  } finally {
+    cancelling.value = false;
+    cancellingEventId.value = null;
   }
-  cancellingEventId.value = null;
 };
 </script>
