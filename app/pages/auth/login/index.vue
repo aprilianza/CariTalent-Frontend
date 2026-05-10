@@ -40,6 +40,7 @@
           </template>
 
           <form class="space-y-4 px-3 pb-3" @submit.prevent="onSubmit">
+            <UAlert v-if="errorMessage" color="red" variant="soft" :title="errorMessage" class="mb-4" />
             <UFormField label="Email" required>
               <UInput
                 v-model="email"
