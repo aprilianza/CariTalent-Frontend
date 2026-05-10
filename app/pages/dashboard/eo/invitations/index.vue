@@ -107,7 +107,7 @@
 </template>
 
 <script setup lang="ts">
-import { useEoApplications } from '~/composables/useEoApplications';
+import { useEoInvitations } from '~/composables/useEoInvitations';
 import { useFormatters } from '~/composables/useFormatters';
 import type { ApplicationStatus } from '~/composables/types';
 
@@ -118,11 +118,8 @@ definePageMeta({
 const pageTitle = useState('eo-layout-title');
 pageTitle.value = 'Invitations';
 
-const { data: allApplications, pending } = useEoApplications();
+const { data: invitations, pending } = useEoInvitations();
 const { formatCurrency, formatDate } = useFormatters();
-
-// Only show applications with source = invitation
-const invitations = computed(() => allApplications.value.filter((a) => a.source === 'invitation'));
 
 type FilterValue = ApplicationStatus | 'all';
 const activeFilter = ref<FilterValue>('all');

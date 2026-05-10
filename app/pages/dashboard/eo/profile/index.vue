@@ -29,7 +29,7 @@
             </div>
             <div class="flex flex-col gap-1">
               <span class="text-xs font-medium text-neutral-light/60 uppercase tracking-wider">Email</span>
-              <span class="text-base text-ui-light font-medium">eo@kafekota.com</span>
+              <span class="text-base text-ui-light font-medium">{{ originalProfile.email }}</span>
             </div>
             <div class="flex flex-col gap-1 sm:col-span-2">
               <span class="text-xs font-medium text-neutral-light/60 uppercase tracking-wider">Nomor Telepon</span>
@@ -57,7 +57,7 @@
           <div class="flex flex-col gap-2">
             <label class="text-sm font-semibold text-neutral-light">Email</label>
             <UInput
-              value="eo@kafekota.com"
+              :value="originalProfile.email"
               disabled
               placeholder="email@domain.com"
               :ui="{ base: 'w-full rounded-xl border border-white/5 bg-white/4 text-neutral-light/40 cursor-not-allowed' }"
@@ -112,30 +112,48 @@
             <label class="text-sm font-semibold text-neutral-light">Password Saat Ini <span class="text-error">*</span></label>
             <UInput
               v-model="passwordForm.current_password"
-              type="password"
+              :type="showCurrentPassword ? 'text' : 'password'"
               placeholder="Password lama"
               :ui="{ base: 'w-full rounded-xl border border-white/10 bg-white/5 text-neutral-light focus:border-indigo-500/50 focus:ring-1 focus:ring-indigo-500/50 transition-all' }"
-            />
+            >
+              <template #trailing>
+                <button type="button" @click="showCurrentPassword = !showCurrentPassword" class="flex items-center text-neutral-light/60 hover:text-neutral-light pr-2 focus:outline-none">
+                  <Icon :name="showCurrentPassword ? 'mdi:eye-outline' : 'mdi:eye-off-outline'" class="h-5 w-5" />
+                </button>
+              </template>
+            </UInput>
           </div>
 
           <div class="flex flex-col gap-2">
             <label class="text-sm font-semibold text-neutral-light">Password Baru <span class="text-error">*</span></label>
             <UInput
               v-model="passwordForm.new_password"
-              type="password"
+              :type="showNewPassword ? 'text' : 'password'"
               placeholder="Min. 8 karakter"
               :ui="{ base: 'w-full rounded-xl border border-white/10 bg-white/5 text-neutral-light focus:border-indigo-500/50 focus:ring-1 focus:ring-indigo-500/50 transition-all' }"
-            />
+            >
+              <template #trailing>
+                <button type="button" @click="showNewPassword = !showNewPassword" class="flex items-center text-neutral-light/60 hover:text-neutral-light pr-2 focus:outline-none">
+                  <Icon :name="showNewPassword ? 'mdi:eye-outline' : 'mdi:eye-off-outline'" class="h-5 w-5" />
+                </button>
+              </template>
+            </UInput>
           </div>
 
           <div class="flex flex-col gap-2">
             <label class="text-sm font-semibold text-neutral-light">Konfirmasi Password Baru <span class="text-error">*</span></label>
             <UInput
               v-model="passwordForm.new_password_confirmation"
-              type="password"
+              :type="showConfirmPassword ? 'text' : 'password'"
               placeholder="Ulangi password baru"
               :ui="{ base: 'w-full rounded-xl border border-white/10 bg-white/5 text-neutral-light focus:border-error/50 focus:ring-1 focus:ring-error/50 transition-all' }"
-            />
+            >
+              <template #trailing>
+                <button type="button" @click="showConfirmPassword = !showConfirmPassword" class="flex items-center text-neutral-light/60 hover:text-neutral-light pr-2 focus:outline-none">
+                  <Icon :name="showConfirmPassword ? 'mdi:eye-outline' : 'mdi:eye-off-outline'" class="h-5 w-5" />
+                </button>
+              </template>
+            </UInput>
             <p v-if="passwordMismatch" class="text-xs text-error mt-1">Password konfirmasi tidak cocok.</p>
           </div>
 
@@ -184,23 +202,44 @@ definePageMeta({
   layout: 'eo',
 });
 
+import { useAuth } from '~/composables/useAuth';
+
 const pageTitle = useState('eo-layout-title');
 pageTitle.value = 'Profile';
 
 const toast = useToast();
 const { data: events } = useEoEvents();
 const { data: bookings } = useEoBookings();
+const { user, updateProfile, updatePassword } = useAuth();
 
 // Profile state
 const isEditingProfile = ref(false);
 
-// Profile form
-const profileForm = reactive({
-  name: 'Kafe Kota',
-  phone: '081234567890',
+const originalProfile = reactive({ 
+  name: user.value?.name || 'Kafe Kota', 
+  phone: user.value?.phone || '',
+  email: user.value?.email || 'eo@kafekota.com'
 });
 
-const originalProfile = { name: 'Kafe Kota', phone: '081234567890' };
+// Watch for user changes to update original profile
+watch(() => user.value, (newVal) => {
+  if (newVal) {
+    originalProfile.name = newVal.name || '';
+    originalProfile.phone = newVal.phone || '';
+    originalProfile.email = newVal.email || '';
+    
+    // Also update layout username just in case
+    const userName = useState('eo-layout-username');
+    userName.value = newVal.name || 'Event Organizer';
+  }
+}, { immediate: true });
+
+// Profile form
+const profileForm = reactive({
+  name: originalProfile.name,
+  phone: originalProfile.phone,
+});
+
 const savingProfile = ref(false);
 
 const profileChanged = computed(
@@ -217,17 +256,28 @@ const handleUpdateProfile = async () => {
   if (!profileForm.name.trim()) return;
   savingProfile.value = true;
 
-  await new Promise((resolve) => setTimeout(resolve, 700));
+  const res = await updateProfile({
+    name: profileForm.name,
+    phone: profileForm.phone,
+  });
 
   savingProfile.value = false;
-  originalProfile.name = profileForm.name;
-  originalProfile.phone = profileForm.phone;
 
-  // Update layout username
-  const userName = useState('eo-layout-username');
-  userName.value = profileForm.name;
-
-  isEditingProfile.value = false;
+  if (res.success) {
+    toast.add({
+      title: 'Profil Diperbarui',
+      description: 'Informasi profil berhasil disimpan.',
+      color: 'success',
+      icon: 'mdi:check-circle-outline'
+    });
+    isEditingProfile.value = false;
+  } else {
+    toast.add({
+      title: 'Gagal memperbarui profil',
+      description: res.message || 'Terjadi kesalahan sistem',
+      color: 'error'
+    });
+  }
 };
 
 // Password state
@@ -241,6 +291,10 @@ const passwordForm = reactive({
 });
 
 const savingPassword = ref(false);
+
+const showCurrentPassword = ref(false);
+const showNewPassword = ref(false);
+const showConfirmPassword = ref(false);
 
 const passwordMismatch = computed(
   () =>
@@ -266,14 +320,32 @@ const handleChangePassword = async () => {
   if (!isPasswordFormValid.value) return;
   savingPassword.value = true;
 
-  await new Promise((resolve) => setTimeout(resolve, 800));
+  const res = await updatePassword({
+    current_password: passwordForm.current_password,
+    new_password: passwordForm.new_password,
+    new_password_confirmation: passwordForm.new_password_confirmation,
+  });
 
   savingPassword.value = false;
-  passwordForm.current_password = '';
-  passwordForm.new_password = '';
-  passwordForm.new_password_confirmation = '';
 
-  isEditingPassword.value = false;
+  if (res.success) {
+    toast.add({
+      title: 'Password Berhasil Diubah',
+      description: 'Keamanan akun kamu kini telah diperbarui.',
+      color: 'success',
+      icon: 'mdi:shield-check-outline'
+    });
+    passwordForm.current_password = '';
+    passwordForm.new_password = '';
+    passwordForm.new_password_confirmation = '';
+    isEditingPassword.value = false;
+  } else {
+    toast.add({
+      title: 'Gagal mengubah password',
+      description: res.message || 'Pastikan password saat ini benar.',
+      color: 'error'
+    });
+  }
 };
 
 // Account info
@@ -295,7 +367,7 @@ const accountInfo = computed(() => [
   },
   {
     label: 'Member Sejak',
-    value: '2026',
+    value: user.value?.created_at ? new Date(user.value.created_at).getFullYear().toString() : '2026',
     icon: 'mdi:calendar-account-outline',
   },
 ]);

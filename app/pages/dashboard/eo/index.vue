@@ -93,8 +93,8 @@ pageTitle.value = 'Dashboard';
 
 const toast = useToast();
 
-const { data: events, pending: eventsPending } = useEoEvents();
-const { data: bookings, pending: bookingsPending } = useEoBookings();
+const { data: events, pending: eventsPending, deleteEvent, refresh: refreshEvents } = useEoEvents();
+const { data: bookings, pending: bookingsPending, completeBooking, cancelBooking, refresh: refreshBookings } = useEoBookings();
 
 const latestEvents = computed(() => events.value.slice(0, 3));
 const latestBookings = computed(() => bookings.value.slice(0, 3));
@@ -144,27 +144,57 @@ const handleEditEvent = (id: number) => {
   });
 };
 
-const handleCancelEvent = (id: number) => {
-  toast.add({
-    title: 'Event dibatalkan',
-    description: `Event #${id} berhasil dibatalkan (dummy).`,
-    color: 'warning',
-  });
+const handleCancelEvent = async (id: number) => {
+  const res = await deleteEvent(id);
+  if (res.success) {
+    toast.add({
+      title: 'Event dibatalkan',
+      description: `Event #${id} berhasil dibatalkan.`,
+      color: 'warning',
+    });
+    refreshEvents();
+  } else {
+    toast.add({
+      title: 'Gagal membatalkan event',
+      description: res.message || 'Terjadi kesalahan sistem',
+      color: 'error',
+    });
+  }
 };
 
-const handleCompleteBooking = (id: number) => {
-  toast.add({
-    title: 'Booking selesai',
-    description: `Booking #${id} ditandai selesai. Kamu bisa memberikan review sekarang.`,
-    color: 'success',
-  });
+const handleCompleteBooking = async (id: number) => {
+  const res = await completeBooking(id);
+  if (res.success) {
+    toast.add({
+      title: 'Booking selesai',
+      description: `Booking #${id} ditandai selesai. Kamu bisa memberikan review sekarang.`,
+      color: 'success',
+    });
+    refreshBookings();
+  } else {
+    toast.add({
+      title: 'Gagal menyelesaikan booking',
+      description: res.message || 'Terjadi kesalahan.',
+      color: 'error',
+    });
+  }
 };
 
-const handleCancelBooking = (id: number) => {
-  toast.add({
-    title: 'Booking dibatalkan',
-    description: `Booking #${id} berhasil dibatalkan.`,
-    color: 'warning',
-  });
+const handleCancelBooking = async (id: number) => {
+  const res = await cancelBooking(id);
+  if (res.success) {
+    toast.add({
+      title: 'Booking dibatalkan',
+      description: `Booking #${id} berhasil dibatalkan.`,
+      color: 'warning',
+    });
+    refreshBookings();
+  } else {
+    toast.add({
+      title: 'Gagal membatalkan booking',
+      description: res.message || 'Terjadi kesalahan.',
+      color: 'error',
+    });
+  }
 };
 </script>

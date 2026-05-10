@@ -83,7 +83,7 @@ const pageTitle = useState('eo-layout-title');
 pageTitle.value = 'My Bookings';
 
 const toast = useToast();
-const { data: rawBookings, pending } = useEoBookings();
+const { data: rawBookings, pending, refresh, completeBooking, cancelBooking, submitReview: apiSubmitReview } = useEoBookings();
 
 const bookings = ref<EoBooking[]>([]);
 watch(
@@ -121,60 +121,88 @@ const filteredBookings = computed(() => {
 const handleComplete = async (id: number) => {
   completingId.value = id;
 
-  // Optimistic update
-  const idx = bookings.value.findIndex((b) => b.id === id);
-  if (idx !== -1) {
-    bookings.value[idx] = { ...bookings.value[idx], status: 'completed', resolution: 'done' } as any;
-  }
+  const res = await completeBooking(id);
 
-  await new Promise((resolve) => setTimeout(resolve, 600));
   completingId.value = null;
 
-  // Prompt review
-  reviewTargetBookingId.value = id;
-  reviewForm.rating = 0;
-  reviewForm.comment = '';
-  showReviewModal.value = true;
+  if (res.success) {
+    // Optimistic update
+    const idx = bookings.value.findIndex((b) => b.id === id);
+    if (idx !== -1) {
+      bookings.value[idx] = { ...bookings.value[idx], status: 'completed', resolution: 'done' } as any;
+    }
+    
+    // Prompt review
+    reviewTargetBookingId.value = id;
+    reviewForm.rating = 0;
+    reviewForm.comment = '';
+    showReviewModal.value = true;
 
-  toast.add({
-    title: 'Booking selesai!',
-    description: 'Booking ditandai selesai. Berikan review untuk talent kamu.',
-    color: 'success',
-    icon: 'mdi:check-decagram-outline',
-  });
+    toast.add({
+      title: 'Booking selesai!',
+      description: 'Booking ditandai selesai. Berikan review untuk talent kamu.',
+      color: 'success',
+      icon: 'mdi:check-decagram-outline',
+    });
+    
+    refresh();
+  } else {
+    toast.add({
+      title: 'Gagal menyelesaikan booking',
+      description: res.message || 'Terjadi kesalahan.',
+      color: 'error'
+    });
+  }
 };
 
 const handleCancel = async (id: number) => {
-  const idx = bookings.value.findIndex((b) => b.id === id);
-  if (idx !== -1) {
-    // Update instead of removing so user can see Completed - Reject
-    bookings.value[idx] = { ...bookings.value[idx], status: 'completed', resolution: 'reject' } as any;
+  const res = await cancelBooking(id);
+  
+  if (res.success) {
+    const idx = bookings.value.findIndex((b) => b.id === id);
+    if (idx !== -1) {
+      bookings.value[idx] = { ...bookings.value[idx], status: 'completed', resolution: 'reject' } as any;
+    }
+
+    toast.add({
+      title: 'Booking dibatalkan',
+      description: `Booking #${id} berhasil dibatalkan.`,
+      color: 'warning',
+      icon: 'mdi:close-circle-outline',
+    });
+    
+    refresh();
+  } else {
+    toast.add({
+      title: 'Gagal membatalkan booking',
+      description: res.message || 'Terjadi kesalahan.',
+      color: 'error'
+    });
   }
-
-  await new Promise((resolve) => setTimeout(resolve, 400));
-
-  toast.add({
-    title: 'Booking dibatalkan',
-    description: `Booking #${id} berhasil dibatalkan.`,
-    color: 'warning',
-    icon: 'mdi:close-circle-outline',
-  });
 };
 
 const submitReview = async () => {
   if (!reviewTargetBookingId.value || reviewForm.rating === 0) return;
   submittingReview.value = true;
 
-  await new Promise((resolve) => setTimeout(resolve, 700));
+  const res = await apiSubmitReview(reviewTargetBookingId.value, reviewForm.rating, reviewForm.comment);
 
   submittingReview.value = false;
-  showReviewModal.value = false;
 
-  toast.add({
-    title: 'Review terkirim!',
-    description: `Rating ${reviewForm.rating}/5 berhasil dikirim. Terima kasih atas ulasannya!`,
-    color: 'success',
-    icon: 'mdi:star-check-outline',
-  });
+  if (res.success) {
+    showReviewModal.value = false;
+    toast.add({
+      title: 'Review terkirim!',
+      description: `Rating ${reviewForm.rating}/5 berhasil dikirim. Terima kasih atas ulasannya!`,
+      color: 'success',
+      icon: 'mdi:star-check-outline',
+    });
+  } else {
+    toast.add({
+      title: 'Gagal mengirim review',
+      description: res.message || 'Terjadi kesalahan.',
+      color: 'error'
+    });
+  }
 };
 </script>
