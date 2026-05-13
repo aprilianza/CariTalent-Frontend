@@ -1,7 +1,7 @@
 <template>
   <UModal v-model:open="modelOpen" :ui="{ content: 'bg-transparent ring-0 shadow-none sm:max-w-2xl w-full mx-auto' }">
     <template #content>
-      <div class="relative overflow-hidden rounded-2xl border border-white/10 bg-[#1e1e2e]/95 backdrop-blur-xl p-7 shadow-2xl">
+      <div class="relative max-h-[90vh] overflow-y-auto rounded-2xl border border-white/10 bg-[#1e1e2e]/95 backdrop-blur-xl p-7 shadow-2xl [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
         <!-- Background decoration -->
         <div class="absolute -top-32 -right-32 h-64 w-64 rounded-full bg-violet-500/20 blur-3xl pointer-events-none"></div>
         <div class="absolute -bottom-32 -left-32 h-64 w-64 rounded-full bg-indigo-500/20 blur-3xl pointer-events-none"></div>

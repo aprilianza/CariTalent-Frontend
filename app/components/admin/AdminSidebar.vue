@@ -59,7 +59,7 @@ const emit = defineEmits<{
 
 const adminLinks = computed(() => props.links);
 
-const adminSidebarClass = computed(() => 'flex h-full w-72 flex-col border-r border-white/10 bg-ui-dark/70 px-4 py-5 backdrop-blur-xl');
+const adminSidebarClass = computed(() => 'flex h-full w-72 flex-col overflow-y-auto [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none] border-r border-white/10 bg-ui-dark/70 px-4 py-5 backdrop-blur-xl');
 
 const adminHeaderIconClasses = computed(() => 'flex h-10 w-10 items-center justify-center rounded-xl border border-highlight/30 bg-highlight/10 text-accent shadow-lg shadow-highlight/25');
 

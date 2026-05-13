@@ -54,6 +54,23 @@ export const useInvitations = (filters?: InvitationsFilters) => {
     }
   };
 
+  // Action method to invite a talent (EO only)
+  const inviteTalent = async (eventId: number, talentId: number, offeredPrice: number) => {
+    try {
+      const result = await api.post('/invitations', {
+        event_id: eventId,
+        talent_id: talentId,
+        offered_price: offeredPrice,
+      });
+      return { success: true, data: result };
+    } catch (err: any) {
+      return { 
+        success: false, 
+        message: err?.data?.message || err?.message || 'Gagal mengirim undangan.' 
+      };
+    }
+  };
+
   return {
     data,
     pagination,
@@ -61,5 +78,6 @@ export const useInvitations = (filters?: InvitationsFilters) => {
     error,
     refresh,
     respondToInvitation,
+    inviteTalent,
   };
 };

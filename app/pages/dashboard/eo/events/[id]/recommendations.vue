@@ -59,8 +59,56 @@
       :loading="pending"
       :inviting-id="invitingId"
       :invited-ids="invitedIds"
-      @invite="handleInvite"
+      @invite="handleInviteClick"
     />
+
+    <!-- Invite Modal -->
+    <UModal v-model:open="isInviteModalOpen" :ui="{ content: 'bg-transparent ring-0 shadow-none sm:max-w-md w-full mx-auto' }">
+      <template #content>
+        <div class="relative overflow-hidden rounded-2xl border border-white/10 bg-[#1e1e2e]/95 backdrop-blur-xl p-7 shadow-2xl">
+          <div class="absolute -top-32 -right-32 h-64 w-64 rounded-full bg-violet-500/20 blur-3xl pointer-events-none"></div>
+          
+          <div class="relative z-10 space-y-6">
+            <div class="border-b border-white/5 pb-4">
+              <h3 class="text-xl font-bold bg-gradient-to-r from-violet-400 to-indigo-400 bg-clip-text text-transparent">
+                Undang Talent
+              </h3>
+              <p class="mt-1.5 text-sm text-neutral-light/70">
+                Tentukan harga penawaran (offering price) untuk talent ini.
+              </p>
+            </div>
+
+            <form class="space-y-5" @submit.prevent="confirmInvite">
+              <div class="flex flex-col gap-2">
+                <label class="text-sm font-semibold text-neutral-light">Harga Penawaran (Rp) <span class="text-error">*</span></label>
+                <UInput
+                  v-model="offeringPrice"
+                  type="number"
+                  placeholder="Contoh: 2000000"
+                  :ui="{ base: 'w-full rounded-xl border border-white/10 bg-white/5 text-neutral-light placeholder-neutral-light/40 focus:border-violet-500/50 focus:ring-1 focus:ring-violet-500/50 transition-all' }"
+                  required
+                />
+              </div>
+
+              <div class="flex justify-end gap-3 pt-4 border-t border-white/5">
+                <UiButton color="neutral" variant="ghost" type="button" class="hover:bg-white/5" @click="isInviteModalOpen = false">Batal</UiButton>
+                <UiButton
+                  color="primary"
+                  variant="soft"
+                  type="submit"
+                  :loading="invitingId !== null"
+                  :disabled="!offeringPrice || Number(offeringPrice) <= 0"
+                  icon="mdi:send-outline"
+                  class="bg-gradient-to-r from-violet-500 to-indigo-500 hover:from-violet-400 hover:to-indigo-400 text-white shadow-lg shadow-violet-500/25 border-0"
+                >
+                  Kirim Undangan
+                </UiButton>
+              </div>
+            </form>
+          </div>
+        </div>
+      </template>
+    </UModal>
   </div>
 </template>
 
@@ -68,6 +116,7 @@
 import EoRecommendationList from '~/components/eo/EoRecommendationList.vue';
 import { useRecommendations } from '~/composables/useRecommendations';
 import { useInvitations } from '~/composables/useInvitations';
+import { useEoApplications } from '~/composables/useEoApplications';
 
 definePageMeta({
   layout: 'eo',
@@ -82,11 +131,27 @@ const toast = useToast();
 const eventId = computed(() => Number(route.params.id));
 const { data: recommendations, pending } = useRecommendations(eventId.value);
 const { inviteTalent } = useInvitations();
+const { data: applications } = useEoApplications(eventId.value);
 
 const invitingId = ref<number | null>(null);
 const invitedIds = ref<number[]>([]);
 
-const handleInvite = async (talentId: number) => {
+watch(applications, (newApps) => {
+  if (newApps && newApps.length > 0) {
+    const ids = newApps.map((app) => app.talent.id);
+    for (const id of ids) {
+      if (!invitedIds.value.includes(id)) {
+        invitedIds.value.push(id);
+      }
+    }
+  }
+}, { immediate: true });
+
+const isInviteModalOpen = ref(false);
+const selectedTalentIdForInvite = ref<number | null>(null);
+const offeringPrice = ref<string>('');
+
+const handleInviteClick = (talentId: number) => {
   if (invitedIds.value.includes(talentId)) {
     toast.add({
       title: 'Sudah diundang',
@@ -96,13 +161,25 @@ const handleInvite = async (talentId: number) => {
     return;
   }
 
-  invitingId.value = talentId;
+  selectedTalentIdForInvite.value = talentId;
+  offeringPrice.value = '';
+  isInviteModalOpen.value = true;
+};
 
-  const talent = recommendations.value.find((r) => r.talent.id === talentId)?.talent;
-  // Default offering price using dummy 2,000,000 for now. In a real app this might come from a modal input.
-  const response = await inviteTalent(eventId.value, talentId, 2000000);
+const confirmInvite = async () => {
+  if (selectedTalentIdForInvite.value === null) return;
+  if (!offeringPrice.value || Number(offeringPrice.value) <= 0) return;
+
+  const talentId = selectedTalentIdForInvite.value;
+  invitingId.value = talentId;
+  isInviteModalOpen.value = false;
+
+  const talent = recommendations.value?.find((r) => r.talent.id === talentId)?.talent;
+  
+  const response = await inviteTalent(eventId.value, talentId, Number(offeringPrice.value));
 
   invitingId.value = null;
+  selectedTalentIdForInvite.value = null;
 
   if (response.success) {
     invitedIds.value.push(talentId);
