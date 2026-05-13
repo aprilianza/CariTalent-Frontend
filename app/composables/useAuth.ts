@@ -5,7 +5,7 @@ export const useAuth = () => {
   const user = useState<any>('user', () => null)
   
   const config = useRuntimeConfig()
-  const baseURL = (config.public.apiBase as string) || 'https://api.caritalent.id/api/v1'
+  const baseURL = (config.public.apiBase as string) || 'http://127.0.0.1:8000/api/v1'
 
   const login = async (credentials: any) => {
     try {
@@ -78,12 +78,49 @@ export const useAuth = () => {
     }
   }
 
+  const updateProfile = async (profileData: { name: string, phone: string }) => {
+    try {
+      const response = await $fetch<any>('/users/profile', {
+        baseURL,
+        method: 'PUT',
+        headers: {
+          Authorization: `Bearer ${token.value}`
+        },
+        body: profileData
+      })
+      if (response.success) {
+        user.value = { ...user.value, ...profileData }
+      }
+      return response
+    } catch (error: any) {
+      return error.data || { success: false, message: error.message }
+    }
+  }
+
+  const updatePassword = async (passwordData: any) => {
+    try {
+      const response = await $fetch<any>('/users/password', {
+        baseURL,
+        method: 'PUT',
+        headers: {
+          Authorization: `Bearer ${token.value}`
+        },
+        body: passwordData
+      })
+      return response
+    } catch (error: any) {
+      return error.data || { success: false, message: error.message }
+    }
+  }
+
   return {
     token,
     user,
     login,
     register,
     fetchUser,
-    logout
+    logout,
+    updateProfile,
+    updatePassword
   }
 }

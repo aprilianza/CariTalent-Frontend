@@ -67,7 +67,7 @@ const emit = defineEmits<{
 
 const eoLinks = computed(() => props.links);
 
-const eoSidebarClass = computed(() => 'flex h-full w-72 flex-col border-r border-white/10 bg-ui-dark/70 px-4 py-5 backdrop-blur-xl');
+const eoSidebarClass = computed(() => 'flex h-full w-72 flex-col overflow-y-auto [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none] border-r border-white/10 bg-ui-dark/70 px-4 py-5 backdrop-blur-xl');
 
 const eoHeaderIconClasses = computed(() => 'flex h-10 w-10 items-center justify-center rounded-xl border border-violet-500/30 bg-violet-500/10 text-fuchsia-400 shadow-lg shadow-violet-500/25');
 

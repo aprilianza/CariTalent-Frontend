@@ -90,7 +90,7 @@ const props = withDefaults(
     footerContent: 'Perbarui portfolio setiap minggu untuk meningkatkan peluang diterima organizer.',
     activeItemClass: 'bg-primary/12 text-primary dark:bg-primary/15',
     inactiveItemClass: 'text-neutral-600 hover:bg-neutral-100 hover:text-neutral-900 dark:text-neutral-300 dark:hover:bg-white/10 dark:hover:text-white',
-    sidebarClass: 'flex h-full w-72 flex-col border-r border-white/10 bg-white/90 px-4 py-5 dark:bg-neutral-950/80',
+    sidebarClass: 'flex h-full w-72 flex-col overflow-y-auto [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none] border-r border-white/10 bg-white/90 px-4 py-5 dark:bg-neutral-950/80',
     footerClass: 'mt-auto rounded-2xl border border-primary/20 bg-primary/8 p-4',
     footerTitleClass: 'text-primary',
     footerContentClass: 'text-neutral-700 dark:text-neutral-200',
