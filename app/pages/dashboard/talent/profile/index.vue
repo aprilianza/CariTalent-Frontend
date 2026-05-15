@@ -4,7 +4,7 @@
       <div class="space-y-3">
         <p class="text-sm font-medium text-neutral-light/70">Talent Workspace</p>
         <h1 class="font-display text-2xl font-bold bg-gradient-to-r from-highlight to-accent bg-clip-text text-transparent md:text-3xl">Profile Settings</h1>
-        <p class="text-sm text-neutral-light/80">Kelola profil, password, dan media portofolio sesuai API spec user dan talent profile.</p>
+        <p class="text-sm text-neutral-light/80">Kelola profil, password, dan media portofolio.</p>
       </div>
     </UiCard>
 
@@ -149,7 +149,7 @@
     </UiCard>
 
     <section class="grid gap-5">
-      <UiCard title="Change Password" description="Implementasi endpoint PUT /users/password." card-class="h-full">
+      <UiCard title="Change Password" description="Ubah password akunmu dengan aman." card-class="h-full">
         <form class="flex h-full flex-col gap-5" @submit.prevent="handleChangePassword">
           <div class="grid gap-4">
             <UFormField label="Current Password" required class="w-full">
@@ -170,7 +170,7 @@
       </UiCard>
     </section>
 
-    <UiCard title="Portfolio Media" description="Implementasi endpoint POST /talents/{id}/media dan DELETE /talents/{talent_id}/media/{media_id}.">
+    <UiCard title="Portfolio Media" description="Kelola media portofoliomu dari satu tempat.">
       <div class="space-y-5">
         <form class="grid gap-4 rounded-xl border border-white/10 bg-white/5 p-4 md:grid-cols-[1fr_180px_auto] md:items-end" @submit.prevent="handleUploadMedia">
           <UFormField label="Media File" required>
@@ -298,9 +298,7 @@ const syncOverviewForm = () => {
   talentForm.city = value.city || '';
   talentForm.bio = value.bio || '';
   talentForm.portfolio_link = value.portfolio_link || '';
-  selectedTalentGenreIds.value = value.genre_ids?.length
-    ? [...value.genre_ids]
-    : value.genre.map((genreName) => genres.value.find((genre) => genre.name === genreName)?.id).filter((id): id is number => Boolean(id));
+  selectedTalentGenreIds.value = value.genre_ids?.length ? [...value.genre_ids] : value.genre.map((genreName) => genres.value.find((genre) => genre.name === genreName)?.id).filter((id): id is number => Boolean(id));
 };
 
 watch(

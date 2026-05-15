@@ -5,7 +5,7 @@
         <div>
           <p class="text-sm font-medium text-neutral-light/70">Talent Workspace</p>
           <h1 class="font-display bg-gradient-to-r from-highlight to-accent bg-clip-text text-2xl font-bold text-transparent md:text-3xl">Talent Reviews</h1>
-          <p class="mt-2 text-sm text-neutral-light/80">Ulasan dari organizer setelah booking selesai, sesuai endpoint review pada API spec.</p>
+          <p class="mt-2 text-sm text-neutral-light/80">Ulasan dari organizer setelah booking selesai.</p>
         </div>
         <div class="flex items-center gap-2">
           <UiBadge :label="meta.stageName || 'Talent'" color="secondary" variant="soft" />

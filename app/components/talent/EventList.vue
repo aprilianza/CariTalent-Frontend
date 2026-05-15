@@ -1,5 +1,5 @@
 <template>
-  <UiCard id="events" title="Open Events" :description="detailed ? 'Daftar event sesuai API spec dengan status, budget, genre, dan lokasi lengkap' : 'Ringkasan event terbaru'" card-class="h-full">
+  <UiCard id="events" title="Open Events" :description="detailed ? 'Daftar event terbaru dengan status, budget, genre, dan lokasi.' : 'Ringkasan event terbaru'" card-class="h-full">
     <div v-if="loading" class="space-y-3">
       <USkeleton v-for="n in 3" :key="`event-skeleton-${n}`" class="h-20 w-full rounded-xl" />
     </div>
@@ -25,6 +25,10 @@
             <span
               >Lokasi: <span class="font-medium text-neutral-900 dark:text-neutral-100">{{ item.location }}</span></span
             >
+          </div>
+
+          <div class="flex flex-wrap items-center gap-2">
+            <UiButton v-if="item.hasLocation" size="xs" color="secondary" variant="soft" icon="mdi:map-marker-outline" @click="handleViewLocation(item.latitude, item.longitude)"> Lihat Lokasi </UiButton>
           </div>
 
           <p v-if="detailed" class="text-xs leading-relaxed text-neutral-500 dark:text-neutral-400">
@@ -72,6 +76,14 @@ const emit = defineEmits<{
 
 const { formatCurrency, formatDate } = useFormatters();
 
+const openGoogleMaps = (latitude?: number, longitude?: number) => {
+  if (latitude === undefined || longitude === undefined) {
+    return;
+  }
+
+  window.open(`https://www.google.com/maps/search/?api=1&query=${latitude},${longitude}`, '_blank', 'noopener,noreferrer');
+};
+
 const statusMeta: Record<Event['status'], { label: string; color: 'success' | 'warning' | 'error' | 'neutral' | 'primary' }> = {
   draft: { label: 'Draft', color: 'neutral' },
   open: { label: 'Open', color: 'success' },
@@ -105,6 +117,9 @@ const mappedItems = computed(() =>
       budget: formatCurrency(event.budget),
       eventDate: formatDateSafe(event.event_date),
       location: [event.venue_name, event.city].filter(Boolean).join(' • '),
+      latitude: event.latitude,
+      longitude: event.longitude,
+      hasLocation: event.latitude !== undefined && event.longitude !== undefined,
       statusLabel: status.label,
       statusColor: status.color,
       canApply,
@@ -124,5 +139,9 @@ const formatDateSafe = (value: string) => {
   } catch {
     return value;
   }
+};
+
+const handleViewLocation = (latitude?: number, longitude?: number) => {
+  openGoogleMaps(latitude, longitude);
 };
 </script>

@@ -18,7 +18,7 @@
       </div>
     </UiCard>
 
-    <UiCard title="Filter Events" description="Filter event sesuai parameter GET /events pada API spec.">
+    <UiCard title="Filter Events" description="Saring event sesuai kebutuhanmu.">
       <div class="grid gap-4 lg:grid-cols-4">
         <UFormField label="Search" class="w-full">
           <UInput v-model="filterForm.search" placeholder="Judul event" class="w-full" :ui="{ base: 'w-full rounded-xl border-white/20 bg-white/8 text-ui-light' }" @keyup.enter="applyFilters" />
@@ -102,6 +102,19 @@
                   <p class="mt-1 font-semibold text-ui-light">{{ formatDate(selectedEvent.event_date) }}</p>
                 </div>
               </div>
+
+              <div class="mt-4 flex justify-start">
+                <UiButton
+                  v-if="selectedEvent.latitude !== undefined && selectedEvent.longitude !== undefined"
+                  size="sm"
+                  color="secondary"
+                  variant="soft"
+                  icon="mdi:map-marker-outline"
+                  @click="openGoogleMaps(selectedEvent.latitude, selectedEvent.longitude)"
+                >
+                  Lihat Lokasi
+                </UiButton>
+              </div>
             </div>
 
             <UFormField label="Pesan" required class="w-full" :ui="{ label: 'text-sm font-semibold text-ui-light', container: 'w-full' }">
@@ -152,6 +165,14 @@ useState('talent-layout-title', () => 'Talent Dashboard').value = 'Events';
 const toast = useToast();
 const { formatCurrency, formatDate } = useFormatters();
 const { data: genres } = useGenres();
+
+const openGoogleMaps = (latitude?: number, longitude?: number) => {
+  if (latitude === undefined || longitude === undefined) {
+    return;
+  }
+
+  window.open(`https://www.google.com/maps/search/?api=1&query=${latitude},${longitude}`, '_blank', 'noopener,noreferrer');
+};
 
 const currentPage = ref(1);
 const appliedFilters = reactive({
