@@ -2,7 +2,6 @@
   <SharedNavbar
     :title="title"
     :subtitle="subtitle"
-    :notifications="notifications"
     :user-name="userName"
     :user-role="userRole"
     :header-classes="adminHeaderClasses"
@@ -25,7 +24,6 @@ withDefaults(
   defineProps<{
     title?: string;
     subtitle?: string;
-    notifications?: number;
     userName?: string;
     userRole?: string;
     menuButtonClass?: string;
@@ -34,7 +32,6 @@ withDefaults(
   {
     title: 'Admin Dashboard',
     subtitle: '',
-    notifications: 0,
     userName: 'Administrator',
     userRole: 'Administrator',
     menuButtonClass: '',
@@ -46,14 +43,9 @@ defineEmits<{
   'toggle-sidebar': [];
 }>();
 
-const adminHeaderClasses = computed(
-  () => 'sticky top-0 z-30 border-b border-white/10 bg-ui-dark/70 backdrop-blur-xl',
-);
+const adminHeaderClasses = computed(() => 'sticky top-0 z-30 border-b border-white/10 bg-ui-dark/70 backdrop-blur-xl');
 
-const adminTitleClasses = computed(
-  () =>
-    'font-display font-bold bg-gradient-to-r from-highlight to-accent bg-clip-text text-transparent',
-);
+const adminTitleClasses = computed(() => 'font-display font-bold bg-gradient-to-r from-highlight to-accent bg-clip-text text-transparent');
 const adminSubtitleClasses = computed(() => 'text-neutral-light/70');
 const adminUserNameClasses = computed(() => 'text-ui-light font-semibold');
 const adminUserRoleClasses = computed(() => 'text-accent/90 font-medium');

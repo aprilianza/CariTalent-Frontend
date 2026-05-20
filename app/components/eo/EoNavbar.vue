@@ -2,7 +2,6 @@
   <SharedNavbar
     :title="title"
     :subtitle="subtitle"
-    :notifications="notifications"
     :user-name="userName"
     :user-role="userRole"
     :header-classes="eoHeaderClasses"
@@ -26,7 +25,6 @@ withDefaults(
   defineProps<{
     title?: string;
     subtitle?: string;
-    notifications?: number;
     userName?: string;
     userRole?: string;
     menuButtonClass?: string;
@@ -35,7 +33,6 @@ withDefaults(
   {
     title: 'EO Dashboard',
     subtitle: '',
-    notifications: 0,
     userName: 'Event Organizer',
     userRole: 'Event Organizer',
     menuButtonClass: '',

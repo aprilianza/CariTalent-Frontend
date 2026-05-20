@@ -30,11 +30,11 @@
               Budget event: <span class="font-medium text-neutral-900 dark:text-neutral-100">{{ item.budget }}</span>
             </p>
             <p>
-              Koordinat: <span class="font-medium text-neutral-900 dark:text-neutral-100">{{ item.coordinates }}</span>
-            </p>
-            <p>
               Dikirim: <span class="font-medium text-neutral-900 dark:text-neutral-100">{{ item.createdAt }}</span>
             </p>
+            <div class="md:col-span-2 flex justify-start">
+              <UiButton v-if="item.hasLocation" size="xs" color="secondary" variant="soft" icon="mdi:map-marker-outline" @click="handleViewLocation(item.latitude, item.longitude)"> Lihat Lokasi </UiButton>
+            </div>
           </div>
 
           <div v-if="detailed && item.isPending" class="flex flex-wrap gap-2">
@@ -73,6 +73,14 @@ const emit = defineEmits<{
 
 const { formatCurrency, formatDate } = useFormatters();
 
+const openGoogleMaps = (latitude?: number, longitude?: number) => {
+  if (latitude === undefined || longitude === undefined) {
+    return;
+  }
+
+  window.open(`https://www.google.com/maps/search/?api=1&query=${latitude},${longitude}`, '_blank', 'noopener,noreferrer');
+};
+
 const statusMap: Record<InvitationStatus, { label: string; color: string }> = {
   pending: { label: 'Pending', color: 'warning' },
   accepted: { label: 'Accepted', color: 'success' },
@@ -87,14 +95,6 @@ const formatDateSafe = (value?: string) => {
   return formatDate(value);
 };
 
-const formatCoordinates = (latitude?: number, longitude?: number) => {
-  if (latitude === undefined || longitude === undefined) {
-    return '-';
-  }
-
-  return `${latitude}, ${longitude}`;
-};
-
 const mappedItems = computed(() =>
   props.invitations.map((invitation) => ({
     id: invitation.id,
@@ -105,7 +105,9 @@ const mappedItems = computed(() =>
     venue: invitation.event.venue_name || '-',
     city: invitation.event.city || '-',
     budget: invitation.event.budget ? formatCurrency(invitation.event.budget) : '-',
-    coordinates: formatCoordinates(invitation.event.latitude, invitation.event.longitude),
+    latitude: invitation.event.latitude,
+    longitude: invitation.event.longitude,
+    hasLocation: invitation.event.latitude !== undefined && invitation.event.longitude !== undefined,
     createdAt: formatDateSafe(invitation.created_at),
     isPending: invitation.status === 'pending',
     statusLabel: statusMap[invitation.status].label,
@@ -120,4 +122,8 @@ const displayedItems = computed(() => {
 
   return mappedItems.value.slice(0, 3);
 });
+
+const handleViewLocation = (latitude?: number, longitude?: number) => {
+  openGoogleMaps(latitude, longitude);
+};
 </script>

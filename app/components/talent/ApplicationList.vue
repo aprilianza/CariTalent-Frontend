@@ -30,11 +30,11 @@
               Sumber: <span class="font-medium text-neutral-900 dark:text-neutral-100">{{ item.sourceLabel }}</span>
             </p>
             <p>
-              Koordinat: <span class="font-medium text-neutral-900 dark:text-neutral-100">{{ item.coordinates }}</span>
-            </p>
-            <p>
               Dikirim: <span class="font-medium text-neutral-900 dark:text-neutral-100">{{ item.createdAt }}</span>
             </p>
+            <div class="md:col-span-2 flex justify-start">
+              <UiButton v-if="item.hasLocation" size="xs" color="secondary" variant="soft" icon="mdi:map-marker-outline" @click="handleViewLocation(item.latitude, item.longitude)"> Lihat Lokasi </UiButton>
+            </div>
           </div>
 
           <div v-if="detailed && item.canCancel" class="flex justify-end">
@@ -71,6 +71,14 @@ const emit = defineEmits<{
 
 const { formatCurrency, formatDate } = useFormatters();
 
+const openGoogleMaps = (latitude?: number, longitude?: number) => {
+  if (latitude === undefined || longitude === undefined) {
+    return;
+  }
+
+  window.open(`https://www.google.com/maps/search/?api=1&query=${latitude},${longitude}`, '_blank', 'noopener,noreferrer');
+};
+
 const statusMap: Record<ApplicationStatus, { label: string; color: string }> = {
   pending: { label: 'Pending', color: 'warning' },
   accepted: { label: 'Accepted', color: 'success' },
@@ -96,14 +104,6 @@ const formatDateSafe = (value?: string) => {
   return formatDate(value);
 };
 
-const formatCoordinates = (latitude?: number, longitude?: number) => {
-  if (latitude === undefined || longitude === undefined) {
-    return '-';
-  }
-
-  return `${latitude}, ${longitude}`;
-};
-
 const mappedItems = computed(() =>
   props.applications.map((application) => ({
     id: application.id,
@@ -113,8 +113,10 @@ const mappedItems = computed(() =>
     eventDate: formatDateSafe(application.event.event_date),
     venue: application.event.venue_name || '-',
     city: application.event.city || '-',
+    latitude: application.event.latitude,
+    longitude: application.event.longitude,
+    hasLocation: application.event.latitude !== undefined && application.event.longitude !== undefined,
     sourceLabel: application.source ? sourceMap[application.source] : '-',
-    coordinates: formatCoordinates(application.event.latitude, application.event.longitude),
     createdAt: formatDateSafe(application.created_at),
     canCancel: application.status === 'pending',
     statusLabel: statusMap[application.status].label,
@@ -129,4 +131,8 @@ const displayedItems = computed(() => {
 
   return mappedItems.value.slice(0, 3);
 });
+
+const handleViewLocation = (latitude?: number, longitude?: number) => {
+  openGoogleMaps(latitude, longitude);
+};
 </script>

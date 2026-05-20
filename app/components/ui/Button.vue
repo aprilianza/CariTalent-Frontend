@@ -8,7 +8,7 @@
     :disabled="disabled"
     :icon="icon"
     :class="['rounded-xl font-medium transition-transform hover:-translate-y-0.5', buttonClass]"
-    @click="$emit('click')"
+    @click="(e: MouseEvent) => $emit('click', e)"
   >
     <slot>{{ label }}</slot>
   </UButton>
@@ -41,6 +41,6 @@ withDefaults(
 );
 
 defineEmits<{
-  click: [];
+  click: [event: MouseEvent];
 }>();
 </script>

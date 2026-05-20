@@ -23,11 +23,11 @@
               Sumber: <span class="font-medium text-neutral-900 dark:text-neutral-100">{{ item.sourceLabel }}</span>
             </p>
             <p>
-              Koordinat: <span class="font-medium text-neutral-900 dark:text-neutral-100">{{ item.coordinates }}</span>
-            </p>
-            <p>
               Dibuat: <span class="font-medium text-neutral-900 dark:text-neutral-100">{{ item.createdAt }}</span>
             </p>
+            <div class="md:col-span-2 flex justify-start">
+              <UiButton v-if="item.hasLocation" size="xs" color="secondary" variant="soft" icon="mdi:map-marker-outline" @click="handleViewLocation(item.latitude, item.longitude)"> Lihat Lokasi </UiButton>
+            </div>
           </div>
         </div>
       </template>
@@ -56,6 +56,14 @@ const listClass = computed(() => (detailed.value ? '' : 'max-h-[26rem] overflow-
 
 const { formatCurrency, formatDate } = useFormatters();
 
+const openGoogleMaps = (latitude?: number, longitude?: number) => {
+  if (latitude === undefined || longitude === undefined) {
+    return;
+  }
+
+  window.open(`https://www.google.com/maps/search/?api=1&query=${latitude},${longitude}`, '_blank', 'noopener,noreferrer');
+};
+
 const statusMap: Record<BookingStatus, { label: string; color: string }> = {
   confirmed: { label: 'Confirmed', color: 'success' },
   completed: { label: 'Completed', color: 'primary' },
@@ -74,23 +82,17 @@ const formatDateSafe = (value?: string) => {
   return formatDate(value);
 };
 
-const formatCoordinates = (latitude?: number, longitude?: number) => {
-  if (latitude === undefined || longitude === undefined) {
-    return '-';
-  }
-
-  return `${latitude}, ${longitude}`;
-};
-
 const mappedItems = computed(() =>
   props.bookings.map((booking) => ({
     id: booking.id,
     title: booking.event.title,
     date: formatDateSafe(booking.event.event_date),
     venue: booking.event.venue_name,
+    latitude: booking.event.latitude,
+    longitude: booking.event.longitude,
+    hasLocation: booking.event.latitude !== undefined && booking.event.longitude !== undefined,
     agreedPrice: booking.agreed_price ? formatCurrency(booking.agreed_price) : '-',
     sourceLabel: booking.source ? sourceMap[booking.source] : '-',
-    coordinates: formatCoordinates(booking.event.latitude, booking.event.longitude),
     createdAt: formatDateSafe(booking.created_at),
     statusLabel: statusMap[booking.status].label,
     statusColor: statusMap[booking.status].color,
@@ -104,4 +106,8 @@ const displayedItems = computed(() => {
 
   return mappedItems.value.slice(0, 3);
 });
+
+const handleViewLocation = (latitude?: number, longitude?: number) => {
+  openGoogleMaps(latitude, longitude);
+};
 </script>

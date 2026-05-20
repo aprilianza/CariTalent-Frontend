@@ -1,87 +1,73 @@
-# CariTalent API Specification V1.1
+# Spec API CariTalent v2.0
 
-**Base URL:** `https://api.caritalent.id/api/v1`
-**Format:** JSON
-**Auth:** Bearer Token (Laravel Sanctum)
-**Content-Type:** `application/json`
+Dokumen ini dibuat berdasarkan backend Laravel terbaru di repository ini, terutama `routes/api.php`, controller, request validation, model, dan migration. Spec lama tidak dijadikan acuan.
 
----
+## Ringkasan
 
-## Perubahan V1.1
-- Register talent otomatis membuat talent profile.
-- `stage_name` pada register talent bersifat opsional. Jika tidak dikirim, backend memakai `name` sebagai nilai awal.
-- Identitas talent profile disamakan dengan identitas user: `talents.id = talents.user_id = users.id`.
-- Endpoint baru untuk talent login: `GET /talents/my`.
-- Endpoint baru untuk review talent login: `GET /reviews/my`.
+- Base URL lokal: `http://localhost:8000/api/v1`
+- Format data utama: JSON
+- Auth: Laravel Sanctum token
+- Header auth:
 
----
+```http
+Authorization: Bearer {token}
+Accept: application/json
+Content-Type: application/json
+```
 
-## Daftar Isi
-1. Konvensi Umum
-2. Authentication
-3. User & Profile
-4. Talent Profile
-5. Event
-6. Application
-7. Invitation
-8. Booking
-9. Review
-10. Notification
-11. Admin
-12. Matchmaking
-13. Error Codes
+Role yang digunakan:
 
----
+- `talent`: membuat profil talent, apply event, menerima undangan, melihat booking/review sendiri.
+- `eo`: membuat event, mengundang talent, menerima/menolak application, menyelesaikan booking, memberi review.
+- `admin`: dashboard admin, moderasi user/talent/event, beberapa akses booking.
 
-## Konvensi Umum
+## Format Response Umum
 
-### HTTP Status Codes
-| Code | Keterangan |
-|---|---|
-| 200 | OK — request berhasil |
-| 201 | Created — resource berhasil dibuat |
-| 400 | Bad Request — input tidak valid |
-| 401 | Unauthorized — token tidak ada / expired |
-| 403 | Forbidden — tidak punya akses |
-| 404 | Not Found — resource tidak ditemukan |
-| 422 | Unprocessable Entity — validasi gagal |
-| 500 | Internal Server Error |
+Mayoritas endpoint memakai bentuk:
 
-### Response Envelope
-Semua response menggunakan format:
 ```json
 {
   "success": true,
-  "message": "Deskripsi singkat",
-  "data": { ... }
+  "message": "OK",
+  "data": {}
 }
 ```
 
-Response error:
+Error umum:
+
 ```json
 {
   "success": false,
-  "message": "Pesan error",
-  "errors": { ... }
+  "message": "Validasi gagal",
+  "errors": {
+    "field": ["Pesan error"]
+  }
 }
 ```
 
-### Role Akses
-| Role | Keterangan |
-|---|---|
-| admin | Administrator platform |
-| eo | Event Organizer |
-| talent | Talent / Seniman |
-| public | Tanpa autentikasi |
+Status umum:
 
----
+- `200`: berhasil
+- `201`: resource berhasil dibuat
+- `400`: request tidak valid secara proses
+- `401`: belum login/token tidak valid
+- `403`: role tidak punya akses
+- `404`: data tidak ditemukan
+- `422`: validasi gagal atau konflik bisnis
+- `500`: kesalahan sistem
 
-## 1. Authentication
+Catatan penting backend saat ini: beberapa endpoint legacy memanggil helper `successResponse($data, $message)` dengan urutan argumen terbalik. Endpoint tersebut tetap dicatat di bagian "Catatan Response Aktual".
 
-### 1.1 Register
+## Auth
+
+### Register
+
 `POST /auth/register`
-**Access:** Public
-**Request Body:**
+
+Akses: public
+
+Body:
+
 ```json
 {
   "name": "Budi Santoso",
@@ -93,73 +79,68 @@ Response error:
   "stage_name": "The Broken Strings"
 }
 ```
-> `role` hanya boleh: `talent` atau `eo`. Role `admin` tidak bisa diregistrasi via endpoint ini.
-> `stage_name` opsional dan hanya digunakan untuk role `talent`. Jika talent tidak mengirim `stage_name`, backend memakai `name` sebagai nama panggung awal. Role `eo` tidak perlu mengirim `stage_name`.
 
-**Response 201:**
+Validasi:
+
+- `name`: required, string, max 255
+- `email`: required, email, unique
+- `password`: required, min 6, confirmed
+- `phone`: required, string, max 20
+- `role`: required, enum `talent|eo`
+- `stage_name`: opsional, hanya boleh untuk role `talent`
+
+Jika role `talent`, backend otomatis membuat profil talent awal dengan:
+
+- `id = user.id`
+- `user_id = user.id`
+- `stage_name = stage_name` atau nama user
+- `city = ""` jika tidak dikirim
+- `verified = false`
+
+Response `201`:
+
 ```json
 {
   "success": true,
   "message": "Registrasi berhasil",
   "data": {
-    "user": {
-      "id": 4,
-      "name": "Budi Santoso",
-      "email": "budi@email.com",
-      "phone": "081234567890",
-      "role": "talent",
-      "created_at": "2026-03-08T10:00:00Z"
-    },
-    "talent": {
-      "id": 4,
-      "user_id": 4,
-      "stage_name": "The Broken Strings",
-      "city": "",
-      "verified": false
-    },
-    "token": "1|abc123tokenhere"
-  }
-}
-```
-**Response 422 (validasi gagal):**
-```json
-{
-  "success": false,
-  "message": "Validasi gagal",
-  "errors": {
-    "email": ["Email sudah terdaftar."],
-    "password": ["Password minimal 8 karakter."]
+    "user": {},
+    "token": "plain_text_token",
+    "talent": {}
   }
 }
 ```
 
-### 1.2 Login
+### Login
+
 `POST /auth/login`
-**Access:** Public
-**Request Body:**
+
+Akses: public
+
+Body:
+
 ```json
 {
   "email": "budi@email.com",
   "password": "password123"
 }
 ```
-**Response 200:**
+
+Response `200`:
+
 ```json
 {
   "success": true,
   "message": "Login berhasil",
   "data": {
-    "user": {
-      "id": 1,
-      "name": "Budi Santoso",
-      "email": "budi@email.com",
-      "role": "talent"
-    },
-    "token": "1|abc123tokenhere"
+    "user": {},
+    "token": "plain_text_token"
   }
 }
 ```
-**Response 401:**
+
+Error login salah: `401`
+
 ```json
 {
   "success": false,
@@ -167,22 +148,30 @@ Response error:
 }
 ```
 
-### 1.3 Logout
+### Logout
+
 `POST /auth/logout`
-**Access:** All authenticated users
-**Headers:** `Authorization: Bearer {token}`
-**Response 200:**
+
+Akses: login
+
+Response aktual `200`:
+
 ```json
 {
   "success": true,
-  "message": "Logout berhasil"
+  "message": "OK",
+  "data": "Logout berhasil"
 }
 ```
 
-### 1.4 Get Current User
+### Me
+
 `GET /auth/me`
-**Access:** All authenticated users
-**Response 200:**
+
+Akses: login
+
+Response `200`:
+
 ```json
 {
   "success": true,
@@ -192,88 +181,115 @@ Response error:
     "name": "Budi Santoso",
     "email": "budi@email.com",
     "phone": "081234567890",
-    "role": "talent",
-    "created_at": "2026-03-08T10:00:00Z"
-  }
-}
-```
-
----
-
-## 2. User & Profile
-
-### 2.1 Update Profile
-`PUT /users/profile`
-**Access:** All authenticated users
-**Request Body:**
-```json
-{
-  "name": "Budi Santoso Updated",
-  "phone": "089876543210"
-}
-```
-**Response 200:**
-```json
-{
-  "success": true,
-  "message": "Profil berhasil diperbarui",
-  "data": {
-    "id": 1,
-    "name": "Budi Santoso Updated",
-    "email": "budi@email.com",
-    "phone": "089876543210",
     "role": "talent"
   }
 }
 ```
 
-### 2.2 Change Password
+## User & Profile
+
+### Update User Profile
+
+`PUT /users/profile`
+
+Akses: login
+
+Body:
+
+```json
+{
+  "name": "Nama Baru",
+  "phone": "081111111111"
+}
+```
+
+Validasi:
+
+- `name`: optional, required jika dikirim, string, max 255
+- `phone`: optional, required jika dikirim, string, max 20
+
+Response `200`:
+
+```json
+{
+  "success": true,
+  "message": "Profil berhasil diperbarui",
+  "data": {}
+}
+```
+
+### Update Password
+
 `PUT /users/password`
-**Access:** All authenticated users
-**Request Body:**
+
+Akses: login
+
+Body:
+
 ```json
 {
   "current_password": "password123",
-  "new_password": "newpassword456",
-  "new_password_confirmation": "newpassword456"
+  "new_password": "password456",
+  "new_password_confirmation": "password456"
 }
 ```
-**Response 200:**
+
+Validasi:
+
+- `current_password`: required, string
+- `new_password`: required, string, min 6, confirmed
+
+Response `200`:
+
 ```json
 {
   "success": true,
   "message": "Password berhasil diubah"
 }
 ```
-**Response 422:**
+
+## Genres
+
+### List Genres
+
+`GET /genres`
+
+Akses: public
+
+Response aktual `200`:
+
 ```json
 {
-  "success": false,
-  "message": "Password lama tidak sesuai"
+  "success": true,
+  "message": {
+    "genres": []
+  },
+  "data": "OK"
 }
 ```
 
----
+Catatan: secara intent endpoint ini mengembalikan daftar genre, tetapi response aktual backend saat ini masih tertukar antara `message` dan `data`.
 
-## 3. Talent Profile
+## Talents
 
-### 3.1 Get All Talents
+### List Talents
+
 `GET /talents`
-**Access:** Public
-**Query Parameters:**
-| Parameter | Type | Keterangan |
-|---|---|---|
-| genre | string | Filter berdasarkan genre |
-| city | string | Filter berdasarkan kota |
-| price_min | int | Filter harga minimum |
-| price_max | int | Filter harga maksimum |
-| verified | boolean | Filter hanya talent terverifikasi |
-| search | string | Cari berdasarkan nama panggung |
-| page | int | Halaman (default: 1) |
-| per_page | int | Jumlah per halaman (default: 15) |
 
-**Contoh Request:** `GET /talents?genre=Pop+Punk&city=Bandung&verified=true`
-**Response 200:**
+Akses: public
+
+Query:
+
+- `city`: filter kota exact match
+- `verified`: `true|false|1|0`
+- `search`: cari `stage_name`
+- `genre`: cari nama genre dengan LIKE
+- `price_min`: filter `price_min >= nilai`
+- `price_max`: filter `price_max <= nilai`
+- `per_page`: default 15
+
+Response `200`:
+
 ```json
 {
   "success": true,
@@ -284,7 +300,7 @@ Response error:
         "id": 4,
         "user_id": 4,
         "stage_name": "The Broken Strings",
-        "genre": ["Pop Punk", "Alternative"],
+        "genre": ["Pop Punk", "Alternative Rock"],
         "price_min": 500000,
         "price_max": 2000000,
         "city": "Bandung",
@@ -292,30 +308,27 @@ Response error:
         "portfolio_link": "https://youtube.com/thebrokenstrings",
         "verified": true,
         "average_rating": 4.5,
-        "total_reviews": 12,
-        "media": [
-          {
-            "id": 1,
-            "media_url": "https://storage.caritalent.id/media/1.jpg",
-            "type": "image"
-          }
-        ]
+        "total_reviews": 12
       }
     ],
     "pagination": {
       "current_page": 1,
       "per_page": 15,
-      "total": 48,
-      "last_page": 4
+      "total": 1,
+      "last_page": 1
     }
   }
 }
 ```
 
-### 3.2 Get Talent by ID
+### Detail Talent
+
 `GET /talents/{id}`
-**Access:** Public
-**Response 200:**
+
+Akses: public
+
+Response `200` jika ditemukan:
+
 ```json
 {
   "success": true,
@@ -324,7 +337,7 @@ Response error:
     "id": 4,
     "user_id": 4,
     "stage_name": "The Broken Strings",
-    "genre": ["Pop Punk", "Alternative"],
+    "genre": ["Pop Punk", "Alternative Rock"],
     "price_min": 500000,
     "price_max": 2000000,
     "city": "Bandung",
@@ -332,27 +345,13 @@ Response error:
     "portfolio_link": "https://youtube.com/thebrokenstrings",
     "verified": true,
     "average_rating": 4.5,
-    "total_reviews": 12,
-    "reviews": [
-      {
-        "id": 1,
-        "organizer_name": "Kafe Kota",
-        "rating": 5,
-        "comment": "Sangat profesional dan memukau penonton.",
-        "created_at": "2026-02-10T20:00:00Z"
-      }
-    ],
-    "media": [
-      {
-        "id": 1,
-        "media_url": "https://storage.caritalent.id/media/1.jpg",
-        "type": "image"
-      }
-    ]
+    "total_reviews": 12
   }
 }
 ```
-**Response 404:**
+
+Error `404`:
+
 ```json
 {
   "success": false,
@@ -360,202 +359,192 @@ Response error:
 }
 ```
 
-### 3.3 Get My Talent Profile
+### My Talent
+
 `GET /talents/my`
-**Access:** talent
-**Headers:** `Authorization: Bearer {token}`
 
-Mengambil data talent profile milik user talent yang sedang login. Frontend tidak perlu mengirim `talent_id`.
+Akses: login, role `talent`
 
-**Response 200:**
+Response `200`:
+
 ```json
 {
   "success": true,
   "message": "OK",
   "data": {
-    "id": 4,
-    "user_id": 4,
+    "id": 1,
+    "user_id": 1,
     "stage_name": "The Broken Strings",
-    "price_min": 500000,
-    "price_max": 2000000,
+    "genre": ["Pop Punk", "Alternative Rock"],
+    "price_min": 1000000,
+    "price_max": 3000000,
     "city": "Bandung",
-    "bio": "Band pop punk asal Bandung dengan 5 tahun pengalaman.",
-    "portfolio_link": "https://youtube.com/thebrokenstrings",
-    "verified": true,
-    "average_rating": 4.5,
-    "total_reviews": 12,
-    "genres": [],
-    "media": []
+    "bio": "Band pop punk Bandung",
+    "portfolio_link": "https://example.com",
+    "verified": false,
+    "average_rating": 0,
+    "total_reviews": 0
   }
 }
 ```
-**Response 404:**
-```json
-{
-  "success": false,
-  "message": "Profil talent tidak ditemukan"
-}
-```
 
-### 3.4 Create Talent Profile
+### Create Talent Profile
+
 `POST /talents`
-**Access:** talent
-**Request Body:**
+
+Akses: login, role `talent`
+
+Body:
+
 ```json
 {
   "stage_name": "The Broken Strings",
-  "genre_ids": [1, 3],
-  "price_min": 500000,
-  "price_max": 2000000,
+  "genre_ids": [1, 2],
+  "price_min": 1000000,
+  "price_max": 3000000,
   "city": "Bandung",
-  "bio": "Band pop punk asal Bandung dengan 5 tahun pengalaman.",
-  "portfolio_link": "https://youtube.com/thebrokenstrings"
+  "bio": "Band pop punk Bandung",
+  "portfolio_link": "https://example.com"
 }
 ```
-**Response 201:**
+
+Validasi:
+
+- `stage_name`: required, string, max 255
+- `genre_ids`: optional array, item harus ada di `genres.id`
+- `price_min`: optional numeric
+- `price_max`: optional numeric
+- `city`: required, string, max 255
+- `bio`: optional string
+- `portfolio_link`: optional url
+
+Response `201`:
+
 ```json
 {
   "success": true,
   "message": "Profil talent berhasil dibuat",
   "data": {
-    "id": 4,
-    "user_id": 4,
+    "id": 1,
+    "user_id": 1,
     "stage_name": "The Broken Strings",
-    "genre": ["Pop Punk", "Heavy Metal"],
-    "price_min": 500000,
-    "price_max": 2000000,
+    "genre": ["Pop Punk", "Alternative Rock"],
+    "price_min": 1000000,
+    "price_max": 3000000,
     "city": "Bandung",
-    "verified": false
+    "bio": "Band pop punk Bandung",
+    "portfolio_link": "https://example.com",
+    "verified": false,
+    "average_rating": 0,
+    "total_reviews": 0
   }
 }
 ```
 
-### 3.5 Update Talent Profile
+Catatan: registrasi role `talent` sudah otomatis membuat profil talent, jadi endpoint ini akan sering menghasilkan `422` `Profil talent sudah ada`.
+
+### Update Talent Profile
+
 `PUT /talents/{id}`
-**Access:** talent (owner), admin
-**Request Body:**
+
+Akses route: login, role `talent`
+
+Otorisasi controller: owner talent atau admin. Karena route hanya mengizinkan role `talent`, admin tidak bisa mencapai endpoint ini melalui route saat ini.
+
+Body:
+
 ```json
 {
-  "stage_name": "The Broken Strings II",
-  "price_min": 750000,
-  "price_max": 2500000,
-  "bio": "Bio terbaru.",
-  "genre_ids": [1, 2, 4]
+  "stage_name": "Nama Stage Baru",
+  "genre_ids": [1, 3],
+  "price_min": 1500000,
+  "price_max": 3500000,
+  "city": "Jakarta",
+  "bio": "Bio baru",
+  "portfolio_link": "https://example.com/portfolio"
 }
 ```
-**Response 200:**
+
+Response `200`:
+
 ```json
 {
   "success": true,
   "message": "Profil talent berhasil diperbarui",
-  "data": { ... }
-}
-```
-
-### 3.6 Delete Talent Profile
-`DELETE /talents/{id}`
-**Access:** admin
-**Response 200:**
-```json
-{
-  "success": true,
-  "message": "Profil talent berhasil dihapus"
-}
-```
-
-### 3.7 Upload Portfolio Media
-`POST /talents/{id}/media`
-**Access:** talent (owner)
-**Content-Type:** `multipart/form-data`
-**Request Body:**
-| Field | Type | Keterangan |
-|---|---|---|
-| file | file | File gambar/video/audio |
-| type | string | image / video / audio |
-
-**Response 201:**
-```json
-{
-  "success": true,
-  "message": "Media berhasil diunggah",
   "data": {
-    "id": 5,
-    "media_url": "https://storage.caritalent.id/media/5.mp4",
-    "type": "video"
+    "id": 1,
+    "stage_name": "Nama Stage Baru",
+    "genre": ["Pop Punk", "Alternative Rock"]
   }
 }
 ```
 
-### 3.8 Delete Portfolio Media
-`DELETE /talents/{talent_id}/media/{media_id}`
-**Access:** talent (owner), admin
-**Response 200:**
+### Delete Talent Profile
+
+`DELETE /talents/{id}`
+
+Akses route: login, role `talent`
+
+Otorisasi controller: hanya admin. Karena route hanya mengizinkan role `talent`, endpoint ini praktis selalu gagal `403` untuk user biasa.
+
+Error umum:
+
 ```json
 {
-  "success": true,
-  "message": "Media berhasil dihapus"
+  "success": false,
+  "message": "Akses ditolak. Hanya admin yang dapat menghapus data ini."
 }
 ```
 
----
+## Events
 
-## 4. Event
+### List Events
 
-### 4.1 Get All Events
 `GET /events`
-**Access:** Public
-**Query Parameters:**
-| Parameter | Type | Keterangan |
-|---|---|---|
-| status | string | draft / open / closed / completed / cancelled |
-| genre | string | Filter genre yang dibutuhkan |
-| city | string | Filter kota venue |
-| budget_min | int | Filter budget minimum |
-| budget_max | int | Filter budget maksimum |
-| date_from | date | Filter tanggal mulai |
-| date_to | date | Filter tanggal akhir |
-| search | string | Cari berdasarkan judul event |
-| page | int | Halaman |
 
-**Contoh Request:** `GET /events?status=open&genre=Pop+Punk&city=Bandung`
-**Response 200:**
+Akses: public
+
+Query yang benar-benar dipakai controller:
+
+- `status`: `dibuka|ditutup|selesai|dibatalkan`
+- `city`: exact match
+- `budget_min`: numeric
+- `budget_max`: numeric
+- `search`: cari title
+- `per_page`: default 15
+
+Query yang tercantum di annotation tetapi belum diproses controller saat ini:
+
+- `genre`
+- `date_from`
+- `date_to`
+
+Response `200`:
+
 ```json
 {
   "success": true,
   "message": "OK",
   "data": {
-    "events": [
-      {
-        "id": 1,
-        "organizer_id": 2,
-        "organizer_name": "Kafe Kota",
-        "title": "Punk Night Vol. 3",
-        "description": "Malam punk rock terbaik di Bandung.",
-        "genre_needed": ["Pop Punk", "Hardcore"],
-        "budget": 3000000,
-        "event_date": "2026-04-15",
-        "venue_name": "Kafe Kota Bandung",
-        "latitude": -6.9175,
-        "longitude": 107.6191,
-        "city": "Bandung",
-        "status": "open",
-        "created_at": "2026-03-01T09:00:00Z"
-      }
-    ],
+    "events": [],
     "pagination": {
       "current_page": 1,
       "per_page": 15,
-      "total": 23,
-      "last_page": 2
+      "total": 0,
+      "last_page": 1
     }
   }
 }
 ```
 
-### 4.2 Get Event by ID
-`GET /events/{id}`
-**Access:** Public
-**Response 200:**
+### Detail Event
+
+`GET /events/{event}`
+
+Akses: public
+
+Response `200`:
+
 ```json
 {
   "success": true,
@@ -563,81 +552,123 @@ Mengambil data talent profile milik user talent yang sedang login. Frontend tida
   "data": {
     "id": 1,
     "organizer_id": 2,
-    "organizer_name": "Kafe Kota",
     "title": "Punk Night Vol. 3",
     "description": "Malam punk rock terbaik di Bandung.",
-    "genre_needed": ["Pop Punk", "Hardcore"],
-    "budget": 3000000,
+    "budget": "3000000.00",
     "event_date": "2026-04-15",
     "venue_name": "Kafe Kota Bandung",
-    "latitude": -6.9175,
-    "longitude": 107.6191,
+    "latitude": "-6.91750000",
+    "longitude": "107.61910000",
     "city": "Bandung",
-    "status": "open",
-    "total_applicants": 5,
-    "created_at": "2026-03-01T09:00:00Z"
+    "status": "dibuka",
+    "genres": [],
+    "genre_needed": [],
+    "total_applicants": 0
   }
 }
 ```
 
-### 4.3 Create Event
+### My Events
+
+`GET /events/my`
+
+Akses: login, role `eo`
+
+Response `200`:
+
+```json
+{
+  "success": true,
+  "message": "OK",
+  "data": {
+    "events": [],
+    "pagination": {
+      "current_page": 1,
+      "per_page": 15,
+      "total": 0,
+      "last_page": 1
+    }
+  }
+}
+```
+
+### Create Event
+
 `POST /events`
-**Access:** eo
-**Request Body:**
+
+Akses: login, role `eo`
+
+Body:
+
 ```json
 {
   "title": "Punk Night Vol. 3",
   "description": "Malam punk rock terbaik di Bandung.",
-  "genre_ids": [1, 5],
   "budget": 3000000,
   "event_date": "2026-04-15",
   "venue_name": "Kafe Kota Bandung",
   "latitude": -6.9175,
   "longitude": 107.6191,
   "city": "Bandung",
-  "status": "draft"
+  "status": "dibuka",
+  "genre_ids": [1, 5]
 }
 ```
-**Response 201:**
+
+Validasi:
+
+- `title`: required, string, max 255
+- `description`: required, string
+- `budget`: required, numeric, min 0
+- `event_date`: required, date
+- `venue_name`: required, string, max 255
+- `latitude`: nullable numeric between -90 and 90
+- `longitude`: nullable numeric between -180 and 180
+- `city`: required, string, max 255
+- `status`: nullable enum `dibuka|ditutup|selesai|dibatalkan`
+- `genre_ids`: nullable array
+- `genre_ids.*`: integer
+
+Response `201`:
+
 ```json
 {
   "success": true,
   "message": "Event berhasil dibuat",
-  "data": {
-    "id": 1,
-    "title": "Punk Night Vol. 3",
-    "status": "draft",
-    "created_at": "2026-03-08T10:00:00Z"
-  }
+  "data": {}
 }
 ```
 
-### 4.4 Update Event
-`PUT /events/{id}`
-**Access:** eo (owner)
-**Request Body:**
-```json
-{
-  "title": "Punk Night Vol. 3 - Special Edition",
-  "budget": 4000000,
-  "status": "open"
-}
-```
-**Response 200:**
+### Update Event
+
+`PUT /events/{event}`
+
+Akses: login, role `eo`
+
+Body: semua field optional, sama seperti create event.
+
+Response `200`:
+
 ```json
 {
   "success": true,
   "message": "Event berhasil diperbarui",
-  "data": { ... }
+  "data": {}
 }
 ```
 
-### 4.5 Cancel Event
-`DELETE /events/{id}`
-**Access:** eo (owner), admin
-> Event tidak dihapus permanen, status berubah menjadi `cancelled`.
+Catatan: backend saat ini belum mengecek owner event di controller update, hanya role `eo`.
 
-**Response 200:**
+### Cancel Event
+
+`DELETE /events/{event}`
+
+Akses: login, role `eo` atau `admin`
+
+Efek: tidak hard delete, hanya update `status = dibatalkan`.
+
+Response `200`:
+
 ```json
 {
   "success": true,
@@ -645,56 +676,62 @@ Mengambil data talent profile milik user talent yang sedang login. Frontend tida
 }
 ```
 
-### 4.6 Get My Events (EO)
-`GET /events/my`
-**Access:** eo
-**Response 200:**
-```json
-{
-  "success": true,
-  "message": "OK",
-  "data": {
-    "events": [ ... ],
-    "pagination": { ... }
-  }
-}
-```
+## Applications
 
----
+Application adalah record talent melamar event. Invitation juga memakai tabel/model `applications`, dengan `source = invitation`.
 
-## 5. Application
+Status application:
 
-### 5.1 Apply ke Event (Talent)
+- `pending`
+- `accepted`
+- `rejected`
+
+Source:
+
+- `apply`
+- `invitation`
+
+### Apply Event
+
 `POST /applications`
-**Access:** talent
-**Request Body:**
+
+Akses: login, role `talent`
+
+Body:
+
 ```json
 {
   "event_id": 1,
-  "message": "Kami band pop punk dari Bandung dengan pengalaman 5 tahun, siap tampil di acara ini.",
+  "message": "Kami siap tampil di acara ini.",
   "proposed_price": 1500000
 }
 ```
-> Sistem otomatis set `source = apply` dan `status = pending`. UNIQUE constraint mencegah talent apply dua kali ke event yang sama.
 
-**Response 201:**
+Validasi:
+
+- `event_id`: required, exists `events.id`
+- `message`: optional string
+- `proposed_price`: required numeric min 0
+
+Response `201`:
+
 ```json
 {
   "success": true,
   "message": "Lamaran berhasil dikirim",
   "data": {
-    "id": 10,
     "event_id": 1,
+    "message": "Kami siap tampil di acara ini.",
+    "proposed_price": 1500000,
     "talent_id": 3,
     "source": "apply",
-    "message": "Kami band pop punk dari Bandung...",
-    "proposed_price": 1500000,
-    "status": "pending",
-    "created_at": "2026-03-08T11:00:00Z"
+    "status": "pending"
   }
 }
 ```
-**Response 422 (sudah pernah apply):**
+
+Error jika sudah pernah apply/invited ke event tersebut:
+
 ```json
 {
   "success": false,
@@ -702,16 +739,39 @@ Mengambil data talent profile milik user talent yang sedang login. Frontend tida
 }
 ```
 
-### 5.2 Get Applications by Event (EO melihat pelamar)
-`GET /events/{event_id}/applications`
-**Access:** eo (owner event)
-**Query Parameters:**
-| Parameter | Type | Keterangan |
-|---|---|---|
-| status | string | pending / accepted / rejected |
-| source | string | apply / invitation |
+### My Applications
 
-**Response 200:**
+`GET /applications/my`
+
+Akses: login, role `talent`
+
+Hanya mengembalikan application dengan `source = apply`.
+
+Response `200`:
+
+```json
+{
+  "success": true,
+  "message": "OK",
+  "data": {
+    "applications": []
+  }
+}
+```
+
+### Event Applications
+
+`GET /events/{event_id}/applications`
+
+Akses: login, role `eo`
+
+Query:
+
+- `status`: `pending|accepted|rejected`
+- `source`: `apply|invitation`
+
+Response `200`:
+
 ```json
 {
   "success": true,
@@ -720,69 +780,51 @@ Mengambil data talent profile milik user talent yang sedang login. Frontend tida
     "applications": [
       {
         "id": 10,
+        "source": "apply",
+        "message": "Kami siap tampil.",
+        "proposed_price": "1500000.00",
+        "status": "pending",
+        "created_at": "2026-05-19T00:00:00.000000Z",
         "talent": {
           "id": 3,
           "stage_name": "The Broken Strings",
           "genre": ["Pop Punk"],
           "city": "Bandung",
-          "verified": true,
-          "average_rating": 4.5
-        },
-        "source": "apply",
-        "message": "Kami band pop punk dari Bandung...",
-        "proposed_price": 1500000,
-        "status": "pending",
-        "created_at": "2026-03-08T11:00:00Z"
+          "verified": false,
+          "average_rating": 0
+        }
       }
     ]
   }
 }
 ```
 
-### 5.3 Get My Applications (Talent melihat lamarannya)
-`GET /applications/my`
-**Access:** talent
-**Response 200:**
-```json
-{
-  "success": true,
-  "message": "OK",
-  "data": {
-    "applications": [
-      {
-        "id": 10,
-        "event": {
-          "id": 1,
-          "title": "Punk Night Vol. 3",
-          "event_date": "2026-04-15",
-          "venue_name": "Kafe Kota Bandung",
-          "city": "Bandung",
-          "latitude": -6.9175,
-          "longitude": 107.6191
-        },
-        "source": "apply",
-        "proposed_price": 1500000,
-        "status": "pending",
-        "created_at": "2026-03-08T11:00:00Z"
-      }
-    ]
-  }
-}
-```
+Catatan: backend saat ini belum mengecek apakah EO adalah pemilik event pada endpoint list application.
 
-### 5.4 Accept / Reject Application (EO)
+### Accept / Reject Application
+
 `PUT /applications/{id}/status`
-**Access:** eo (owner event)
-**Request Body:**
+
+Akses: login, role `eo`
+
+Body:
+
 ```json
 {
   "status": "accepted",
   "agreed_price": 1500000
 }
 ```
-> Jika status = `accepted`, sistem otomatis membuat record Booking baru. `agreed_price` wajib diisi jika accepted.
 
-**Response 200:**
+Validasi:
+
+- `status`: required enum `accepted|rejected`
+- `agreed_price`: required jika `status = accepted`, numeric min 0
+
+Jika accepted, backend otomatis membuat booking dengan status `confirmed`.
+
+Response accepted `200`:
+
 ```json
 {
   "success": true,
@@ -802,12 +844,31 @@ Mengambil data talent profile milik user talent yang sedang login. Frontend tida
 }
 ```
 
-### 5.5 Cancel Application (Talent)
-`DELETE /applications/{id}`
-**Access:** talent (owner)
-> Hanya bisa dilakukan jika status masih `pending`.
+Response rejected `200`:
 
-**Response 200:**
+```json
+{
+  "success": true,
+  "message": "Lamaran ditolak",
+  "data": {
+    "application": {
+      "id": 10,
+      "status": "rejected"
+    }
+  }
+}
+```
+
+### Cancel Application
+
+`DELETE /applications/{id}`
+
+Akses: login, role `talent`
+
+Syarat: application masih `pending`.
+
+Response `200`:
+
 ```json
 {
   "success": true,
@@ -815,14 +876,20 @@ Mengambil data talent profile milik user talent yang sedang login. Frontend tida
 }
 ```
 
----
+Catatan: backend saat ini belum mengecek owner application pada endpoint cancel application.
 
-## 6. Invitation
+## Invitations
 
-### 6.1 Send Invitation (EO mengundang Talent)
+Invitation adalah application dengan `source = invitation`.
+
+### Send Invitation
+
 `POST /invitations`
-**Access:** eo
-**Request Body:**
+
+Akses: login, role `eo`
+
+Body:
+
 ```json
 {
   "event_id": 1,
@@ -830,35 +897,57 @@ Mengambil data talent profile milik user talent yang sedang login. Frontend tida
   "offered_price": 2000000
 }
 ```
-> Sistem otomatis membuat record di tabel applications dengan source = `invitation` dan status = `pending`.
 
-**Response 201:**
+Validasi:
+
+- `event_id`: required, exists `events.id`
+- `talent_id`: required, exists `users.id`
+- `offered_price`: required numeric min 0
+
+Response `201`:
+
 ```json
 {
   "success": true,
   "message": "Undangan berhasil dikirim",
   "data": {
-    "id": 15,
     "event_id": 1,
     "talent_id": 3,
     "offered_price": 2000000,
-    "status": "pending",
-    "created_at": "2026-03-08T12:00:00Z"
+    "source": "invitation",
+    "status": "pending"
   }
 }
 ```
-**Response 422 (sudah apply/invitation aktif):**
+
+Catatan: validasi `talent_id` hanya memastikan user ada, belum memastikan role user adalah `talent`.
+
+### My Invitations
+
+`GET /invitations/my`
+
+Akses: login, role `talent`
+
+Response `200`:
+
 ```json
 {
-  "success": false,
-  "message": "Talent ini sudah memiliki lamaran aktif untuk event tersebut"
+  "success": true,
+  "message": "OK",
+  "data": {
+    "invitations": []
+  }
 }
 ```
 
-### 6.2 Get My Invitations (Talent melihat undangan masuk)
-`GET /invitations/my`
-**Access:** talent
-**Response 200:**
+### Sent Invitations
+
+`GET /invitations/sent`
+
+Akses: login, role `eo`
+
+Response `200`:
+
 ```json
 {
   "success": true,
@@ -867,38 +956,47 @@ Mengambil data talent profile milik user talent yang sedang login. Frontend tida
     "invitations": [
       {
         "id": 15,
-        "event": {
-          "id": 1,
-          "title": "Punk Night Vol. 3",
-          "event_date": "2026-04-15",
-          "venue_name": "Kafe Kota Bandung",
+        "event": {},
+        "talent": {
+          "id": 3,
+          "stage_name": "The Broken Strings",
           "city": "Bandung",
-          "budget": 3000000,
-          "latitude": -6.9175,
-          "longitude": 107.6191
+          "verified": false,
+          "average_rating": 0,
+          "genre": []
         },
-        "organizer_name": "Kafe Kota",
-        "offered_price": 2000000,
+        "offered_price": "2000000.00",
+        "proposed_price": "2000000.00",
         "status": "pending",
-        "created_at": "2026-03-08T12:00:00Z"
+        "created_at": "2026-05-19T00:00:00.000000Z"
       }
     ]
   }
 }
 ```
 
-### 6.3 Accept / Reject Invitation (Talent)
+### Respond Invitation
+
 `PUT /invitations/{id}/respond`
-**Access:** talent (penerima undangan)
-**Request Body:**
+
+Akses: login, role `talent`
+
+Body:
+
 ```json
 {
   "status": "accepted"
 }
 ```
-> status hanya boleh: `accepted` atau `rejected`. Jika `accepted`, sistem otomatis membuat record Booking.
 
-**Response 200 (accepted):**
+Validasi:
+
+- `status`: required enum `accepted|rejected`
+
+Jika accepted, backend otomatis membuat booking dengan `agreed_price = offered_price`.
+
+Response accepted `200`:
+
 ```json
 {
   "success": true,
@@ -911,40 +1009,86 @@ Mengambil data talent profile milik user talent yang sedang login. Frontend tida
     "booking": {
       "id": 6,
       "application_id": 15,
-      "agreed_price": 2000000,
+      "agreed_price": "2000000.00",
       "status": "confirmed"
     }
   }
 }
 ```
-**Response 200 (rejected):**
-```json
-{
-  "success": true,
-  "message": "Undangan berhasil ditolak",
-  "data": {
-    "invitation": {
-      "id": 15,
-      "status": "rejected"
-    }
-  }
-}
-```
 
----
+Catatan: backend saat ini belum mengecek apakah user login adalah penerima undangan.
 
-## 7. Booking
+## Bookings
 
-### 7.1 Get Booking by ID
-`GET /bookings/{id}`
-**Access:** eo (owner event), talent (yang di-booking), admin
-**Response 200:**
+Booking dibuat otomatis ketika application atau invitation diterima.
+
+Status booking:
+
+- `confirmed`
+- `completed`
+- `cancelled`
+
+### My Bookings
+
+`GET /bookings/my`
+
+Akses: login
+
+Query:
+
+- `status`: `confirmed|completed|cancelled`
+
+Role behavior:
+
+- `eo`: hanya booking dari event miliknya
+- `talent`: hanya booking miliknya
+- `admin`: semua booking
+
+Response `200`:
+
 ```json
 {
   "success": true,
   "message": "OK",
   "data": {
-    "id": 5,
+    "bookings": [
+      {
+        "id": 1,
+        "application_id": 10,
+        "source": "apply",
+        "event": {
+          "id": 1,
+          "title": "Punk Night Vol. 3",
+          "event_date": "2026-04-15",
+          "venue_name": "Kafe Kota Bandung"
+        },
+        "talent": {
+          "id": 3,
+          "stage_name": "The Broken Strings"
+        },
+        "agreed_price": "1500000.00",
+        "status": "confirmed",
+        "created_at": "2026-05-19T00:00:00.000000Z"
+      }
+    ]
+  }
+}
+```
+
+### Detail Booking
+
+`GET /bookings/{id}`
+
+Akses: login, pemilik event, talent terkait, atau admin
+
+Response `200`:
+
+```json
+{
+  "success": true,
+  "message": "OK",
+  "data": {
+    "id": 1,
     "application_id": 10,
     "source": "apply",
     "event": {
@@ -952,62 +1096,53 @@ Mengambil data talent profile milik user talent yang sedang login. Frontend tida
       "title": "Punk Night Vol. 3",
       "event_date": "2026-04-15",
       "venue_name": "Kafe Kota Bandung",
-      "latitude": -6.9175,
-      "longitude": 107.6191
+      "latitude": "-6.91750000",
+      "longitude": "107.61910000"
     },
     "talent": {
       "id": 3,
       "stage_name": "The Broken Strings"
     },
-    "agreed_price": 1500000,
+    "agreed_price": "1500000.00",
     "status": "confirmed",
-    "created_at": "2026-03-08T11:30:00Z"
+    "created_at": "2026-05-19T00:00:00.000000Z"
   }
 }
 ```
 
-### 7.2 Get My Bookings
-`GET /bookings/my`
-**Access:** eo, talent
-**Query Parameters:**
-| Parameter | Type | Keterangan |
-|---|---|---|
-| status | string | confirmed / completed |
+### Complete Booking
 
-**Response 200:**
-```json
-{
-  "success": true,
-  "message": "OK",
-  "data": {
-    "bookings": [ ... ]
-  }
-}
-```
-
-### 7.3 Complete Booking (EO)
 `PUT /bookings/{id}/complete`
-**Access:** eo (owner event)
-> Menandai booking selesai setelah event berlangsung. Status berubah dari `confirmed` → `completed`. Setelah ini EO dapat memberikan review.
 
-**Response 200:**
+Akses: login, role `eo`, pemilik event
+
+Syarat: status booking `confirmed`.
+
+Efek tambahan: membuat notification untuk talent.
+
+Response `200`:
+
 ```json
 {
   "success": true,
   "message": "Booking telah ditandai selesai",
   "data": {
-    "id": 5,
+    "id": 1,
     "status": "completed"
   }
 }
 ```
 
-### 7.4 Cancel Booking
-`PUT /bookings/{id}/cancel`
-**Access:** eo (owner event), admin
-> Hanya bisa jika status masih `confirmed`.
+### Cancel Booking
 
-**Response 200:**
+`PUT /bookings/{id}/cancel`
+
+Akses: login, pemilik event, talent terkait, atau admin
+
+Syarat: status booking `confirmed`.
+
+Response `200`:
+
 ```json
 {
   "success": true,
@@ -1015,31 +1150,53 @@ Mengambil data talent profile milik user talent yang sedang login. Frontend tida
 }
 ```
 
----
+## Reviews
 
-## 8. Review
+Review hanya dibuat oleh EO setelah booking selesai.
 
-### 8.1 Create Review (EO memberi review ke Talent)
+### Create Review
+
 `POST /reviews`
-**Access:** eo
-> Hanya bisa dilakukan setelah booking berstatus `completed`. Satu booking hanya bisa dibuatkan satu review.
 
-**Request Body:**
+Akses: login, role `eo`
+
+Body:
+
 ```json
 {
-  "booking_id": 5,
+  "booking_id": 1,
   "rating": 5,
-  "comment": "The Broken Strings tampil luar biasa, penonton sangat antusias. Sangat profesional dan tepat waktu."
+  "comment": "Penampilan sangat bagus."
 }
 ```
-**Response 201:**
+
+Validasi:
+
+- `booking_id`: required, exists `bookings.id`
+- `rating`: required integer min 1 max 5
+- `comment`: optional string
+
+Syarat bisnis:
+
+- user adalah EO pemilik event booking
+- booking status harus `completed`
+- satu booking hanya boleh punya satu review
+
+Efek tambahan:
+
+- update `talents.average_rating`
+- update `talents.total_reviews`
+- membuat notification untuk talent
+
+Response `201`:
+
 ```json
 {
   "success": true,
   "message": "Review berhasil dikirim",
   "data": {
-    "id": 8,
-    "booking_id": 5,
+    "id": 1,
+    "booking_id": 1,
     "talent": {
       "id": 3,
       "stage_name": "The Broken Strings"
@@ -1049,23 +1206,22 @@ Mengambil data talent profile milik user talent yang sedang login. Frontend tida
       "title": "Punk Night Vol. 3"
     },
     "rating": 5,
-    "comment": "The Broken Strings tampil luar biasa...",
-    "created_at": "2026-04-16T10:00:00Z"
+    "comment": "Penampilan sangat bagus.",
+    "created_at": "2026-05-19T00:00:00.000000Z"
   }
 }
 ```
-**Response 422 (belum completed / sudah direview):** 
-```json
-{
-  "success": false,
-  "message": "Review hanya bisa diberikan setelah event selesai / Kamu sudah memberikan review untuk booking ini"
-}
-```
 
-### 8.2 Get Reviews by Talent
+### Public Talent Reviews
+
 `GET /talents/{talent_id}/reviews`
-**Access:** Public
-**Response 200:**
+
+Akses: public
+
+`talent_id` bisa berupa user id talent. Backend juga punya fallback mencari by talent profile id.
+
+Response `200`:
+
 ```json
 {
   "success": true,
@@ -1074,75 +1230,76 @@ Mengambil data talent profile milik user talent yang sedang login. Frontend tida
     "talent_id": 3,
     "stage_name": "The Broken Strings",
     "average_rating": 4.5,
-    "total_reviews": 12,
+    "total_reviews": 2,
     "reviews": [
       {
-        "id": 8,
+        "id": 1,
         "organizer_name": "Kafe Kota",
         "event_title": "Punk Night Vol. 3",
         "rating": 5,
-        "comment": "The Broken Strings tampil luar biasa...",
-        "created_at": "2026-04-16T10:00:00Z"
+        "comment": "Penampilan sangat bagus.",
+        "created_at": "2026-05-19T00:00:00.000000Z"
       }
     ],
-    "pagination": { ... }
+    "pagination": {
+      "current_page": 1,
+      "per_page": 15,
+      "total": 1,
+      "last_page": 1
+    }
   }
 }
 ```
 
-### 8.3 Get My Reviews
+### My Reviews
+
 `GET /reviews/my`
-**Access:** talent
-**Headers:** `Authorization: Bearer {token}`
 
-Mengambil review untuk talent yang sedang login. Frontend tidak perlu mengirim `talent_id`.
+Akses: login, role `talent`
 
-**Response 200:**
-```json
-{
-  "success": true,
-  "message": "OK",
-  "data": {
-    "talent_id": 4,
-    "stage_name": "The Broken Strings",
-    "average_rating": 4.5,
-    "total_reviews": 12,
-    "reviews": [
-      {
-        "id": 8,
-        "organizer_name": "Kafe Kota",
-        "event_title": "Punk Night Vol. 3",
-        "rating": 5,
-        "comment": "The Broken Strings tampil luar biasa...",
-        "created_at": "2026-04-16T10:00:00Z"
-      }
-    ],
-    "pagination": { ... }
-  }
-}
-```
-**Response 404:**
-```json
-{
-  "success": false,
-  "message": "Profil talent tidak ditemukan"
-}
-```
+Response `200`: sama seperti public talent reviews, tetapi talent diambil dari user login.
 
----
+## Notifications
 
-## 9. Notification
+Notification dibuat otomatis oleh backend dari aksi utama. Mobile tidak perlu mengirim request khusus untuk membuat notification. Mobile cukup mengambil daftar notification dan menandai sudah dibaca.
 
-### 9.1 Get My Notifications
+Trigger notification saat ini:
+
+- `POST /applications`: EO mendapat `application_created`
+- `PUT /applications/{id}/status`: Talent mendapat `application_accepted` atau `application_rejected`
+- `DELETE /applications/{id}`: EO mendapat `application_cancelled`
+- `POST /invitations`: Talent mendapat `invitation_received`
+- `PUT /invitations/{id}/respond`: EO mendapat `invitation_accepted` atau `invitation_rejected`
+- `PUT /bookings/{id}/complete`: Talent mendapat `booking_completed`
+- `PUT /bookings/{id}/cancel`: pihak lawan mendapat `booking_cancelled`; jika admin yang membatalkan, EO dan talent sama-sama mendapat notification
+- `POST /reviews`: Talent mendapat `review_created`
+- `PUT /admin/talents/{id}/verify`: Talent mendapat `talent_verified` atau `talent_unverified`
+- `PUT /admin/events/{id}/moderate`: EO mendapat `event_moderated`
+
+Atribut notification:
+
+- `type`: kategori besar, salah satu `application|booking|invitation|review|event|talent`
+- `action`: kejadian spesifik, contoh `application_accepted`
+- `reference_type`: target detail screen, contoh `booking`
+- `reference_id`: id data target
+- `data`: payload ringan untuk deep-link mobile
+- `is_read`: status sudah dibaca
+- `read_at`: waktu notification dibaca
+
+### List Notifications
+
 `GET /notifications`
-**Access:** All authenticated users
-**Query Parameters:**
-| Parameter | Type | Keterangan |
-|---|---|---|
-| is_read | boolean | Filter notifikasi yang sudah/belum dibaca |
-| type | string | application / booking / invitation / review |
 
-**Response 200:**
+Akses: login
+
+Query:
+
+- `is_read`: boolean
+- `type`: `application|booking|invitation|review|event|talent`
+- `action`: string, contoh `application_accepted`
+
+Response `200`:
+
 ```json
 {
   "success": true,
@@ -1150,25 +1307,50 @@ Mengambil review untuk talent yang sedang login. Frontend tidak perlu mengirim `
   "data": {
     "notifications": [
       {
-        "id": 20,
-        "title": "Undangan Manggung Baru!",
-        "body": "Kafe Kota mengundang kamu untuk tampil di Punk Night Vol. 3",
-        "type": "invitation",
-        "reference_id": 15,
+        "id": 1,
+        "user_id": 3,
+        "title": "Review Baru",
+        "body": "EO ... telah memberikan ulasan untuk performa kamu.",
+        "type": "review",
+        "action": "review_created",
+        "reference_type": "review",
+        "reference_id": 1,
+        "data": {
+          "review_id": 1,
+          "booking_id": 4,
+          "event_id": 7,
+          "event_title": "Braga Punk Night Vol.4",
+          "rating": 5
+        },
         "is_read": false,
-        "created_at": "2026-03-08T12:00:00Z"
+        "read_at": null,
+        "created_at": "2026-05-19T00:00:00.000000Z"
       }
     ],
-    "unread_count": 3,
-    "pagination": { ... }
+    "unread_count": 1,
+    "pagination": {
+      "current_page": 1,
+      "per_page": 15,
+      "total": 1,
+      "last_page": 1
+    }
   }
 }
 ```
 
-### 9.2 Mark Notification as Read
+### Mark Notification As Read
+
 `PUT /notifications/{id}/read`
-**Access:** All authenticated users (owner notifikasi)
-**Response 200:**
+
+Akses: login, owner notification
+
+Efek:
+
+- `is_read` menjadi `true`
+- `read_at` diisi waktu saat endpoint dipanggil
+
+Response `200`:
+
 ```json
 {
   "success": true,
@@ -1176,10 +1358,19 @@ Mengambil review untuk talent yang sedang login. Frontend tidak perlu mengirim `
 }
 ```
 
-### 9.3 Mark All Notifications as Read
+### Mark All Notifications As Read
+
 `PUT /notifications/read-all`
-**Access:** All authenticated users
-**Response 200:**
+
+Akses: login
+
+Efek:
+
+- semua notification user login dengan `is_read = false` menjadi `true`
+- `read_at` diisi waktu saat endpoint dipanggil
+
+Response `200`:
+
 ```json
 {
   "success": true,
@@ -1187,130 +1378,25 @@ Mengambil review untuk talent yang sedang login. Frontend tidak perlu mengirim `
 }
 ```
 
----
+## Matchmaking
 
-## 10. Admin
+### Talent Recommendations
 
-### 10.1 Get All Users
-`GET /admin/users`
-**Access:** admin
-**Query Parameters:**
-| Parameter | Type | Keterangan |
-|---|---|---|
-| role | string | eo / talent |
-| search | string | Cari berdasarkan nama / email |
-| page | int | Halaman |
-
-**Response 200:**
-```json
-{
-  "success": true,
-  "message": "OK",
-  "data": {
-    "users": [
-      {
-        "id": 1,
-        "name": "Budi Santoso",
-        "email": "budi@email.com",
-        "role": "talent",
-        "phone": "081234567890",
-        "created_at": "2026-03-08T10:00:00Z"
-      }
-    ],
-    "pagination": { ... }
-  }
-}
-```
-
-### 10.2 Delete User
-`DELETE /admin/users/{id}`
-**Access:** admin
-**Response 200:**
-```json
-{
-  "success": true,
-  "message": "Akun pengguna berhasil dihapus"
-}
-```
-
-### 10.3 Verify Talent
-`PUT /admin/talents/{id}/verify`
-**Access:** admin
-**Request Body:**
-```json
-{
-  "verified": true
-}
-```
-**Response 200:**
-```json
-{
-  "success": true,
-  "message": "Talent berhasil diverifikasi",
-  "data": {
-    "id": 1,
-    "stage_name": "The Broken Strings",
-    "verified": true
-  }
-}
-```
-
-### 10.4 Get Dashboard Statistics
-`GET /admin/dashboard`
-**Access:** admin
-**Response 200:**
-```json
-{
-  "success": true,
-  "message": "OK",
-  "data": {
-    "total_users": 245,
-    "total_talents": 180,
-    "total_eo": 65,
-    "total_events": 120,
-    "active_events": 34,
-    "total_bookings": 89,
-    "completed_bookings": 56,
-    "total_reviews": 48
-  }
-}
-```
-
-### 10.5 Moderate Event
-`PUT /admin/events/{id}/moderate`
-**Access:** admin
-**Request Body:**
-```json
-{
-  "status": "cancelled",
-  "reason": "Konten event melanggar ketentuan platform."
-}
-```
-**Response 200:**
-```json
-{
-  "success": true,
-  "message": "Event berhasil dimoderasi"
-}
-```
-
----
-
-## 11. Matchmaking
-
-### 11.1 Get Talent Recommendations untuk Event
 `GET /events/{event_id}/recommendations`
-**Access:** eo (owner event)
-> Menjalankan rule-based matchmaking engine dan mengembalikan Top 5 talent yang paling cocok.
 
-**Scoring Rules:**
-| Rule | Kondisi | Skor |
-|---|---|---|
-| Genre Match | event.genre ada di talent.genre | +50 |
-| Budget Match | event.budget >= talent.price_min | +30 |
-| Location Match | Jarak venue < 20km dari kota talent | +20 |
+Akses: login, role `eo`, pemilik event
 
-**Response 200:**
+Algoritma saat ini:
+
+- genre match: +50 jika minimal ada satu genre event yang sama dengan genre talent
+- budget match: +30 jika `event.budget >= talent.price_min`
+- location match: +20 jika kota sama persis setelah lowercase dan trim
+- hanya talent `verified = true`
+- hasil diurutkan dari score tertinggi
+- maksimal 5 rekomendasi
+
+Response `200`:
+
 ```json
 {
   "success": true,
@@ -1330,31 +1416,12 @@ Mengambil review untuk talent yang sedang login. Frontend tidak perlu mengirim `
         "talent": {
           "id": 3,
           "stage_name": "The Broken Strings",
-          "genre": ["Pop Punk", "Alternative"],
-          "price_min": 500000,
-          "price_max": 2000000,
+          "genre": ["Pop Punk"],
+          "price_min": "1000000.00",
+          "price_max": "3000000.00",
           "city": "Bandung",
           "verified": true,
           "average_rating": 4.5
-        }
-      },
-      {
-        "rank": 2,
-        "score": 80,
-        "score_breakdown": {
-          "genre_score": 50,
-          "budget_score": 30,
-          "location_score": 0
-        },
-        "talent": {
-          "id": 7,
-          "stage_name": "Riot Kids",
-          "genre": ["Pop Punk"],
-          "price_min": 800000,
-          "price_max": 2500000,
-          "city": "Jakarta",
-          "verified": true,
-          "average_rating": 4.2
         }
       }
     ]
@@ -1362,41 +1429,319 @@ Mengambil review untuk talent yang sedang login. Frontend tidak perlu mengirim `
 }
 ```
 
-### 11.2 Get Genre List
-`GET /genres`
-**Access:** Public
-**Response 200:**
+## Admin
+
+Semua endpoint admin berada di prefix `/admin` dan membutuhkan login role `admin`.
+
+### Dashboard
+
+`GET /admin/dashboard`
+
+Response `200`:
+
+```json
+{
+  "success": true,
+  "message": "Dashboard stats",
+  "data": {
+    "total_users": 10,
+    "total_talents": 6,
+    "total_eo": 3,
+    "total_events": 12,
+    "active_events": 4,
+    "total_bookings": 5,
+    "completed_bookings": 2,
+    "total_reviews": 2
+  }
+}
+```
+
+### List Users
+
+`GET /admin/users`
+
+Query:
+
+- `role`: `eo|talent`
+- `search`: cari `name` atau `email`
+
+Response `200`:
+
 ```json
 {
   "success": true,
   "message": "OK",
   "data": {
-    "genres": [
-      { "id": 1, "name": "Pop Punk" },
-      { "id": 2, "name": "Heavy Metal" },
-      { "id": 3, "name": "DJ" },
-      { "id": 4, "name": "Solo Singer" },
-      { "id": 5, "name": "Hardcore" },
-      { "id": 6, "name": "Jazz" },
-      { "id": 7, "name": "Seniman Visual" },
-      { "id": 8, "name": "Street Performer" }
-    ]
+    "users": [],
+    "pagination": {
+      "current_page": 1,
+      "per_page": 15,
+      "total": 0,
+      "last_page": 1
+    }
   }
 }
 ```
 
----
+### Delete User
 
-## 13. Error Codes
+`DELETE /admin/users/{id}`
 
-| Code | Message | Keterangan |
-|---|---|---|
-| `AUTH_001` | Token tidak valid | Token expired atau tidak ditemukan |
-| `AUTH_002` | Akses ditolak | Role tidak memiliki izin |
-| `VALID_001` | Validasi gagal | Input tidak memenuhi aturan |
-| `APP_001` | Sudah pernah melamar | Duplicate application |
-| `APP_002` | Event tidak tersedia | Event bukan status open |
-| `BOOK_001` | Booking tidak ditemukan | ID booking tidak valid |
-| `BOOK_002` | Status tidak sesuai | Aksi tidak sesuai status booking |
-| `REV_001` | Review sudah ada | Booking sudah pernah direviw |
-| `REV_002` | Event belum selesai | Booking belum completed |
+Tidak bisa menghapus user role `admin`.
+
+Response `200`:
+
+```json
+{
+  "success": true,
+  "message": "Akun pengguna berhasil dihapus"
+}
+```
+
+### Verify Talent
+
+`PUT /admin/talents/{id}/verify`
+
+Path `id`: user id talent, bukan selalu talent profile id.
+
+Body:
+
+```json
+{
+  "verified": true
+}
+```
+
+Response `200`:
+
+```json
+{
+  "success": true,
+  "message": "Talent berhasil diverifikasi",
+  "data": {
+    "id": 3,
+    "stage_name": "The Broken Strings",
+    "verified": true
+  }
+}
+```
+
+Jika `verified = false`, message menjadi `Verifikasi talent dicabut`.
+
+### Moderate Event
+
+`PUT /admin/events/{id}/moderate`
+
+Body:
+
+```json
+{
+  "status": "dibatalkan",
+  "reason": "Melanggar ketentuan platform"
+}
+```
+
+Validasi:
+
+- `status`: required enum `dibuka|ditutup|selesai|dibatalkan`
+- `reason`: optional string
+
+Status event yang diterima backend: `dibuka|ditutup|selesai|dibatalkan`.
+
+Jika `reason` dikirim, backend membuat notification untuk EO.
+
+Response `200`:
+
+```json
+{
+  "success": true,
+  "message": "Event berhasil dimoderasi"
+}
+```
+
+## Entity Fields
+
+### User
+
+```json
+{
+  "id": 1,
+  "name": "Budi Santoso",
+  "email": "budi@email.com",
+  "phone": "081234567890",
+  "role": "talent",
+  "email_verified_at": null,
+  "created_at": "2026-05-19T00:00:00.000000Z",
+  "updated_at": "2026-05-19T00:00:00.000000Z"
+}
+```
+
+### Talent
+
+```json
+{
+  "id": 1,
+  "user_id": 1,
+  "stage_name": "The Broken Strings",
+  "genre": ["Pop Punk", "Alternative Rock"],
+  "price_min": "1000000.00",
+  "price_max": "3000000.00",
+  "city": "Bandung",
+  "bio": "Band pop punk Bandung",
+  "portfolio_link": "https://example.com",
+  "verified": false,
+  "average_rating": 0,
+  "total_reviews": 0,
+  "created_at": "2026-05-19T00:00:00.000000Z",
+  "updated_at": "2026-05-19T00:00:00.000000Z"
+}
+```
+
+### Event
+
+```json
+{
+  "id": 1,
+  "organizer_id": 2,
+  "title": "Punk Night Vol. 3",
+  "description": "Malam punk rock terbaik di Bandung.",
+  "budget": "3000000.00",
+  "event_date": "2026-04-15",
+  "venue_name": "Kafe Kota Bandung",
+  "latitude": "-6.91750000",
+  "longitude": "107.61910000",
+  "city": "Bandung",
+  "status": "dibuka",
+  "created_at": "2026-05-19T00:00:00.000000Z",
+  "updated_at": "2026-05-19T00:00:00.000000Z"
+}
+```
+
+### Application / Invitation
+
+```json
+{
+  "id": 10,
+  "event_id": 1,
+  "talent_id": 3,
+  "source": "apply",
+  "message": "Kami siap tampil.",
+  "proposed_price": "1500000.00",
+  "offered_price": null,
+  "status": "pending",
+  "created_at": "2026-05-19T00:00:00.000000Z",
+  "updated_at": "2026-05-19T00:00:00.000000Z"
+}
+```
+
+### Booking
+
+```json
+{
+  "id": 1,
+  "application_id": 10,
+  "agreed_price": "1500000.00",
+  "status": "confirmed",
+  "created_at": "2026-05-19T00:00:00.000000Z",
+  "updated_at": "2026-05-19T00:00:00.000000Z"
+}
+```
+
+### Review
+
+```json
+{
+  "id": 1,
+  "booking_id": 1,
+  "rating": 5,
+  "comment": "Penampilan sangat bagus.",
+  "created_at": "2026-05-19T00:00:00.000000Z",
+  "updated_at": "2026-05-19T00:00:00.000000Z"
+}
+```
+
+### Notification
+
+```json
+{
+  "id": 1,
+  "user_id": 3,
+  "title": "Review Baru",
+  "body": "EO ... telah memberikan ulasan untuk performa kamu.",
+  "type": "review",
+  "action": "review_created",
+  "reference_type": "review",
+  "reference_id": 1,
+  "data": {
+    "review_id": 1,
+    "booking_id": 4,
+    "event_id": 7,
+    "event_title": "Braga Punk Night Vol.4",
+    "rating": 5
+  },
+  "is_read": false,
+  "read_at": null,
+  "created_at": "2026-05-19T00:00:00.000000Z",
+  "updated_at": "2026-05-19T00:00:00.000000Z"
+}
+```
+
+## Endpoint Matrix
+
+| Method | Endpoint | Akses |
+| --- | --- | --- |
+| POST | `/auth/register` | Public |
+| POST | `/auth/login` | Public |
+| POST | `/auth/logout` | Login |
+| GET | `/auth/me` | Login |
+| PUT | `/users/profile` | Login |
+| PUT | `/users/password` | Login |
+| GET | `/genres` | Public |
+| GET | `/talents` | Public |
+| GET | `/talents/my` | Talent |
+| GET | `/talents/{id}` | Public |
+| POST | `/talents` | Talent |
+| PUT | `/talents/{id}` | Talent |
+| DELETE | `/talents/{id}` | Talent route, tetapi controller hanya admin |
+| GET | `/talents/{talent_id}/reviews` | Public |
+| GET | `/events` | Public |
+| GET | `/events/my` | EO |
+| GET | `/events/{event}` | Public |
+| POST | `/events` | EO |
+| PUT | `/events/{event}` | EO |
+| DELETE | `/events/{event}` | EO/Admin |
+| POST | `/applications` | Talent |
+| GET | `/applications/my` | Talent |
+| DELETE | `/applications/{id}` | Talent |
+| GET | `/events/{event_id}/applications` | EO |
+| PUT | `/applications/{id}/status` | EO |
+| POST | `/invitations` | EO |
+| GET | `/invitations/sent` | EO |
+| GET | `/invitations/my` | Talent |
+| PUT | `/invitations/{id}/respond` | Talent |
+| GET | `/bookings/my` | Login |
+| GET | `/bookings/{id}` | Related user/Admin |
+| PUT | `/bookings/{id}/complete` | EO owner |
+| PUT | `/bookings/{id}/cancel` | Related user/Admin |
+| POST | `/reviews` | EO |
+| GET | `/reviews/my` | Talent |
+| GET | `/notifications` | Login |
+| PUT | `/notifications/{id}/read` | Login |
+| PUT | `/notifications/read-all` | Login |
+| GET | `/events/{event_id}/recommendations` | EO owner |
+| GET | `/admin/dashboard` | Admin |
+| GET | `/admin/users` | Admin |
+| DELETE | `/admin/users/{id}` | Admin |
+| PUT | `/admin/talents/{id}/verify` | Admin |
+| PUT | `/admin/events/{id}/moderate` | Admin |
+
+## Catatan Integrasi Frontend
+
+- Simpan token dari `login/register`, lalu kirim lewat `Authorization: Bearer`.
+- Untuk talent baru, profil talent sudah otomatis dibuat saat register role `talent`; gunakan `GET /talents/my` untuk mengambil profilnya.
+- Gunakan user id talent sebagai `talent_id` untuk application, invitation, review, dan recommendation output.
+- `DELETE /events/{event}` adalah cancel event, bukan hapus permanen.
+- `DELETE /applications/{id}` adalah cancel application dan hanya bisa jika status masih `pending`.
+- Booking tidak dibuat lewat endpoint manual; booking dibuat otomatis dari accepted application/invitation.
+- Review hanya bisa setelah booking `completed`.
+- Untuk endpoint yang response aktualnya tertukar, frontend sebaiknya disesuaikan dengan backend aktual atau backend diperbaiki agar kembali ke format standar.

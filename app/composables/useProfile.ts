@@ -6,16 +6,8 @@ export const useProfile = () => {
 
   const normalizeGenres = (talentData: any) => {
     const rawGenres = talentData?.genres ?? talentData?.genre ?? [];
-    const genreNames = Array.isArray(rawGenres)
-      ? rawGenres
-          .map((genre) => (typeof genre === 'string' ? genre : genre?.name))
-          .filter((genre): genre is string => Boolean(genre))
-      : [];
-    const genreIds = Array.isArray(rawGenres)
-      ? rawGenres
-          .map((genre) => (typeof genre === 'object' ? Number(genre?.id) : undefined))
-          .filter((id): id is number => Number.isFinite(id))
-      : [];
+    const genreNames = Array.isArray(rawGenres) ? rawGenres.map((genre) => (typeof genre === 'string' ? genre : genre?.name)).filter((genre): genre is string => Boolean(genre)) : [];
+    const genreIds = Array.isArray(rawGenres) ? rawGenres.map((genre) => (typeof genre === 'object' ? Number(genre?.id) : undefined)).filter((id): id is number => Number.isFinite(id)) : [];
 
     return { genreNames, genreIds };
   };
@@ -65,7 +57,6 @@ export const useProfile = () => {
         verified: Boolean(talentData?.verified),
         average_rating: Number(talentData?.average_rating ?? 0),
         total_reviews: Number(talentData?.total_reviews ?? 0),
-        media: talentData?.media || [],
       };
 
       return profile;
