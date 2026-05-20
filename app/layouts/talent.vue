@@ -17,7 +17,7 @@
       </UDrawer>
 
       <div class="flex min-h-0 flex-1 flex-col overflow-hidden">
-        <TalentNavbar :title="pageTitle" :subtitle="todayLabel" :notifications="notificationCount" :user-name="displayName" :user-role="displayRole" :menu-button-icon="menuButtonIcon" @toggle-sidebar="handleToggleSidebar" />
+        <TalentNavbar :title="pageTitle" :subtitle="todayLabel" :user-name="displayName" :user-role="displayRole" :menu-button-icon="menuButtonIcon" @toggle-sidebar="handleToggleSidebar" />
 
         <main class="flex-1 min-h-0 overflow-y-auto px-4 py-6 sm:px-6">
           <slot />
@@ -69,7 +69,6 @@ let updateDeviceState: (() => void) | null = null;
 const { token, user, fetchUser, logout } = useAuth();
 const userName = useState('talent-layout-username', () => 'The Broken Strings');
 const pageTitle = useState('talent-layout-title', () => 'Talent Dashboard');
-const notificationCount = ref(3);
 
 const displayName = computed(() => user.value?.name || user.value?.stage_name || userName.value);
 const displayRole = computed(() => {
@@ -149,7 +148,6 @@ const confirmLogout = async () => {
     await logout();
 
     userName.value = '';
-    notificationCount.value = 0;
     isLogoutModalOpen.value = false;
 
     await navigateTo('/auth/login');

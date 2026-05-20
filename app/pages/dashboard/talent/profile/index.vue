@@ -4,7 +4,7 @@
       <div class="space-y-3">
         <p class="text-sm font-medium text-neutral-light/70">Talent Workspace</p>
         <h1 class="font-display text-2xl font-bold bg-gradient-to-r from-highlight to-accent bg-clip-text text-transparent md:text-3xl">Profile Settings</h1>
-        <p class="text-sm text-neutral-light/80">Kelola profil, password, dan media portofolio.</p>
+        <p class="text-sm text-neutral-light/80">Kelola profil dan password akunmu.</p>
       </div>
     </UiCard>
 
@@ -169,47 +169,10 @@
         </form>
       </UiCard>
     </section>
-
-    <UiCard title="Portfolio Media" description="Kelola media portofoliomu dari satu tempat.">
-      <div class="space-y-5">
-        <form class="grid gap-4 rounded-xl border border-white/10 bg-white/5 p-4 md:grid-cols-[1fr_180px_auto] md:items-end" @submit.prevent="handleUploadMedia">
-          <UFormField label="Media File" required>
-            <input
-              type="file"
-              class="w-full rounded-lg border border-white/15 bg-transparent px-3 py-2 text-sm text-ui-light file:mr-3 file:rounded-md file:border-0 file:bg-highlight/20 file:px-3 file:py-1.5 file:text-xs file:font-semibold file:text-accent"
-              accept="image/*,video/*,audio/*"
-              @change="handleFileChange"
-            />
-          </UFormField>
-
-          <UFormField label="Type" required>
-            <USelect v-model="uploadForm.type" :items="mediaTypeOptions" />
-          </UFormField>
-
-          <UiButton type="submit" color="primary" :loading="isUploadingMedia">Upload</UiButton>
-        </form>
-
-        <UiList :items="mediaItems" empty-text="Belum ada media portofolio.">
-          <template #item="{ item }">
-            <div class="flex flex-wrap items-start justify-between gap-3">
-              <div class="min-w-0 flex-1">
-                <p class="truncate text-sm font-semibold text-neutral-900 dark:text-neutral-100">{{ item.url }}</p>
-                <p class="mt-1 text-xs text-neutral-500 dark:text-neutral-400">ID: {{ item.id }}</p>
-              </div>
-              <div class="flex items-center gap-2">
-                <UiBadge :label="item.type" color="secondary" variant="soft" />
-                <UiButton size="xs" color="error" variant="soft" :loading="deletingMediaId === Number(item.id)" @click="handleDeleteMedia(Number(item.id))"> Delete </UiButton>
-              </div>
-            </div>
-          </template>
-        </UiList>
-      </div>
-    </UiCard>
   </div>
 </template>
 
 <script setup lang="ts">
-import type { TalentMedia, TalentMediaType } from '~/composables/types';
 import { useProfile } from '~/composables/useProfile';
 import { useProfileSettings } from '~/composables/useProfileSettings';
 import { useTalentReviews } from '~/composables/useTalentReviews';
@@ -226,7 +189,7 @@ const { formatCurrency } = useFormatters();
 const { data: profile, pending, refresh: refreshProfile } = useProfile();
 const talentId = computed(() => profile.value?.talent_id ?? null);
 const { meta: reviewMeta, pending: reviewPending, error: reviewError } = useTalentReviews({ page: 1, per_page: 1 });
-const { updateProfile, updateTalentProfile, changePassword, uploadMedia, deleteMedia } = useProfileSettings();
+const { updateProfile, updateTalentProfile, changePassword } = useProfileSettings();
 
 const profileForm = reactive({
   name: '',
@@ -250,24 +213,9 @@ const passwordForm = reactive({
   new_password_confirmation: '',
 });
 
-const uploadForm = reactive<{ file: File | null; type: TalentMediaType }>({
-  file: null,
-  type: 'image',
-});
-
-const mediaList = ref<TalentMedia[]>([]);
-
 const isEditingOverview = ref(false);
 const isSavingOverview = ref(false);
 const isChangingPassword = ref(false);
-const isUploadingMedia = ref(false);
-const deletingMediaId = ref<number | null>(null);
-
-const mediaTypeOptions = [
-  { label: 'Image', value: 'image' },
-  { label: 'Video', value: 'video' },
-  { label: 'Audio', value: 'audio' },
-];
 
 const { data: genres } = useGenres();
 
@@ -305,25 +253,9 @@ watch(
   profile,
   () => {
     syncOverviewForm();
-    mediaList.value = profile.value.media ? profile.value.media.map((item) => ({ ...item })) : [];
   },
   { immediate: true },
 );
-
-const mediaItems = computed(() =>
-  mediaList.value.map((media) => ({
-    id: media.id,
-    title: media.media_url,
-    type: media.type.toUpperCase(),
-    url: media.media_url,
-  })),
-);
-
-const handleFileChange = (event: Event) => {
-  const input = event.target as HTMLInputElement;
-  const file = input.files?.[0];
-  uploadForm.file = file || null;
-};
 
 const toggleOverviewEdit = () => {
   syncOverviewForm();
@@ -432,75 +364,6 @@ const handleChangePassword = async () => {
     });
   } finally {
     isChangingPassword.value = false;
-  }
-};
-
-const handleUploadMedia = async () => {
-  if (!uploadForm.file) {
-    toast.add({
-      title: 'File belum dipilih',
-      description: 'Pilih file sebelum upload media.',
-      color: 'warning',
-    });
-    return;
-  }
-
-  isUploadingMedia.value = true;
-
-  try {
-    const response = await uploadMedia({
-      file: uploadForm.file,
-      type: uploadForm.type,
-    });
-
-    mediaList.value = [response.data, ...mediaList.value];
-
-    // Refresh profile data from server
-    await refreshProfile();
-
-    uploadForm.file = null;
-
-    toast.add({
-      title: 'Media uploaded',
-      description: response.message,
-      color: 'success',
-    });
-  } catch {
-    toast.add({
-      title: 'Upload gagal',
-      description: 'Terjadi kendala saat upload media.',
-      color: 'error',
-    });
-  } finally {
-    isUploadingMedia.value = false;
-  }
-};
-
-const handleDeleteMedia = async (mediaId: number) => {
-  deletingMediaId.value = mediaId;
-
-  try {
-    const talentId = profile.value.talent_id || profile.value.id;
-    const response = await deleteMedia(talentId, mediaId);
-
-    mediaList.value = mediaList.value.filter((item) => item.id !== mediaId);
-
-    // Refresh profile data from server
-    await refreshProfile();
-
-    toast.add({
-      title: 'Media deleted',
-      description: response.message,
-      color: 'success',
-    });
-  } catch {
-    toast.add({
-      title: 'Delete gagal',
-      description: 'Terjadi kendala saat menghapus media.',
-      color: 'error',
-    });
-  } finally {
-    deletingMediaId.value = null;
   }
 };
 </script>

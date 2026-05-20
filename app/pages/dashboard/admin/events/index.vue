@@ -2,9 +2,7 @@
   <div class="space-y-6">
     <!-- Header -->
     <div>
-      <h1 class="font-display text-2xl font-bold bg-gradient-to-r from-highlight to-accent bg-clip-text text-transparent">
-        Moderasi Event
-      </h1>
+      <h1 class="font-display text-2xl font-bold bg-gradient-to-r from-highlight to-accent bg-clip-text text-transparent">Moderasi Event</h1>
       <p class="mt-1 text-sm text-neutral-light/60">Tinjau dan moderasi semua event di platform.</p>
     </div>
 
@@ -41,10 +39,7 @@
       </div>
 
       <!-- Empty -->
-      <div
-        v-else-if="filteredEvents.length === 0"
-        class="flex flex-col items-center justify-center gap-3 rounded-2xl border border-dashed border-white/10 py-16"
-      >
+      <div v-else-if="filteredEvents.length === 0" class="flex flex-col items-center justify-center gap-3 rounded-2xl border border-dashed border-white/10 py-16">
         <div class="rounded-2xl border border-white/10 bg-white/5 p-4">
           <Icon name="mdi:calendar-remove-outline" class="h-10 w-10 text-neutral-light/40" />
         </div>
@@ -52,32 +47,19 @@
       </div>
 
       <!-- Cards -->
-      <UiCard
-        v-for="event in filteredEvents"
-        :key="event.id"
-        card-class="transition-all hover:border-highlight/30"
-      >
+      <UiCard v-for="event in filteredEvents" :key="event.id" card-class="transition-all hover:border-highlight/30">
         <div class="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
           <!-- Event Info -->
           <div class="flex-1 min-w-0 space-y-2">
             <div class="flex flex-wrap items-center gap-2">
               <p class="text-sm font-bold text-ui-light">{{ event.title }}</p>
-              <UiBadge
-                :label="statusLabel(event.status)"
-                :color="statusColor(event.status)"
-                variant="soft"
-                dot
-              />
+              <UiBadge :label="statusLabel(event.status)" :color="statusColor(event.status)" variant="soft" dot />
             </div>
             <p class="text-xs text-neutral-light/60 line-clamp-2">{{ event.description }}</p>
             <div class="flex flex-wrap gap-1.5">
               <UiBadge v-for="g in event.genre_needed" :key="g" :label="g" color="info" size="sm" variant="subtle" />
             </div>
             <div class="flex flex-wrap items-center gap-4 text-xs text-neutral-light/60">
-              <span class="flex items-center gap-1">
-                <Icon name="mdi:account-outline" class="h-3.5 w-3.5" />
-                {{ event.organizer_name }}
-              </span>
               <span class="flex items-center gap-1">
                 <Icon name="mdi:map-marker-outline" class="h-3.5 w-3.5" />
                 {{ event.venue_name }}, {{ event.city }}
@@ -95,15 +77,7 @@
 
           <!-- Actions -->
           <div class="shrink-0">
-            <UiButton
-              label="Moderasi"
-              icon="mdi:gavel"
-              color="primary"
-              variant="soft"
-              size="sm"
-              :disabled="event.status === 'cancelled'"
-              @click="openModerateModal(event)"
-            />
+            <UiButton label="Moderasi" icon="mdi:gavel" color="primary" variant="soft" size="sm" :disabled="event.status === 'cancelled'" @click="openModerateModal(event)" />
           </div>
         </div>
       </UiCard>
@@ -126,9 +100,7 @@
           </div>
 
           <div class="space-y-3">
-            <label class="block text-xs font-semibold uppercase tracking-wide text-neutral-light/60">
-              Ubah Status
-            </label>
+            <label class="block text-xs font-semibold uppercase tracking-wide text-neutral-light/60"> Ubah Status </label>
             <div class="flex flex-wrap gap-2">
               <UiButton
                 v-for="s in moderateStatuses"
@@ -141,9 +113,7 @@
               />
             </div>
 
-            <label class="block text-xs font-semibold uppercase tracking-wide text-neutral-light/60 mt-4">
-              Alasan (opsional)
-            </label>
+            <label class="block text-xs font-semibold uppercase tracking-wide text-neutral-light/60 mt-4"> Alasan (opsional) </label>
             <textarea
               v-model="moderateReason"
               rows="3"
@@ -154,14 +124,7 @@
 
           <div class="flex justify-end gap-3 pt-2">
             <UiButton label="Batal" color="neutral" variant="soft" @click="showModerateModal = false" />
-            <UiButton
-              label="Terapkan"
-              color="primary"
-              variant="solid"
-              :loading="moderating"
-              :disabled="!moderateStatus"
-              @click="doModerate"
-            />
+            <UiButton label="Terapkan" color="primary" variant="solid" :loading="moderating" :disabled="!moderateStatus" @click="doModerate" />
           </div>
         </div>
       </template>

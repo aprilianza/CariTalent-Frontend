@@ -10,7 +10,6 @@
           <div class="flex flex-wrap items-start justify-between gap-2">
             <div class="min-w-0">
               <p class="truncate text-sm font-semibold text-neutral-900 dark:text-neutral-100">{{ item.title }}</p>
-              <p class="mt-1 text-xs text-neutral-500 dark:text-neutral-400">{{ item.organizer }}</p>
             </div>
             <div class="flex shrink-0 items-center gap-2">
               <UiBadge :label="item.statusLabel" :color="item.statusColor" variant="soft" />
@@ -111,7 +110,6 @@ const mappedItems = computed(() =>
     return {
       id: event.id,
       title: event.title,
-      organizer: event.organizer_name ? `Organizer: ${event.organizer_name}` : 'Organizer: -',
       description: event.description || 'Deskripsi event belum tersedia.',
       genres: event.genre_needed && event.genre_needed.length > 0 ? event.genre_needed : ['General'],
       budget: formatCurrency(event.budget),

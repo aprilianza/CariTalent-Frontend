@@ -4,14 +4,6 @@ export type ApiResponse<T> = {
   data: T;
 };
 
-export type TalentMediaType = 'image' | 'video' | 'audio';
-
-export type TalentMedia = {
-  id: number;
-  media_url: string;
-  type: TalentMediaType;
-};
-
 export type TalentProfile = {
   id: number;
   talent_id?: number;
@@ -31,7 +23,6 @@ export type TalentProfile = {
   total_reviews?: number;
   verified: boolean;
   average_rating: number;
-  media?: TalentMedia[];
 };
 
 export type ApplicationStatus = 'pending' | 'accepted' | 'rejected';
@@ -358,9 +349,4 @@ export type ChangePasswordPayload = {
 
 export type RespondToInvitationPayload = {
   status: 'accepted' | 'rejected';
-};
-
-export type UploadMediaPayload = {
-  file: File;
-  type: TalentMediaType;
 };

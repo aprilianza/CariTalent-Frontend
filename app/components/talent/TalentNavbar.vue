@@ -2,7 +2,6 @@
   <SharedNavbar
     :title="title"
     :subtitle="subtitle"
-    :notifications="notifications"
     :user-name="userName"
     :user-role="userRole"
     :header-classes="talentHeaderClasses"
@@ -10,8 +9,6 @@
     :subtitle-classes="talentSubtitleClasses"
     :user-name-classes="talentUserNameClasses"
     :user-role-classes="talentUserRoleClasses"
-    :notification-badge-component="notificationBadgeComponent"
-    :notification-badge-props="notificationBadgeProps"
     :menu-button-class="menuButtonClass"
     :menu-button-icon="menuButtonIcon"
     @toggle-sidebar="$emit('toggle-sidebar')"
@@ -23,13 +20,10 @@
 </template>
 
 <script setup lang="ts">
-import TalentNotificationBadge from './TalentNotificationBadge.vue';
-
 withDefaults(
   defineProps<{
     title?: string;
     subtitle?: string;
-    notifications?: number;
     userName?: string;
     userRole?: string;
     menuButtonClass?: string;
@@ -38,7 +32,6 @@ withDefaults(
   {
     title: 'Talent Dashboard',
     subtitle: '',
-    notifications: 0,
     userName: 'Talent User',
     userRole: 'Talent',
     menuButtonClass: '',
@@ -57,10 +50,4 @@ const talentTitleClasses = computed(() => 'font-display font-bold bg-gradient-to
 const talentSubtitleClasses = computed(() => 'text-neutral-light/70');
 const talentUserNameClasses = computed(() => 'text-ui-light font-semibold');
 const talentUserRoleClasses = computed(() => 'text-accent/90 font-medium');
-
-const notificationBadgeComponent = TalentNotificationBadge;
-const notificationBadgeProps = computed(() => ({
-  showGradient: true,
-  pulseAnimation: true,
-}));
 </script>
