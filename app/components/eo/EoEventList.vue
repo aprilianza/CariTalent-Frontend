@@ -43,11 +43,16 @@
               <Icon name="mdi:account-group-outline" class="h-3.5 w-3.5" />
               {{ item.applicantsLabel }}
             </span>
-            <span class="flex items-center gap-1">
-              <Icon name="mdi:map-marker-outline" class="h-3.5 w-3.5" />
-              {{ item.city }}
-            </span>
+            <button 
+              type="button"
+              class="flex items-center gap-1 group transition-colors hover:text-violet-400"
+              @click="showLocation(item)"
+            >
+              <Icon name="mdi:map-marker-outline" class="h-3.5 w-3.5 group-hover:text-violet-400" />
+              <span class="hover:underline">Lihat Lokasi</span>
+            </button>
           </div>
+
 
           <!-- Genre badges -->
           <div v-if="detailed && item.genres.length" class="flex flex-wrap gap-1.5">
@@ -105,6 +110,12 @@
         </div>
       </template>
     </UiList>
+
+    <!-- Location Modal -->
+    <EoLocationModal 
+      v-model:open="locationModalOpen"
+      v-bind="selectedLocation"
+    />
   </UiCard>
 </template>
 
@@ -130,6 +141,31 @@ const emit = defineEmits<{
   edit: [eventId: number];
   cancel: [eventId: number];
 }>();
+
+const locationModalOpen = ref(false);
+const selectedLocation = ref({
+  latitude: undefined as number | undefined,
+  longitude: undefined as number | undefined,
+  venueName: '',
+  city: '',
+  fullAddress: '',
+  eventName: ''
+});
+
+const showLocation = (item: any) => {
+  const originalEvent = props.events.find(e => e.id === item.id);
+  if (originalEvent) {
+    selectedLocation.value = {
+      latitude: originalEvent.latitude,
+      longitude: originalEvent.longitude,
+      venueName: originalEvent.venue_name,
+      city: originalEvent.city || '',
+      fullAddress: originalEvent.full_address || `${originalEvent.venue_name}, ${originalEvent.city || ''} - CariTalent Location System`,
+      eventName: originalEvent.title
+    };
+    locationModalOpen.value = true;
+  }
+};
 
 const { formatCurrency, formatDate } = useFormatters();
 
