@@ -105,6 +105,7 @@ export type Event = {
   venue_name: string;
   latitude?: number;
   longitude?: number;
+  full_address?: string;
   city?: string;
   status: EventStatus;
   created_at?: string;
@@ -232,6 +233,7 @@ export type CreateEventPayload = {
   venue_name: string;
   latitude?: number;
   longitude?: number;
+  full_address?: string;
   city: string;
   status: EventStatus;
 };

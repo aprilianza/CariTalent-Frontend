@@ -199,6 +199,8 @@ const handleEditEvent = (id: number) => {
     city: event.city || '',
     status: event.status,
     genre_ids: genreIds || [],
+    latitude: event.latitude,
+    longitude: event.longitude,
   };
 
   modalMode.value = 'edit';
