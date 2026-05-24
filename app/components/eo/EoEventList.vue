@@ -170,11 +170,10 @@ const showLocation = (item: any) => {
 const { formatCurrency, formatDate } = useFormatters();
 
 const statusMeta: Record<EoEvent['status'], { label: string; color: 'success' | 'warning' | 'error' | 'neutral' | 'primary' }> = {
-  draft: { label: 'Draft', color: 'neutral' },
-  open: { label: 'Open', color: 'success' },
-  closed: { label: 'Closed', color: 'warning' },
-  completed: { label: 'Completed', color: 'primary' },
-  cancelled: { label: 'Cancelled', color: 'error' },
+  dibuka: { label: 'Buka', color: 'success' },
+  ditutup: { label: 'Tutup', color: 'neutral' },
+  selesai: { label: 'Selesai', color: 'primary' },
+  dibatalkan: { label: 'Batal', color: 'error' },
 };
 
 const formatDateSafe = (value?: string) => {
@@ -189,8 +188,8 @@ const formatDateSafe = (value?: string) => {
 const mappedItems = computed(() =>
   props.events.map((event) => {
     const status = statusMeta[event.status] ?? { label: event.status, color: 'neutral' as const };
-    const canEdit = event.status !== 'completed' && event.status !== 'cancelled';
-    const canCancel = event.status !== 'completed' && event.status !== 'cancelled';
+    const canEdit = event.status !== 'selesai' && event.status !== 'dibatalkan';
+    const canCancel = event.status !== 'selesai' && event.status !== 'dibatalkan';
 
     return {
       id: event.id,

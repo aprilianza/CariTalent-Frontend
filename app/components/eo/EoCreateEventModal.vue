@@ -68,7 +68,7 @@
             </div>
 
             <!-- Grid: Date & Status -->
-            <div class="grid grid-cols-1 gap-5 sm:grid-cols-2">
+            <div :class="['grid grid-cols-1 gap-5', mode === 'edit' ? 'sm:grid-cols-2' : '']">
               <div class="flex flex-col gap-2">
                 <label class="text-sm font-semibold text-neutral-light">Tanggal Event <span class="text-error">*</span></label>
                 <UInput
@@ -77,8 +77,8 @@
                   :ui="{ base: 'w-full rounded-xl border border-white/10 bg-white/5 text-neutral-light focus:border-violet-500/50 focus:ring-1 focus:ring-violet-500/50 transition-all' }"
                 />
               </div>
-              <div class="flex flex-col gap-2">
-                <label class="text-sm font-semibold text-neutral-light">Status Awal</label>
+              <div v-if="mode === 'edit'" class="flex flex-col gap-2">
+                <label class="text-sm font-semibold text-neutral-light">Status Event</label>
                 <USelectMenu
                   v-model="form.status"
                   :items="statusOptions"
@@ -143,27 +143,7 @@
                 <span class="text-xs text-neutral-light/40 italic">Alamat belum terdeteksi</span>
               </div>
 
-              <!-- Latitude / Longitude Display -->
-              <div class="grid grid-cols-2 gap-4 mt-1">
-                <div class="flex flex-col gap-1">
-                  <span class="text-[11px] font-medium text-neutral-light/50">Latitude</span>
-                  <UInput
-                    :model-value="form.latitude !== undefined ? String(form.latitude) : ''"
-                    readonly
-                    placeholder="Belum ada pin"
-                    :ui="{ base: 'w-full rounded-xl border border-white/10 bg-white/5 text-neutral-light/50 placeholder-neutral-light/20 cursor-not-allowed text-xs' }"
-                  />
-                </div>
-                <div class="flex flex-col gap-1">
-                  <span class="text-[11px] font-medium text-neutral-light/50">Longitude</span>
-                  <UInput
-                    :model-value="form.longitude !== undefined ? String(form.longitude) : ''"
-                    readonly
-                    placeholder="Belum ada pin"
-                    :ui="{ base: 'w-full rounded-xl border border-white/10 bg-white/5 text-neutral-light/50 placeholder-neutral-light/20 cursor-not-allowed text-xs' }"
-                  />
-                </div>
-              </div>
+
             </div>
 
             <!-- Actions -->
@@ -219,8 +199,10 @@ const genreOptions = computed(() =>
 );
 
 const statusOptions = [
-  { label: 'Draft (simpan dulu)', value: 'draft' },
-  { label: 'Open (langsung terima lamar)', value: 'open' },
+  { label: 'Dibuka', value: 'dibuka' },
+  { label: 'Ditutup', value: 'ditutup' },
+  { label: 'Selesai', value: 'selesai' },
+  { label: 'Dibatalkan', value: 'dibatalkan' },
 ];
 
 const selectedGenreIds = ref<number[]>([]);
@@ -243,7 +225,7 @@ const form = reactive<{
   event_date: '',
   venue_name: '',
   city: '',
-  status: 'draft',
+  status: 'dibuka',
   latitude: undefined,
   longitude: undefined,
   full_address: '',
@@ -483,7 +465,7 @@ watch(modelOpen, async (isOpen) => {
       form.event_date = props.initialData.event_date || '';
       form.venue_name = props.initialData.venue_name || '';
       form.city = props.initialData.city || '';
-      form.status = props.initialData.status || 'draft';
+      form.status = props.initialData.status || 'dibuka';
       selectedGenreIds.value = props.initialData.genre_ids ? [...props.initialData.genre_ids] : [];
       form.latitude = props.initialData.latitude;
       form.longitude = props.initialData.longitude;
@@ -497,7 +479,7 @@ watch(modelOpen, async (isOpen) => {
       form.event_date = '';
       form.venue_name = '';
       form.city = '';
-      form.status = 'draft';
+      form.status = 'dibuka';
       selectedGenreIds.value = [];
       form.latitude = undefined;
       form.longitude = undefined;

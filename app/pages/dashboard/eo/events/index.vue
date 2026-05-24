@@ -129,11 +129,10 @@ type StatusTabValue = EventStatus | 'all';
 
 const statusTabs = computed<{ label: string; value: StatusTabValue; count: number }[]>(() => [
   { label: 'Semua', value: 'all', count: events.value.length },
-  { label: 'Draft', value: 'draft', count: events.value.filter((e) => e.status === 'draft').length },
-  { label: 'Open', value: 'open', count: events.value.filter((e) => e.status === 'open').length },
-  { label: 'Closed', value: 'closed', count: events.value.filter((e) => e.status === 'closed').length },
-  { label: 'Completed', value: 'completed', count: events.value.filter((e) => e.status === 'completed').length },
-  { label: 'Cancelled', value: 'cancelled', count: events.value.filter((e) => e.status === 'cancelled').length },
+  { label: 'Dibuka', value: 'dibuka', count: events.value.filter((e) => e.status === 'dibuka').length },
+  { label: 'Ditutup', value: 'ditutup', count: events.value.filter((e) => e.status === 'ditutup').length },
+  { label: 'Selesai', value: 'selesai', count: events.value.filter((e) => e.status === 'selesai').length },
+  { label: 'Dibatalkan', value: 'dibatalkan', count: events.value.filter((e) => e.status === 'dibatalkan').length },
 ]);
 
 const filteredEvents = computed(() => {
