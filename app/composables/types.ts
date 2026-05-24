@@ -31,7 +31,7 @@ export type InvitationStatus = 'pending' | 'accepted' | 'rejected';
 
 export type BookingStatus = 'confirmed' | 'completed';
 
-export type EventStatus = 'draft' | 'open' | 'closed' | 'completed' | 'cancelled';
+export type EventStatus = 'dibuka' | 'ditutup' | 'selesai' | 'dibatalkan';
 
 export type TalentReviewItem = {
   id: number;

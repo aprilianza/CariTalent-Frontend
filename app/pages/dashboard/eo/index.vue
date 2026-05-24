@@ -108,7 +108,7 @@ const statsCards = computed(() => [
   },
   {
     title: 'Active Events',
-    value: events.value.filter((e) => e.status === 'open').length,
+    value: events.value.filter((e) => e.status === 'dibuka').length,
     hint: 'Event yang sedang buka lamaran',
     icon: 'mdi:calendar-check-outline',
   },

@@ -219,11 +219,10 @@ const applyForm = reactive({
 
 const statusOptions = [
   { label: 'Semua Status', value: '' },
-  { label: 'Draft', value: 'draft' },
-  { label: 'Open', value: 'open' },
-  { label: 'Closed', value: 'closed' },
-  { label: 'Completed', value: 'completed' },
-  { label: 'Cancelled', value: 'cancelled' },
+  { label: 'Dibuka', value: 'dibuka' },
+  { label: 'Ditutup', value: 'ditutup' },
+  { label: 'Selesai', value: 'selesai' },
+  { label: 'Dibatalkan', value: 'dibatalkan' },
 ];
 
 const genreOptions = computed(() => [{ label: 'Semua Genre', value: '' }, ...genres.value.map((genre) => ({ label: genre.name, value: genre.name }))]);
@@ -266,10 +265,10 @@ const handleApply = async (eventId: number) => {
     return;
   }
 
-  if (targetEvent.status !== 'open') {
+  if (targetEvent.status !== 'dibuka') {
     toast.add({
       title: 'Event tidak tersedia',
-      description: 'Hanya event dengan status open yang bisa dilamar.',
+      description: 'Hanya event dengan status dibuka yang bisa dilamar.',
       color: 'warning',
     });
     return;
@@ -333,8 +332,8 @@ const submitApplication = async () => {
 };
 
 const statusSummary = computed(() => ({
-  open: events.value.filter((item) => item.status === 'open').length,
-  closed: events.value.filter((item) => item.status === 'closed').length,
-  completed: events.value.filter((item) => item.status === 'completed').length,
+  open: events.value.filter((item) => item.status === 'dibuka').length,
+  closed: events.value.filter((item) => item.status === 'ditutup').length,
+  completed: events.value.filter((item) => item.status === 'selesai').length,
 }));
 </script>

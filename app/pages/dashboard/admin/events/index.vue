@@ -158,17 +158,16 @@ const moderating = ref(false);
 
 const statusTabs = [
   { label: 'Semua', value: 'all' as const },
-  { label: 'Draft', value: 'draft' as const },
-  { label: 'Open', value: 'open' as const },
-  { label: 'Closed', value: 'closed' as const },
-  { label: 'Completed', value: 'completed' as const },
-  { label: 'Cancelled', value: 'cancelled' as const },
+  { label: 'Dibuka', value: 'dibuka' as const },
+  { label: 'Ditutup', value: 'ditutup' as const },
+  { label: 'Selesai', value: 'selesai' as const },
+  { label: 'Dibatalkan', value: 'dibatalkan' as const },
 ];
 
 const moderateStatuses: { value: EventStatus; label: string; activeColor: 'primary' | 'error' | 'success' | 'neutral' }[] = [
-  { value: 'open', label: 'Open', activeColor: 'success' },
-  { value: 'closed', label: 'Closed', activeColor: 'primary' },
-  { value: 'cancelled', label: 'Cancelled', activeColor: 'error' },
+  { value: 'dibuka', label: 'Buka', activeColor: 'success' },
+  { value: 'ditutup', label: 'Tutup', activeColor: 'primary' },
+  { value: 'dibatalkan', label: 'Batal', activeColor: 'error' },
 ];
 
 const filteredEvents = computed(() => {
@@ -181,22 +180,20 @@ const filteredEvents = computed(() => {
 
 const statusLabel = (status: EventStatus) => {
   const map: Record<EventStatus, string> = {
-    draft: 'Draft',
-    open: 'Open',
-    closed: 'Closed',
-    completed: 'Completed',
-    cancelled: 'Cancelled',
+    dibuka: 'Buka',
+    ditutup: 'Tutup',
+    selesai: 'Selesai',
+    dibatalkan: 'Batal',
   };
   return map[status] ?? status;
 };
 
 const statusColor = (status: EventStatus): 'success' | 'primary' | 'error' | 'neutral' | 'info' => {
   const map: Record<EventStatus, 'success' | 'primary' | 'error' | 'neutral' | 'info'> = {
-    open: 'success',
-    closed: 'primary',
-    cancelled: 'error',
-    completed: 'info',
-    draft: 'neutral',
+    dibuka: 'success',
+    ditutup: 'neutral',
+    dibatalkan: 'error',
+    selesai: 'info',
   };
   return map[status] ?? 'neutral';
 };

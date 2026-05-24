@@ -84,11 +84,10 @@ const openGoogleMaps = (latitude?: number, longitude?: number) => {
 };
 
 const statusMeta: Record<Event['status'], { label: string; color: 'success' | 'warning' | 'error' | 'neutral' | 'primary' }> = {
-  draft: { label: 'Draft', color: 'neutral' },
-  open: { label: 'Open', color: 'success' },
-  closed: { label: 'Closed', color: 'warning' },
-  completed: { label: 'Completed', color: 'primary' },
-  cancelled: { label: 'Cancelled', color: 'error' },
+  dibuka: { label: 'Buka', color: 'success' },
+  ditutup: { label: 'Tutup', color: 'neutral' },
+  selesai: { label: 'Selesai', color: 'primary' },
+  dibatalkan: { label: 'Batal', color: 'error' },
 };
 
 const mappedItems = computed(() =>
@@ -96,12 +95,12 @@ const mappedItems = computed(() =>
     const status = statusMeta[event.status] ?? { label: event.status, color: 'neutral' as const };
     const alreadyApplied = props.appliedEventIds.includes(event.id);
     const isApplying = props.applyingEventIds.includes(event.id);
-    const canApply = event.status === 'open' && !alreadyApplied && !isApplying;
+    const canApply = event.status === 'dibuka' && !alreadyApplied && !isApplying;
 
     let applyLabel = 'Melamar';
     if (alreadyApplied) {
       applyLabel = 'Sudah Dilamar';
-    } else if (event.status !== 'open') {
+    } else if (event.status !== 'dibuka') {
       applyLabel = 'Event Ditutup';
     } else if (isApplying) {
       applyLabel = 'Memproses...';
