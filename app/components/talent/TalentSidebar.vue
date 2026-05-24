@@ -6,14 +6,9 @@
     :header-icon="headerIcon"
     :header-link="headerLink"
     :header-icon-classes="talentHeaderIconClasses"
-    :footer-title="footerTitle"
-    :footer-content="footerContent"
     :active-item-class="talentActiveItemClass"
     :inactive-item-class="talentInactiveItemClass"
     :sidebar-class="talentSidebarClass"
-    :footer-class="talentFooterClass"
-    :footer-title-class="talentFooterTitleClass"
-    :footer-content-class="talentFooterContentClass"
     @navigate="emit('navigate')"
     @logout="emit('logout')"
   >
@@ -41,25 +36,21 @@ const props = withDefaults(
     headerSubtitle?: string;
     headerIcon?: string;
     headerLink?: string;
-    footerTitle?: string;
-    footerContent?: string;
   }>(),
   {
     links: () => [
       { label: 'Dashboard', to: '/dashboard/talent', icon: 'mdi:view-dashboard-outline' },
       { label: 'Events', to: '/dashboard/talent/events', icon: 'mdi:calendar-search-outline' },
-      { label: 'Applications', to: '/dashboard/talent/applications', icon: 'mdi:file-document-outline' },
-      { label: 'Invitations', to: '/dashboard/talent/invitations', icon: 'mdi:email-fast-outline' },
+      { label: 'Lamaran', to: '/dashboard/talent/applications', icon: 'mdi:file-document-outline' },
+      { label: 'Undangan', to: '/dashboard/talent/invitations', icon: 'mdi:email-fast-outline' },
       { label: 'Bookings', to: '/dashboard/talent/bookings', icon: 'mdi:calendar-check-outline' },
       { label: 'Reviews', to: '/dashboard/talent/reviews', icon: 'mdi:star-outline' },
       { label: 'Profile', to: '/dashboard/talent/profile', icon: 'mdi:account-circle-outline' },
     ],
     headerTitle: 'CariTalent',
-    headerSubtitle: 'Talent Workspace',
+    headerSubtitle: 'Area Kerja Talent',
     headerIcon: 'mdi:music-circle',
     headerLink: '/dashboard/talent',
-    footerTitle: 'Pro Tips',
-    footerContent: 'Perbarui portfolio setiap minggu untuk meningkatkan peluang diterima organizer.',
   },
 );
 
@@ -78,8 +69,4 @@ const talentHeaderIconClasses = computed(() => 'flex h-10 w-10 items-center just
 const talentActiveItemClass = computed(() => 'bg-gradient-to-r from-highlight/20 to-accent/15 border border-highlight/30 text-ui-light shadow-sm font-medium');
 
 const talentInactiveItemClass = computed(() => 'text-neutral-light/80 hover:bg-white/8 hover:text-ui-light');
-
-const talentFooterClass = computed(() => 'mt-auto rounded-2xl border border-highlight/30 bg-highlight/10 p-4 backdrop-blur-sm');
-const talentFooterTitleClass = computed(() => 'text-accent');
-const talentFooterContentClass = computed(() => 'text-neutral-light/80');
 </script>

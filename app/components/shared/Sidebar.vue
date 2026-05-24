@@ -25,15 +25,10 @@
     </nav>
 
     <!-- Footer Section - Customizable via slot -->
-    <slot name="footer">
-      <div :class="footerClasses">
-        <p class="text-xs font-semibold uppercase tracking-wide" :class="footerTitleClasses">{{ footerTitle }}</p>
-        <p class="mt-2 text-sm" :class="footerContentClasses">{{ footerContent }}</p>
-      </div>
-    </slot>
+    <slot name="footer" />
 
     <!-- Logout Button Section -->
-    <div class="mt-6 border-t border-white/10 pt-4">
+    <div class="mt-auto border-t border-white/10 pt-4">
       <button
         class="w-full flex items-center justify-center gap-2 rounded-xl px-4 py-2.5 text-sm font-medium transition-colors text-neutral-600 hover:bg-neutral-100 hover:text-neutral-900 dark:text-neutral-300 dark:hover:bg-white/10 dark:hover:text-white"
         @click="handleLogout"

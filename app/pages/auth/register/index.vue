@@ -32,8 +32,40 @@
           </template>
 
           <form class="space-y-4 px-3 pb-3" @submit.prevent="onSubmit">
-            <!-- Nama & Role -->
-            <div class="grid gap-4 sm:grid-cols-2">
+            <!-- Peran (Role Toggle) -->
+            <UFormField label="Peran" required>
+              <div class="grid grid-cols-2 gap-3 p-1 rounded-2xl bg-white/5 border border-white/10">
+                <button
+                  type="button"
+                  @click="role = 'Talent / Musisi'"
+                  :class="[
+                    'flex items-center justify-center gap-2 rounded-xl py-2.5 text-sm font-semibold transition-all border-0 outline-none cursor-pointer',
+                    role === 'Talent / Musisi'
+                      ? 'bg-gradient-to-r from-accent to-highlight text-white shadow-lg shadow-accent/25'
+                      : 'bg-transparent text-neutral-light/75 hover:bg-white/5'
+                  ]"
+                >
+                  <Icon name="mdi:music-circle-outline" class="h-5 w-5" />
+                  Talent / Musisi
+                </button>
+                <button
+                  type="button"
+                  @click="role = 'Event Organizer'"
+                  :class="[
+                    'flex items-center justify-center gap-2 rounded-xl py-2.5 text-sm font-semibold transition-all border-0 outline-none cursor-pointer',
+                    role === 'Event Organizer'
+                      ? 'bg-gradient-to-r from-accent to-highlight text-white shadow-lg shadow-accent/25'
+                      : 'bg-transparent text-neutral-light/75 hover:bg-white/5'
+                  ]"
+                >
+                  <Icon name="mdi:calendar-star-outline" class="h-5 w-5" />
+                  Event Organizer
+                </button>
+              </div>
+            </UFormField>
+
+            <!-- Nama Lengkap & Nama Panggung -->
+            <div class="grid gap-4" :class="role === 'Talent / Musisi' ? 'sm:grid-cols-2' : 'sm:grid-cols-1'">
               <UFormField label="Nama Lengkap" required>
                 <UInput
                   v-model="fullName"
@@ -41,27 +73,19 @@
                   placeholder="Contoh: Rizky Saputra"
                   class="w-full"
                   :ui="{
-                    base: `
-            !bg-white/5 !border-white/10 !text-white
-            placeholder-neutral-light/50
-            focus:!border-accent focus:!ring-accent
-          `,
+                    base: '!bg-white/5 !border-white/10 !text-white placeholder-neutral-light/50 focus:!border-accent focus:!ring-accent',
                   }"
                 />
               </UFormField>
 
-              <UFormField label="Peran" required>
-                <USelect
-                  v-model="role"
-                  :items="roles"
+              <UFormField v-if="role === 'Talent / Musisi'" label="Nama Panggung" required>
+                <UInput
+                  v-model="stageName"
                   size="xl"
-                  placeholder="Pilih peran"
+                  placeholder="Contoh: Rizky & Friends"
                   class="w-full"
                   :ui="{
-                    base: `
-            !bg-white/5 !border-white/10 !text-white
-            focus:!border-accent focus:!ring-accent
-          `,
+                    base: '!bg-white/5 !border-white/10 !text-white placeholder-neutral-light/50 focus:!border-accent focus:!ring-accent',
                   }"
                 />
               </UFormField>
@@ -160,10 +184,10 @@
 
 <script setup lang="ts">
 import { useAuth } from '~/composables/useAuth';
-const roles = ['Talent / Musisi', 'Event Organizer'];
 
 const fullName = ref('');
-const role = ref('');
+const role = ref('Talent / Musisi');
+const stageName = ref('');
 const email = ref('');
 const phone = ref('');
 const password = ref('');
@@ -201,6 +225,15 @@ const onSubmit = async () => {
     return;
   }
 
+  if (role.value === 'Talent / Musisi' && !stageName.value.trim()) {
+    toast.add({
+      title: 'Lengkapi data',
+      description: 'Nama Panggung wajib diisi untuk peran Talent.',
+      color: 'warning',
+    });
+    return;
+  }
+
   if (password.value !== confirmPassword.value) {
     toast.add({
       title: 'Password tidak cocok',
@@ -212,16 +245,22 @@ const onSubmit = async () => {
 
   const roleValue = role.value === 'Event Organizer' ? 'eo' : 'talent';
 
+  const payload: any = {
+    name: fullName.value,
+    email: email.value,
+    phone: phone.value,
+    password: password.value,
+    password_confirmation: confirmPassword.value,
+    role: roleValue,
+  };
+
+  if (roleValue === 'talent') {
+    payload.stage_name = stageName.value.trim();
+  }
+
   isSubmitting.value = true;
   try {
-    const response = await register({
-      name: fullName.value,
-      email: email.value,
-      phone: phone.value,
-      password: password.value,
-      password_confirmation: confirmPassword.value,
-      role: roleValue,
-    });
+    const response = await register(payload);
 
     toast.add({
       title: 'Registrasi berhasil',
@@ -230,7 +269,8 @@ const onSubmit = async () => {
     });
 
     fullName.value = '';
-    role.value = '';
+    role.value = 'Talent / Musisi';
+    stageName.value = '';
     email.value = '';
     phone.value = '';
     password.value = '';

@@ -4,7 +4,7 @@
     <UiCard card-class="overflow-hidden border-white/10 bg-gradient-to-br from-highlight/12 via-white/5 to-accent/12 shadow-md">
       <div class="flex flex-col gap-5 md:flex-row md:items-center md:justify-between">
         <div class="space-y-3" id="profile">
-          <p class="text-sm font-medium text-neutral-light/70">Welcome back,</p>
+          <p class="text-sm font-medium text-neutral-light/70">Selamat datang kembali,</p>
           <h1 class="font-display text-2xl font-bold bg-gradient-to-r from-highlight to-accent bg-clip-text text-transparent md:text-3xl">
             {{ profile?.stage_name || 'Talent User' }}
           </h1>
@@ -95,25 +95,25 @@ const averageRatingLabel = computed(() => {
 
 const statsCards = computed(() => [
   {
-    title: 'Total Applications',
+    title: 'Total Lamaran',
     value: applications.value.length,
     hint: 'Lamaran yang sudah dikirim',
     icon: 'mdi:file-document-multiple-outline',
   },
   {
-    title: 'Total Invitations',
+    title: 'Total Undangan',
     value: invitations.value.length,
     hint: 'Undangan dari organizer',
     icon: 'mdi:email-fast-outline',
   },
   {
-    title: 'Total Bookings',
+    title: 'Total Booking',
     value: bookings.value.length,
     hint: 'Booking terkonfirmasi dan selesai',
     icon: 'mdi:calendar-check-outline',
   },
   {
-    title: 'Average Rating',
+    title: 'Rating Rata-rata',
     value: averageRatingLabel.value,
     hint: 'Berdasarkan perform terakhir',
     icon: 'mdi:star-circle-outline',
@@ -122,19 +122,19 @@ const statsCards = computed(() => [
 
 const quickActions = [
   {
-    label: 'Edit Profile',
+    label: 'Edit Profil',
     icon: 'mdi:account-edit-outline',
     color: 'primary',
     to: '/dashboard/talent/profile',
   },
   {
-    label: 'See Invitations',
+    label: 'Lihat Undangan',
     icon: 'mdi:folder-multiple-image',
     color: 'secondary',
     to: '/dashboard/talent/invitations',
   },
   {
-    label: 'Browse Events',
+    label: 'Cari Event',
     icon: 'mdi:compass-outline',
     color: 'primary',
     to: '/dashboard/talent/events',
@@ -158,14 +158,14 @@ const handleInvitation = async (action: 'accept' | 'reject', invitationId: numbe
     await respondToInvitation(invitationId, status);
 
     toast.add({
-      title: action === 'accept' ? 'Invitation accepted' : 'Invitation rejected',
-      description: `${current.event.title} has been ${action}ed successfully.`,
+      title: action === 'accept' ? 'Undangan diterima' : 'Undangan ditolak',
+      description: `${current.event.title} telah berhasil ${action === 'accept' ? 'diterima' : 'ditolak'}.`,
       color: action === 'accept' ? 'success' : 'error',
     });
   } catch (error: any) {
     toast.add({
-      title: 'Action failed',
-      description: error.message || 'Failed to respond to invitation',
+      title: 'Aksi gagal',
+      description: error.message || 'Gagal menanggapi undangan',
       color: 'error',
     });
   }

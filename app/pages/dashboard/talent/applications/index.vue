@@ -3,12 +3,12 @@
     <UiCard card-class="overflow-hidden border-white/10 bg-gradient-to-br from-highlight/12 via-white/5 to-accent/12 shadow-md">
       <div class="flex flex-wrap items-start justify-between gap-4">
         <div>
-          <p class="text-sm font-medium text-neutral-light/70">Talent Workspace</p>
-          <h1 class="font-display text-2xl font-bold bg-gradient-to-r from-highlight to-accent bg-clip-text text-transparent md:text-3xl">Recent Applications</h1>
+          <p class="text-sm font-medium text-neutral-light/70">Area Kerja Talent</p>
+          <h1 class="font-display text-2xl font-bold bg-gradient-to-r from-highlight to-accent bg-clip-text text-transparent md:text-3xl">Lamaran Terbaru</h1>
           <div class="mt-3 flex flex-wrap gap-2">
-            <UiBadge :label="`Pending ${statusSummary.pending}`" color="warning" variant="soft" />
-            <UiBadge :label="`Accepted ${statusSummary.accepted}`" color="success" variant="soft" />
-            <UiBadge :label="`Rejected ${statusSummary.rejected}`" color="error" variant="soft" />
+            <UiBadge :label="`Menunggu ${statusSummary.pending}`" color="warning" variant="soft" />
+            <UiBadge :label="`Diterima ${statusSummary.accepted}`" color="success" variant="soft" />
+            <UiBadge :label="`Ditolak ${statusSummary.rejected}`" color="error" variant="soft" />
           </div>
         </div>
         <div class="flex items-center gap-2">
@@ -30,7 +30,7 @@ definePageMeta({
   layout: 'talent',
 });
 
-useState('talent-layout-title', () => 'Talent Dashboard').value = 'Applications';
+useState('talent-layout-title', () => 'Talent Dashboard').value = 'Lamaran';
 
 const toast = useToast();
 

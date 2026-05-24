@@ -38,8 +38,8 @@
           </div>
 
           <div v-if="detailed && item.isPending" class="flex flex-wrap gap-2">
-            <UiButton size="sm" color="success" variant="soft" @click="emit('accept', item.id as number)"> Accept </UiButton>
-            <UiButton size="sm" color="error" variant="soft" @click="emit('reject', item.id as number)"> Reject </UiButton>
+            <UiButton size="sm" color="success" variant="soft" @click="emit('accept', item.id as number)"> Terima </UiButton>
+            <UiButton size="sm" color="error" variant="soft" @click="emit('reject', item.id as number)"> Tolak </UiButton>
           </div>
         </div>
       </template>
@@ -82,9 +82,9 @@ const openGoogleMaps = (latitude?: number, longitude?: number) => {
 };
 
 const statusMap: Record<InvitationStatus, { label: string; color: string }> = {
-  pending: { label: 'Pending', color: 'warning' },
-  accepted: { label: 'Accepted', color: 'success' },
-  rejected: { label: 'Rejected', color: 'error' },
+  pending: { label: 'Menunggu', color: 'warning' },
+  accepted: { label: 'Diterima', color: 'success' },
+  rejected: { label: 'Ditolak', color: 'error' },
 };
 
 const formatDateSafe = (value?: string) => {

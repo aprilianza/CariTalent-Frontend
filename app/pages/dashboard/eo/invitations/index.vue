@@ -125,16 +125,16 @@ type FilterValue = ApplicationStatus | 'all';
 const activeFilter = ref<FilterValue>('all');
 
 const statusMap: Record<ApplicationStatus, { label: string; color: 'success' | 'warning' | 'error' }> = {
-  pending: { label: 'Pending', color: 'warning' },
-  accepted: { label: 'Accepted', color: 'success' },
-  rejected: { label: 'Rejected', color: 'error' },
+  pending: { label: 'Menunggu', color: 'warning' },
+  accepted: { label: 'Diterima', color: 'success' },
+  rejected: { label: 'Ditolak', color: 'error' },
 };
 
 const filterTabs = computed<{ label: string; value: FilterValue; count: number }[]>(() => [
   { label: 'Semua', value: 'all', count: invitations.value.length },
-  { label: 'Pending', value: 'pending', count: invitations.value.filter((i) => i.status === 'pending').length },
-  { label: 'Accepted', value: 'accepted', count: invitations.value.filter((i) => i.status === 'accepted').length },
-  { label: 'Rejected', value: 'rejected', count: invitations.value.filter((i) => i.status === 'rejected').length },
+  { label: 'Menunggu', value: 'pending', count: invitations.value.filter((i) => i.status === 'pending').length },
+  { label: 'Diterima', value: 'accepted', count: invitations.value.filter((i) => i.status === 'accepted').length },
+  { label: 'Ditolak', value: 'rejected', count: invitations.value.filter((i) => i.status === 'rejected').length },
 ]);
 
 const filteredInvitations = computed(() => {
@@ -149,12 +149,12 @@ const invitationStats = computed(() => [
     colorClass: 'text-violet-400',
   },
   {
-    label: 'Accepted',
+    label: 'Diterima',
     value: invitations.value.filter((i) => i.status === 'accepted').length,
     colorClass: 'text-emerald-400',
   },
   {
-    label: 'Pending',
+    label: 'Menunggu',
     value: invitations.value.filter((i) => i.status === 'pending').length,
     colorClass: 'text-amber-400',
   },

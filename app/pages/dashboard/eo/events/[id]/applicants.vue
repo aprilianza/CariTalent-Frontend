@@ -71,10 +71,10 @@ const activeFilter = ref<FilterValue>('all');
 
 const filterTabs = computed<{ label: string; value: FilterValue; count: number }[]>(() => [
   { label: 'Semua', value: 'all', count: applications.value.length },
-  { label: 'Pending', value: 'pending', count: applications.value.filter((a) => a.status === 'pending').length },
-  { label: 'Accepted', value: 'accepted', count: applications.value.filter((a) => a.status === 'accepted').length },
-  { label: 'Rejected', value: 'rejected', count: applications.value.filter((a) => a.status === 'rejected').length },
-  { label: 'Via Invitation', value: 'invitation', count: applications.value.filter((a) => a.source === 'invitation').length },
+  { label: 'Menunggu', value: 'pending', count: applications.value.filter((a) => a.status === 'pending').length },
+  { label: 'Diterima', value: 'accepted', count: applications.value.filter((a) => a.status === 'accepted').length },
+  { label: 'Ditolak', value: 'rejected', count: applications.value.filter((a) => a.status === 'rejected').length },
+  { label: 'Via Undangan', value: 'invitation', count: applications.value.filter((a) => a.source === 'invitation').length },
 ]);
 
 const filteredApplications = computed(() => {
