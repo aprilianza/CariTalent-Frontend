@@ -1,5 +1,5 @@
 <template>
-  <UiCard title="Recent Applications" :description="detailed ? 'Riwayat lamaran event dengan detail status, lokasi, dan harga' : 'Ringkasan lamaran event terbaru'" card-class="h-full">
+  <UiCard title="Lamaran Terbaru" :description="detailed ? 'Riwayat lamaran event dengan detail status, lokasi, dan harga' : 'Ringkasan lamaran event terbaru'" card-class="h-full">
     <div v-if="loading" class="space-y-3">
       <USkeleton v-for="n in 3" :key="n" class="h-20 w-full rounded-xl" />
     </div>
@@ -38,7 +38,7 @@
           </div>
 
           <div v-if="detailed && item.canCancel" class="flex justify-end">
-            <UiButton size="xs" color="error" variant="soft" @click="emit('cancel', Number(item.id))"> Cancel Application </UiButton>
+            <UiButton size="xs" color="error" variant="soft" @click="emit('cancel', Number(item.id))"> Batalkan Lamaran </UiButton>
           </div>
         </div>
       </template>
@@ -80,14 +80,14 @@ const openGoogleMaps = (latitude?: number, longitude?: number) => {
 };
 
 const statusMap: Record<ApplicationStatus, { label: string; color: string }> = {
-  pending: { label: 'Pending', color: 'warning' },
-  accepted: { label: 'Accepted', color: 'success' },
-  rejected: { label: 'Rejected', color: 'error' },
+  pending: { label: 'Menunggu', color: 'warning' },
+  accepted: { label: 'Diterima', color: 'success' },
+  rejected: { label: 'Ditolak', color: 'error' },
 };
 
 const sourceMap = {
   apply: 'Apply langsung',
-  invitation: 'Invitation',
+  invitation: 'Via Undangan',
 } as const;
 
 const statusSubtitleMap: Record<ApplicationStatus, string> = {

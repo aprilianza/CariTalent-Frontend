@@ -3,12 +3,12 @@
     <UiCard card-class="overflow-hidden border-white/10 bg-gradient-to-br from-highlight/12 via-white/5 to-accent/12 shadow-md">
       <div class="flex flex-wrap items-start justify-between gap-4">
         <div>
-          <p class="text-sm font-medium text-neutral-light/70">Talent Workspace</p>
-          <h1 class="font-display bg-gradient-to-r from-highlight to-accent bg-clip-text text-2xl font-bold text-transparent md:text-3xl">Browse Events</h1>
+          <p class="text-sm font-medium text-neutral-light/70">Area Kerja Talent</p>
+          <h1 class="font-display bg-gradient-to-r from-highlight to-accent bg-clip-text text-2xl font-bold text-transparent md:text-3xl">Cari Event</h1>
           <div class="mt-3 flex flex-wrap gap-2">
-            <UiBadge :label="`Open ${statusSummary.open}`" color="success" variant="soft" />
-            <UiBadge :label="`Closed ${statusSummary.closed}`" color="warning" variant="soft" />
-            <UiBadge :label="`Completed ${statusSummary.completed}`" color="primary" variant="soft" />
+            <UiBadge :label="`Dibuka ${statusSummary.open}`" color="success" variant="soft" />
+            <UiBadge :label="`Ditutup ${statusSummary.closed}`" color="warning" variant="soft" />
+            <UiBadge :label="`Selesai ${statusSummary.completed}`" color="primary" variant="soft" />
           </div>
         </div>
         <div class="flex items-center gap-2">
@@ -20,7 +20,7 @@
 
     <UiCard title="Filter Events" description="Saring event sesuai kebutuhanmu.">
       <div class="grid gap-4 lg:grid-cols-4">
-        <UFormField label="Search" class="w-full">
+        <UFormField label="Cari" class="w-full">
           <UInput v-model="filterForm.search" placeholder="Judul event" class="w-full" :ui="{ base: 'w-full rounded-xl border-white/20 bg-white/8 text-ui-light' }" @keyup.enter="applyFilters" />
         </UFormField>
 
@@ -160,7 +160,7 @@ definePageMeta({
   layout: 'talent',
 });
 
-useState('talent-layout-title', () => 'Talent Dashboard').value = 'Events';
+useState('talent-layout-title', () => 'Talent Dashboard').value = 'Event';
 
 const toast = useToast();
 const { formatCurrency, formatDate } = useFormatters();

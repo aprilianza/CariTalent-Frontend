@@ -48,9 +48,9 @@ const props = withDefaults(
 const { formatCurrency, formatDate } = useFormatters();
 
 const statusMap: Record<ApplicationStatus, { label: string; color: 'success' | 'warning' | 'error' }> = {
-  pending: { label: 'Pending', color: 'warning' },
-  accepted: { label: 'Accepted', color: 'success' },
-  rejected: { label: 'Rejected', color: 'error' },
+  pending: { label: 'Menunggu', color: 'warning' },
+  accepted: { label: 'Diterima', color: 'success' },
+  rejected: { label: 'Ditolak', color: 'error' },
 };
 
 const formatDateSafe = (value?: string) => {

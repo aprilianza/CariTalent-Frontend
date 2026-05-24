@@ -6,9 +6,9 @@
           <p class="text-sm font-medium text-neutral-light/70">Talent Workspace</p>
           <h1 class="font-display text-2xl font-bold bg-gradient-to-r from-highlight to-accent bg-clip-text text-transparent md:text-3xl">Invitations</h1>
           <div class="mt-3 flex flex-wrap gap-2">
-            <UiBadge :label="`Pending ${statusSummary.pending}`" color="warning" variant="soft" />
-            <UiBadge :label="`Accepted ${statusSummary.accepted}`" color="success" variant="soft" />
-            <UiBadge :label="`Rejected ${statusSummary.rejected}`" color="error" variant="soft" />
+            <UiBadge :label="`Menunggu ${statusSummary.pending}`" color="warning" variant="soft" />
+            <UiBadge :label="`Diterima ${statusSummary.accepted}`" color="success" variant="soft" />
+            <UiBadge :label="`Ditolak ${statusSummary.rejected}`" color="error" variant="soft" />
           </div>
         </div>
         <div class="flex items-center gap-2">
@@ -61,14 +61,14 @@ const handleInvitation = async (action: 'accept' | 'reject', invitationId: numbe
     await respondToInvitation(invitationId, status);
 
     toast.add({
-      title: action === 'accept' ? 'Invitation accepted' : 'Invitation rejected',
-      description: `${current.event.title} has been ${action}ed successfully.`,
+      title: action === 'accept' ? 'Undangan diterima' : 'Undangan ditolak',
+      description: `${current.event.title} telah berhasil ${action === 'accept' ? 'diterima' : 'ditolak'}.`,
       color: action === 'accept' ? 'success' : 'error',
     });
   } catch (error: any) {
     toast.add({
-      title: 'Action failed',
-      description: error.message || 'Failed to respond to invitation',
+      title: 'Aksi gagal',
+      description: error.message || 'Gagal menanggapi undangan',
       color: 'error',
     });
   }
