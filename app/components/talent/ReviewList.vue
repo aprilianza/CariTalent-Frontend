@@ -63,14 +63,14 @@ const formatDateSafe = (value?: string) => {
 
 const getRatingMeta = (rating: number) => {
   if (rating >= 4.5) {
-    return { label: 'Excellent', color: 'success' as const };
+    return { label: 'Sangat Baik', color: 'success' as const };
   }
 
   if (rating >= 3.5) {
-    return { label: 'Good', color: 'primary' as const };
+    return { label: 'Baik', color: 'primary' as const };
   }
 
-  return { label: 'Needs Improvement', color: 'warning' as const };
+  return { label: 'Perlu Ditingkatkan', color: 'warning' as const };
 };
 
 const buildStars = (rating: number) => {
