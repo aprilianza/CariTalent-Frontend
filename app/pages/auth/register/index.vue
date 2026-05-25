@@ -167,8 +167,6 @@
 
             <!-- Button -->
             <UButton type="submit" size="xl" block :loading="isSubmitting" class="!justify-center !rounded-xl !py-3 text-sm font-semibold !bg-gradient-to-r !from-accent !to-highlight hover:!opacity-90"> Daftar Sekarang </UButton>
-
-            <p class="text-center text-xs leading-relaxed text-neutral-light/60">Dengan mendaftar, kamu setuju menerima notifikasi terkait event, update akun, dan informasi penting platform.</p>
           </form>
           <template #footer>
             <p class="px-3 pb-3 pt-1 text-center text-sm text-neutral-light/70">
