@@ -161,16 +161,23 @@ const filteredTalents = computed(() => {
 
 const handleVerify = async (id: number, verified: boolean) => {
   loadingId.value = id;
-  await new Promise((r) => setTimeout(r, 600));
 
-  verifyTalent(id, verified);
-  toast.add({
-    title: verified ? 'Talent diverifikasi' : 'Verifikasi dicabut',
-    description: verified
-      ? 'Status talent berhasil diubah menjadi verified.'
-      : 'Verifikasi talent berhasil dicabut.',
-    color: verified ? 'success' : 'neutral',
-  });
+  const res = await verifyTalent(id, verified);
+  if (res.success) {
+    toast.add({
+      title: verified ? 'Talent diverifikasi' : 'Verifikasi dicabut',
+      description: verified
+        ? 'Status talent berhasil diubah menjadi verified.'
+        : 'Verifikasi talent berhasil dicabut.',
+      color: 'success',
+    });
+  } else {
+    toast.add({
+      title: 'Gagal',
+      description: res.message || 'Terjadi kesalahan saat memverifikasi talent.',
+      color: 'error',
+    });
+  }
 
   loadingId.value = null;
 };

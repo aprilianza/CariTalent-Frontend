@@ -8,7 +8,7 @@
         <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           <div>
             <h1 class="font-display text-2xl font-bold bg-gradient-to-r from-violet-400 to-fuchsia-400 bg-clip-text text-transparent">Pelamar Event</h1>
-            <p class="mt-1 text-sm text-neutral-light/70">Event ID: #{{ route.params.id }} · {{ applications.length }} pelamar</p>
+            <p class="mt-1 text-sm text-neutral-light/70">{{ event?.title || ('Event ID: #' + route.params.id) }} · {{ applications.length }} pelamar</p>
           </div>
           <UiButton icon="mdi:star-shooting-outline" color="secondary" variant="soft" @click="navigateTo(`/dashboard/eo/events/${route.params.id}/recommendations`)"> Lihat Rekomendasi </UiButton>
         </div>
@@ -52,7 +52,7 @@ const route = useRoute();
 const toast = useToast();
 
 const eventId = computed(() => Number(route.params.id));
-const { data: rawApplications, pending, updateApplicationStatus } = useEoApplications(eventId.value);
+const { data: rawApplications, pending, updateApplicationStatus, event } = useEoApplications(eventId.value);
 
 // Local reactive copy for optimistic updates
 const applications = ref<EoApplication[]>([]);
@@ -65,7 +65,7 @@ watch(
   { immediate: true },
 );
 
-type FilterValue = ApplicationStatus | 'all' | 'invitation';
+type FilterValue = ApplicationStatus | 'all';
 
 const activeFilter = ref<FilterValue>('all');
 
@@ -74,12 +74,10 @@ const filterTabs = computed<{ label: string; value: FilterValue; count: number }
   { label: 'Menunggu', value: 'pending', count: applications.value.filter((a) => a.status === 'pending').length },
   { label: 'Diterima', value: 'accepted', count: applications.value.filter((a) => a.status === 'accepted').length },
   { label: 'Ditolak', value: 'rejected', count: applications.value.filter((a) => a.status === 'rejected').length },
-  { label: 'Via Undangan', value: 'invitation', count: applications.value.filter((a) => a.source === 'invitation').length },
 ]);
 
 const filteredApplications = computed(() => {
   if (activeFilter.value === 'all') return applications.value;
-  if (activeFilter.value === 'invitation') return applications.value.filter((a) => a.source === 'invitation');
   return applications.value.filter((a) => a.status === activeFilter.value);
 });
 

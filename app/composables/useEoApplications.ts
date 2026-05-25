@@ -1,4 +1,4 @@
-import type { EoApplication, EventApplicationsData } from '~/composables/types';
+import type { ApiResponse, EoApplication, EventApplicationsData } from '~/composables/types';
 
 export const useEoApplications = (eventId?: number) => {
   const api = useApiClient();
@@ -13,7 +13,7 @@ export const useEoApplications = (eventId?: number) => {
         success: false,
         message: '',
         data: { applications: [] },
-      }),
+      } as ApiResponse<EventApplicationsData>),
     },
   );
 
@@ -33,5 +33,6 @@ export const useEoApplications = (eventId?: number) => {
     refresh,
     updateApplicationStatus,
     data: computed<EoApplication[]>(() => response.value?.data?.applications ?? []),
+    event: computed(() => response.value?.data?.event),
   };
 };
