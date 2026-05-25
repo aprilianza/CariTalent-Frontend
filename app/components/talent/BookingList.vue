@@ -1,5 +1,5 @@
 <template>
-  <UiCard id="bookings" title="Upcoming Bookings" :description="detailed ? 'Detail booking event, harga deal, dan metadata jadwal' : 'Ringkasan jadwal booking terdekat'" card-class="h-full">
+  <UiCard id="bookings" title="Booking Mendatang" :description="detailed ? 'Detail booking event, harga deal, dan metadata jadwal' : 'Ringkasan jadwal booking terdekat'" card-class="h-full">
     <div v-if="loading" class="space-y-3">
       <USkeleton v-for="n in 2" :key="n" class="h-24 w-full rounded-xl" />
     </div>
@@ -65,8 +65,8 @@ const openGoogleMaps = (latitude?: number, longitude?: number) => {
 };
 
 const statusMap: Record<BookingStatus, { label: string; color: string }> = {
-  confirmed: { label: 'Confirmed', color: 'success' },
-  completed: { label: 'Completed', color: 'primary' },
+  confirmed: { label: 'Dikonfirmasi', color: 'success' },
+  completed: { label: 'Selesai', color: 'primary' },
 };
 
 const sourceMap = {

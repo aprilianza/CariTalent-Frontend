@@ -3,8 +3,8 @@
     <!-- Page header -->
     <UiCard card-class="border-white/10 bg-gradient-to-r from-violet-500/10 to-fuchsia-500/10">
       <div>
-        <h1 class="font-display text-2xl font-bold bg-gradient-to-r from-violet-400 to-fuchsia-400 bg-clip-text text-transparent">My Bookings</h1>
-        <p class="mt-1 text-sm text-neutral-light/70">{{ bookings.length }} booking · {{ confirmedCount }} confirmed · {{ completedCount }} completed</p>
+        <h1 class="font-display text-2xl font-bold bg-gradient-to-r from-violet-400 to-fuchsia-400 bg-clip-text text-transparent">Booking Saya</h1>
+        <p class="mt-1 text-sm text-neutral-light/70">{{ bookings.length }} booking · {{ confirmedCount }} dikonfirmasi · {{ completedCount }} selesai</p>
       </div>
     </UiCard>
 
@@ -80,7 +80,7 @@ definePageMeta({
 });
 
 const pageTitle = useState('eo-layout-title');
-pageTitle.value = 'My Bookings';
+pageTitle.value = 'Bookings';
 
 const toast = useToast();
 const api = useApiClient();
@@ -110,8 +110,8 @@ const completedCount = computed(() => bookings.value.filter((b) => b.status === 
 
 const filterTabs = computed<{ label: string; value: FilterValue; count: number }[]>(() => [
   { label: 'Semua', value: 'all', count: bookings.value.length },
-  { label: 'Confirmed', value: 'confirmed', count: confirmedCount.value },
-  { label: 'Completed', value: 'completed', count: completedCount.value },
+  { label: 'Dikonfirmasi', value: 'confirmed', count: confirmedCount.value },
+  { label: 'Selesai', value: 'completed', count: completedCount.value },
 ]);
 
 const filteredBookings = computed(() => {

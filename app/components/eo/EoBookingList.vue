@@ -1,5 +1,5 @@
 <template>
-  <UiCard title="Bookings" :description="detailed ? 'Detail booking event beserta talent, harga deal, dan status' : 'Ringkasan booking terkini'" card-class="h-full flex flex-col" body-class="flex-1 flex flex-col">
+  <UiCard title="Booking" :description="detailed ? 'Detail booking event beserta talent, harga deal, dan status' : 'Ringkasan booking terkini'" card-class="h-full flex flex-col" body-class="flex-1 flex flex-col">
     <div v-if="loading" class="space-y-3">
       <USkeleton v-for="n in 3" :key="`booking-skeleton-${n}`" class="h-24 w-full rounded-xl" />
     </div>
@@ -15,7 +15,7 @@
             </div>
             <div class="flex items-center gap-2">
               <UiBadge :label="item.statusLabel" :color="item.statusColor" variant="soft" />
-              <UiBadge v-if="item.resolution" :label="item.resolution === 'done' ? 'Done' : 'Reject'" :color="item.resolution === 'done' ? 'success' : 'error'" variant="soft" class="font-bold border border-current/20" />
+              <UiBadge v-if="item.resolution" :label="item.resolution === 'done' ? 'Selesai' : 'Dibatalkan'" :color="item.resolution === 'done' ? 'success' : 'error'" variant="soft" class="font-bold border border-current/20" />
             </div>
           </div>
 
@@ -74,8 +74,8 @@ const detailed = computed(() => props.detailed);
 const completingId = computed(() => props.completingId);
 
 const statusMap: Record<BookingStatus, { label: string; color: 'success' | 'primary' }> = {
-  confirmed: { label: 'Confirmed', color: 'success' },
-  completed: { label: 'Completed', color: 'primary' },
+  confirmed: { label: 'Dikonfirmasi', color: 'success' },
+  completed: { label: 'Selesai', color: 'primary' },
 };
 
 const sourceMap = { apply: 'Apply Langsung', invitation: 'Via Invitation' } as const;
