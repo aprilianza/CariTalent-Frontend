@@ -153,6 +153,13 @@ export type TalentSummary = {
   city?: string;
   verified: boolean;
   average_rating: number;
+  name?: string;
+  email?: string;
+  phone?: string;
+  bio?: string;
+  portfolio_link?: string;
+  price_min?: number;
+  price_max?: number;
 };
 
 export type EoApplication = {
@@ -205,6 +212,7 @@ export type MyEoEventsData = {
 };
 
 export type EventApplicationsData = {
+  event?: Event;
   applications: EoApplication[];
 };
 

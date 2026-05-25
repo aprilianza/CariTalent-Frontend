@@ -209,18 +209,24 @@ const doModerate = async () => {
   if (!eventToModerate.value || !moderateStatus.value) return;
   moderating.value = true;
 
-  await new Promise((r) => setTimeout(r, 700));
-
-  moderateEvent(eventToModerate.value.id, {
+  const res = await moderateEvent(eventToModerate.value.id, {
     status: moderateStatus.value as EventStatus,
     reason: moderateReason.value || undefined,
   });
 
-  toast.add({
-    title: 'Event dimoderasi',
-    description: `Status "${eventToModerate.value.title}" diubah ke "${statusLabel(moderateStatus.value as EventStatus)}".`,
-    color: 'success',
-  });
+  if (res.success) {
+    toast.add({
+      title: 'Event dimoderasi',
+      description: `Status "${eventToModerate.value.title}" diubah ke "${statusLabel(moderateStatus.value as EventStatus)}".`,
+      color: 'success',
+    });
+  } else {
+    toast.add({
+      title: 'Gagal',
+      description: res.message || 'Terjadi kesalahan saat memoderasi event.',
+      color: 'error',
+    });
+  }
 
   moderating.value = false;
   showModerateModal.value = false;

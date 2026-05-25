@@ -168,14 +168,20 @@ const doDelete = async () => {
   if (!userToDelete.value) return;
   deleting.value = true;
 
-  await new Promise((r) => setTimeout(r, 600));
-
-  deleteUser(userToDelete.value.id);
-  toast.add({
-    title: 'Pengguna dihapus',
-    description: `Akun "${userToDelete.value.name}" berhasil dihapus.`,
-    color: 'error',
-  });
+  const res = await deleteUser(userToDelete.value.id);
+  if (res.success) {
+    toast.add({
+      title: 'Pengguna dihapus',
+      description: `Akun "${userToDelete.value.name}" berhasil dihapus.`,
+      color: 'error',
+    });
+  } else {
+    toast.add({
+      title: 'Gagal',
+      description: res.message || 'Terjadi kesalahan saat menghapus pengguna.',
+      color: 'error',
+    });
+  }
 
   deleting.value = false;
   showDeleteModal.value = false;
