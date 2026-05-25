@@ -61,7 +61,7 @@
             <UFormField label="Password" required>
               <UInput
                 v-model="password"
-                type="password"
+                :type="showPassword ? 'text' : 'password'"
                 size="xl"
                 placeholder="Masukkan password"
                 class="w-full"
@@ -72,7 +72,13 @@
           focus:!border-accent focus:!ring-accent
         `,
                 }"
-              />
+              >
+                <template #trailing>
+                  <button type="button" @click="showPassword = !showPassword" class="flex items-center text-neutral-light/60 hover:text-neutral-light pr-2 focus:outline-none cursor-pointer">
+                    <Icon :name="showPassword ? 'mdi:eye-outline' : 'mdi:eye-off-outline'" class="h-5 w-5" />
+                  </button>
+                </template>
+              </UInput>
             </UFormField>
 
             <UButton type="submit" color="primary" size="xl" block :loading="isSubmitting" class="!mt-2 !justify-center !rounded-xl !py-3 text-sm font-semibold !bg-gradient-to-r !from-accent !to-highlight hover:!opacity-90" variant="solid">
@@ -96,6 +102,7 @@
 import { useAuth } from '~/composables/useAuth';
 const email = ref('');
 const password = ref('');
+const showPassword = ref(false);
 const isSubmitting = ref(false);
 
 const toast = useToast();
