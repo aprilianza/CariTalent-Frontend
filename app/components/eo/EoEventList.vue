@@ -78,6 +78,7 @@
               Pelamar ({{ item.totalApplicants }})
             </UiButton>
             <UiButton
+              v-if="item.status === 'dibuka'"
               size="sm"
               color="secondary"
               variant="soft"
@@ -89,8 +90,8 @@
             <UiButton
               v-if="item.canEdit"
               size="sm"
-              color="neutral"
-              variant="outline"
+              color="warning"
+              variant="soft"
               icon="mdi:pencil-outline"
               @click="emit('edit', Number(item.id))"
             >
@@ -188,7 +189,7 @@ const formatDateSafe = (value?: string) => {
 const mappedItems = computed(() =>
   props.events.map((event) => {
     const status = statusMeta[event.status] ?? { label: event.status, color: 'neutral' as const };
-    const canEdit = event.status !== 'selesai' && event.status !== 'dibatalkan';
+    const canEdit = true;
     const canCancel = event.status !== 'selesai' && event.status !== 'dibatalkan';
 
     return {
@@ -203,6 +204,7 @@ const mappedItems = computed(() =>
       applicantsLabel: `${event.total_applicants ?? 0} pelamar`,
       statusLabel: status.label,
       statusColor: status.color,
+      status: event.status,
       canEdit,
       canCancel,
     };

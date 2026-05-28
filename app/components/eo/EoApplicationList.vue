@@ -42,8 +42,8 @@
             <p class="text-neutral-light/50">Dikirim: {{ item.createdAt }}</p>
           </div>
 
-          <!-- Accept / Reject actions — only for pending items -->
-          <div v-if="item.isPending" class="flex flex-wrap gap-2">
+          <!-- Accept / Reject actions — only for pending items and when event is opened -->
+          <div v-if="item.isPending && eventStatus === 'dibuka'" class="flex flex-wrap gap-2">
             <UiButton size="sm" color="success" variant="soft" icon="mdi:check-circle-outline" :loading="acceptingId === item.rawId" @click="handleAccept(item.rawId)"> Terima </UiButton>
             <UiButton size="sm" color="error" variant="ghost" icon="mdi:close-circle-outline" :loading="rejectingId === item.rawId" @click="emit('reject', item.rawId)"> Tolak </UiButton>
           </div>
@@ -182,10 +182,6 @@
               </div>
             </div>
 
-            <!-- Footer Action -->
-            <div class="flex justify-end pt-2">
-              <UiButton color="neutral" variant="soft" @click="showProfileModal = false" class="px-5"> Tutup </UiButton>
-            </div>
           </div>
         </div>
       </template>
@@ -202,10 +198,12 @@ const props = withDefaults(
     applications: EoApplication[];
     loading?: boolean;
     detailed?: boolean;
+    eventStatus?: string;
   }>(),
   {
     loading: false,
     detailed: true,
+    eventStatus: 'dibuka',
   },
 );
 

@@ -10,7 +10,7 @@
             <h1 class="font-display text-2xl font-bold bg-gradient-to-r from-violet-400 to-fuchsia-400 bg-clip-text text-transparent">Pelamar Event</h1>
             <p class="mt-1 text-sm text-neutral-light/70">{{ event?.title || ('Event ID: #' + route.params.id) }} · {{ applications.length }} pelamar</p>
           </div>
-          <UiButton icon="mdi:star-shooting-outline" color="secondary" variant="soft" @click="navigateTo(`/dashboard/eo/events/${route.params.id}/recommendations`)"> Lihat Rekomendasi </UiButton>
+          <UiButton v-if="event && event.status === 'dibuka'" icon="mdi:star-shooting-outline" color="secondary" variant="soft" @click="navigateTo(`/dashboard/eo/events/${route.params.id}/recommendations`)"> Lihat Rekomendasi </UiButton>
         </div>
       </div>
     </UiCard>
@@ -31,8 +31,19 @@
       </button>
     </div>
 
+    <!-- Alert when event is not open -->
+    <UiCard v-if="event && event.status !== 'dibuka'" card-class="border-yellow-500/20 bg-yellow-500/10">
+      <div class="flex items-center gap-3 text-yellow-300">
+        <Icon name="mdi:alert-circle-outline" class="h-5 w-5 shrink-0" />
+        <div class="text-sm">
+          <p class="font-semibold">Event tidak sedang dibuka</p>
+          <p class="text-yellow-300/80">Status event ini adalah <span class="font-bold uppercase">{{ event.status }}</span>. Anda tidak dapat menerima atau menolak lamaran untuk event yang tidak aktif.</p>
+        </div>
+      </div>
+    </UiCard>
+
     <!-- Application list -->
-    <EoApplicationList :applications="filteredApplications" :loading="pending" :detailed="true" @accept="handleAccept" @reject="handleReject" />
+    <EoApplicationList :applications="filteredApplications" :loading="pending" :detailed="true" :event-status="event?.status" @accept="handleAccept" @reject="handleReject" />
   </div>
 </template>
 
@@ -82,6 +93,14 @@ const filteredApplications = computed(() => {
 });
 
 const handleAccept = async (applicationId: number, agreedPrice: number) => {
+  if (event.value && event.value.status !== 'dibuka') {
+    toast.add({
+      title: 'Aksi ditolak',
+      description: 'Event tidak sedang dibuka.',
+      color: 'warning',
+    });
+    return;
+  }
   try {
     await updateApplicationStatus(applicationId, 'accepted', agreedPrice);
     const idx = applications.value.findIndex((a) => a.id === applicationId);
@@ -104,6 +123,14 @@ const handleAccept = async (applicationId: number, agreedPrice: number) => {
 };
 
 const handleReject = async (applicationId: number) => {
+  if (event.value && event.value.status !== 'dibuka') {
+    toast.add({
+      title: 'Aksi ditolak',
+      description: 'Event tidak sedang dibuka.',
+      color: 'warning',
+    });
+    return;
+  }
   try {
     await updateApplicationStatus(applicationId, 'rejected');
     const idx = applications.value.findIndex((a) => a.id === applicationId);
