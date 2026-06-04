@@ -49,7 +49,7 @@
       @view-applicants="(id) => navigateTo(`/dashboard/eo/events/${id}/applicants`)"
       @view-recommendations="(id) => navigateTo(`/dashboard/eo/events/${id}/recommendations`)"
       @edit="handleEditEvent"
-      @cancel="handleCancelEvent"
+      @delete="handleDeleteEvent"
     />
 
     <!-- Create / Edit Event Modal -->
@@ -62,26 +62,26 @@
       @submit="handleEventSubmit"
     />
 
-    <!-- Cancel Confirmation Modal -->
-    <UModal v-model:open="showCancelModal" :ui="{ content: 'bg-transparent ring-0 shadow-none sm:max-w-md w-full mx-auto' }">
+    <!-- Delete Confirmation Modal -->
+    <UModal v-model:open="showDeleteModal" :ui="{ content: 'bg-transparent ring-0 shadow-none sm:max-w-md w-full mx-auto' }">
       <template #content>
         <div class="relative overflow-hidden rounded-2xl border border-white/10 bg-[#1e1e2e]/95 backdrop-blur-xl p-7 shadow-2xl">
           <div class="absolute -top-24 -right-24 h-48 w-48 rounded-full bg-red-500/20 blur-3xl pointer-events-none"></div>
           
           <div class="relative z-10 space-y-6 text-center">
             <div class="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-red-500/10 text-red-400 border border-red-500/20">
-               <Icon name="mdi:alert-circle-outline" class="h-8 w-8" />
+               <Icon name="mdi:trash-can-outline" class="h-8 w-8" />
             </div>
             <div>
-              <h3 class="text-xl font-bold text-neutral-light">Batalkan Event?</h3>
+              <h3 class="text-xl font-bold text-neutral-light">Hapus Event?</h3>
               <p class="mt-2 text-sm text-neutral-light/70">
-                Apakah kamu yakin ingin membatalkan dan menghapus event ini? Tindakan ini tidak dapat dibatalkan.
+                Apakah kamu yakin ingin menghapus event ini? Tindakan ini akan menghapus semua data terkait secara permanen dan tidak dapat dibatalkan.
               </p>
             </div>
             
             <div class="flex justify-center gap-3 pt-2">
-              <UiButton color="neutral" variant="ghost" class="hover:bg-white/5" @click="showCancelModal = false">Kembali</UiButton>
-              <UiButton color="error" variant="soft" :loading="cancelling" @click="confirmCancelEvent" class="border border-red-500/30 font-semibold">
+              <UiButton color="neutral" variant="ghost" class="hover:bg-white/5" @click="showDeleteModal = false">Kembali</UiButton>
+              <UiButton color="error" variant="soft" :loading="deleting" @click="confirmDeleteEvent" class="border border-red-500/30 font-semibold">
                 Ya, Hapus Event
               </UiButton>
             </div>
@@ -120,10 +120,10 @@ const modalMode = ref<'create' | 'edit'>('create');
 const editingEventId = ref<number | null>(null);
 const editingEventData = ref<Partial<CreateEventPayload>>({});
 
-// Cancel State
-const showCancelModal = ref(false);
-const cancellingEventId = ref<number | null>(null);
-const cancelling = ref(false);
+// Delete State
+const showDeleteModal = ref(false);
+const deletingEventId = ref<number | null>(null);
+const deleting = ref(false);
 
 type StatusTabValue = EventStatus | 'all';
 
@@ -206,34 +206,34 @@ const handleEditEvent = (id: number) => {
   showCreateModal.value = true;
 };
 
-const handleCancelEvent = (id: number) => {
-  cancellingEventId.value = id;
-  showCancelModal.value = true;
+const handleDeleteEvent = (id: number) => {
+  deletingEventId.value = id;
+  showDeleteModal.value = true;
 };
 
-const confirmCancelEvent = async () => {
-  if (!cancellingEventId.value) return;
-  cancelling.value = true;
+const confirmDeleteEvent = async () => {
+  if (!deletingEventId.value) return;
+  deleting.value = true;
 
   try {
-    await deleteEvent(cancellingEventId.value);
-    showCancelModal.value = false;
+    await deleteEvent(deletingEventId.value);
+    showDeleteModal.value = false;
 
     toast.add({
-      title: 'Event dibatalkan',
-      description: `Event berhasil dihapus/dibatalkan.`,
-      color: 'warning',
-      icon: 'mdi:delete-outline',
+      title: 'Event berhasil dihapus',
+      description: `Event telah dihapus secara permanen beserta data terkait.`,
+      color: 'success',
+      icon: 'mdi:trash-can-outline',
     });
   } catch (error: any) {
     toast.add({
-      title: 'Gagal membatalkan event',
+      title: 'Gagal menghapus event',
       description: error?.message || 'Terjadi kesalahan sistem',
       color: 'error',
     });
   } finally {
-    cancelling.value = false;
-    cancellingEventId.value = null;
+    deleting.value = false;
+    deletingEventId.value = null;
   }
 };
 </script>

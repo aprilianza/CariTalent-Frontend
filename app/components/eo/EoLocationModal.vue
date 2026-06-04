@@ -30,7 +30,7 @@
           </div>
 
           <!-- Map Container -->
-          <div class="relative w-full h-72 rounded-xl border border-white/10 overflow-hidden bg-white/5 z-0">
+          <div class="relative w-full h-80 rounded-xl border border-white/10 overflow-hidden bg-white/5 z-0">
             <div ref="mapContainer" class="w-full h-full"></div>
             <!-- Overlay when leaflet is loading or not initialized -->
             <div v-if="!mapInitialized" class="absolute inset-0 flex items-center justify-center bg-neutral-900/80 z-10">
@@ -41,21 +41,13 @@
             </div>
           </div>
 
-          <!-- Location Info -->
-          <div class="flex items-start gap-3 px-4 py-3 rounded-xl bg-violet-500/5 border border-violet-500/20">
-            <Icon name="mdi:map-marker-radius" class="h-5 w-5 text-violet-400 mt-0.5 shrink-0" />
-            <div class="flex flex-col gap-0.5">
-              <span class="text-[10px] font-semibold text-violet-400 uppercase tracking-wider">Detail Lokasi</span>
-              <span class="text-xs text-neutral-light/90 leading-relaxed">{{ fullAddress || venueName }}</span>
-            </div>
-          </div>
-
           <!-- Action -->
-          <div class="flex justify-end pt-2">
+          <div class="flex justify-end pt-1">
             <UiButton
-              color="primary"
+              color="secondary"
               variant="soft"
-              class="bg-gradient-to-r from-violet-500 to-indigo-500 text-white"
+              icon="mdi:google-maps"
+              class="rounded-xl px-4 text-xs font-semibold"
               @click="openInGoogleMaps"
             >
               Buka di Google Maps

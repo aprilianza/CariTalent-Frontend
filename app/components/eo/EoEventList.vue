@@ -98,14 +98,14 @@
               Edit
             </UiButton>
             <UiButton
-              v-if="item.canCancel"
+              v-if="item.canDelete"
               size="sm"
               color="error"
               variant="ghost"
-              icon="mdi:close-circle-outline"
-              @click="emit('cancel', Number(item.id))"
+              icon="mdi:trash-can-outline"
+              @click="emit('delete', Number(item.id))"
             >
-              Batalkan
+              Hapus
             </UiButton>
           </div>
         </div>
@@ -140,7 +140,7 @@ const emit = defineEmits<{
   'view-applicants': [eventId: number];
   'view-recommendations': [eventId: number];
   edit: [eventId: number];
-  cancel: [eventId: number];
+  delete: [eventId: number];
 }>();
 
 const locationModalOpen = ref(false);
@@ -190,7 +190,7 @@ const mappedItems = computed(() =>
   props.events.map((event) => {
     const status = statusMeta[event.status] ?? { label: event.status, color: 'neutral' as const };
     const canEdit = true;
-    const canCancel = event.status !== 'selesai' && event.status !== 'dibatalkan';
+    const canDelete = true;
 
     return {
       id: event.id,
@@ -206,7 +206,7 @@ const mappedItems = computed(() =>
       statusColor: status.color,
       status: event.status,
       canEdit,
-      canCancel,
+      canDelete,
     };
   }),
 );
