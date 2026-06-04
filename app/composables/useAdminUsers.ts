@@ -6,7 +6,7 @@ export const useAdminUsers = () => {
   const role = ref('');
   const search = ref('');
 
-  const { data: response, pending, error, refresh } = useAsyncData(
+  const { data: response, pending, status, error, refresh } = useAsyncData(
     'admin-users',
     () => {
       const query = new URLSearchParams();
@@ -17,7 +17,7 @@ export const useAdminUsers = () => {
       const queryString = query.toString();
       return $api<ApiResponse<AdminUsersData>>(`/admin/users${queryString ? '?' + queryString : ''}`);
     },
-    { watch: [page, role, search] }
+    { watch: [page, role, search], server: false, lazy: true }
   );
 
   const users = computed<AdminUser[]>(() => response.value?.data?.users || []);
@@ -43,6 +43,7 @@ export const useAdminUsers = () => {
     users,
     pagination,
     pending,
+    status,
     error,
     refresh,
     deleteUser,
