@@ -33,7 +33,7 @@
     <!-- Event List -->
     <div class="space-y-3">
       <!-- Loading -->
-      <div v-if="pending" class="flex flex-col items-center justify-center gap-3 py-16">
+      <div v-if="pending || status === 'idle'" class="flex flex-col items-center justify-center gap-3 py-16">
         <Icon name="mdi:loading" class="h-8 w-8 animate-spin text-highlight" />
         <p class="text-sm text-neutral-light/60">Memuat data event...</p>
       </div>
@@ -52,10 +52,17 @@
           <!-- Event Info -->
           <div class="flex-1 min-w-0 space-y-2">
             <div class="flex flex-wrap items-center gap-2">
-              <p class="text-sm font-bold text-ui-light">{{ event.title }}</p>
+              <button
+                type="button"
+                class="group/btn flex items-center gap-0.5 text-sm font-bold text-ui-light hover:text-primary-400 hover:underline transition-colors text-left focus:outline-none"
+                @click="openDetail(event)"
+              >
+                <span>{{ event.title }}</span>
+                <Icon name="mdi:chevron-right" class="h-4 w-4 transition-transform group-hover/btn:translate-x-0.5 text-neutral-light/50" />
+              </button>
               <UiBadge :label="statusLabel(event.status)" :color="statusColor(event.status)" variant="soft" dot />
             </div>
-            <p class="text-xs text-neutral-light/60 line-clamp-2">{{ event.description }}</p>
+            <p class="text-xs text-neutral-light/60 line-clamp-2">{{ event.description || 'Tidak ada deskripsi' }}</p>
             <div class="flex flex-wrap gap-1.5">
               <UiBadge v-for="g in event.genre_needed" :key="g" :label="g" color="info" size="sm" variant="subtle" />
             </div>
@@ -129,6 +136,136 @@
         </div>
       </template>
     </UModal>
+
+    <!-- Detail Event Modal -->
+    <UModal
+      v-model:open="showDetailModal"
+      :ui="{
+        content: 'w-[calc(100vw-2rem)] max-w-xl overflow-hidden rounded-[28px] border border-white/10 bg-[#12121a]/95 p-0 shadow-2xl ring-0 backdrop-blur-xl mx-auto my-auto',
+      }"
+    >
+      <template #content>
+        <div v-if="selectedEvent" class="overflow-hidden rounded-[28px]">
+          <!-- Header -->
+          <div class="border-b border-white/10 bg-white/[0.03] px-5 py-5 sm:px-6">
+            <div class="flex items-start justify-between gap-4">
+              <div class="min-w-0">
+                <div class="flex items-center gap-2">
+                  <span class="text-xs font-semibold uppercase text-primary-400">Detail Informasi Event</span>
+                </div>
+                <h3 class="mt-2 font-display text-xl font-bold text-neutral-100 line-clamp-2">
+                  {{ selectedEvent.title }}
+                </h3>
+              </div>
+              <UButton 
+                color="neutral" 
+                variant="ghost" 
+                icon="i-lucide-x" 
+                class="-mr-2 -mt-2 shrink-0 rounded-full text-neutral-light/75 hover:text-white" 
+                aria-label="Tutup modal" 
+                @click="showDetailModal = false" 
+              />
+            </div>
+          </div>
+
+          <!-- Body Content -->
+          <div class="space-y-5 px-5 py-5 sm:px-6 max-h-[60vh] overflow-y-auto">
+            <!-- Basic Info & Status -->
+            <div class="rounded-2xl border border-white/10 bg-white/5 p-5 space-y-4">
+              <div class="flex flex-wrap items-center justify-between gap-3">
+                <div class="flex items-center gap-2.5">
+                  <div class="flex h-9 w-9 items-center justify-center rounded-xl bg-primary-500/10 text-primary-400 border border-primary-500/20 font-bold">
+                    <Icon name="mdi:domain" class="h-5 w-5" />
+                  </div>
+                  <div>
+                    <p class="text-[9px] text-neutral-light/40 uppercase tracking-wider font-semibold">Penyelenggara</p>
+                    <p class="text-sm font-semibold text-neutral-200">
+                      {{ selectedEvent.organizer_name || 'Event Organizer' }}
+                    </p>
+                  </div>
+                </div>
+                <UiBadge 
+                  :label="statusLabel(selectedEvent.status)" 
+                  :color="statusColor(selectedEvent.status)" 
+                  variant="soft" 
+                  class="font-bold tracking-wide" 
+                />
+              </div>
+
+              <!-- Time & Budget -->
+              <div class="grid gap-3 text-sm text-neutral-light/70 sm:grid-cols-2 mt-2">
+                <div class="rounded-xl bg-white/[0.03] border border-white/5 px-4 py-3">
+                  <p class="text-[9px] text-neutral-light/40 uppercase tracking-wider font-semibold">Tanggal Event</p>
+                  <p class="mt-1 text-sm font-bold text-neutral-200">{{ formatDate(selectedEvent.event_date) }}</p>
+                </div>
+                <div class="rounded-xl bg-white/[0.03] border border-white/5 px-4 py-3">
+                  <p class="text-[9px] text-neutral-light/40 uppercase tracking-wider font-semibold">Budget Event</p>
+                  <p class="mt-1 text-sm font-bold text-primary-300">{{ formatCurrency(selectedEvent.budget) }}</p>
+                </div>
+              </div>
+            </div>
+
+            <!-- Location Grid -->
+            <div class="grid gap-3 text-sm text-neutral-light/70 sm:grid-cols-2">
+              <div class="rounded-xl bg-white/[0.03] border border-white/5 px-4 py-3">
+                <p class="text-[9px] text-neutral-light/40 uppercase tracking-wider font-semibold">Nama Venue</p>
+                <p class="mt-1 text-sm font-bold text-neutral-100">{{ selectedEvent.venue_name || '-' }}</p>
+              </div>
+              <div class="rounded-xl bg-white/[0.03] border border-white/5 px-4 py-3">
+                <p class="text-[9px] text-neutral-light/40 uppercase tracking-wider font-semibold">Kota</p>
+                <p class="mt-1 text-sm font-bold text-neutral-100">{{ selectedEvent.city || '-' }}</p>
+              </div>
+              <div class="rounded-xl bg-white/[0.03] border border-white/5 px-4 py-3 sm:col-span-2" v-if="selectedEvent.full_address">
+                <p class="text-[9px] text-neutral-light/40 uppercase tracking-wider font-semibold">Alamat Lengkap</p>
+                <p class="mt-1 text-sm text-neutral-200">{{ selectedEvent.full_address }}</p>
+              </div>
+            </div>
+
+            <!-- Description -->
+            <div class="space-y-2">
+              <h4 class="text-xs uppercase tracking-wider font-bold text-neutral-light/40">Deskripsi Event</h4>
+              <p class="text-sm leading-relaxed text-neutral-300 whitespace-pre-line bg-white/[0.02] border border-white/5 p-4 rounded-xl">
+                {{ selectedEvent.description || 'Penyelenggara belum menambahkan deskripsi.' }}
+              </p>
+            </div>
+
+            <!-- Genres -->
+            <div v-if="selectedEvent.genre_needed && selectedEvent.genre_needed.length" class="space-y-2">
+              <h4 class="text-xs uppercase tracking-wider font-bold text-neutral-light/40">Genre yang Dicari</h4>
+              <div class="flex flex-wrap gap-2">
+                <span
+                  v-for="genre in selectedEvent.genre_needed"
+                  :key="genre"
+                  class="rounded-xl bg-primary-500/10 border border-primary-500/20 px-3 py-1 text-xs font-semibold text-primary-300 tracking-wide"
+                >
+                  {{ genre }}
+                </span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Footer Actions -->
+          <div class="flex gap-3 border-t border-white/10 bg-white/[0.03] px-5 py-4 justify-end sm:px-6">
+            <UButton 
+              color="neutral" 
+              variant="soft" 
+              class="rounded-xl px-5" 
+              @click="showDetailModal = false"
+            > 
+              Tutup 
+            </UButton>
+            <UiButton
+              label="Moderasi Event"
+              icon="mdi:gavel"
+              color="primary"
+              class="rounded-xl px-4"
+              :disabled="selectedEvent.status === 'cancelled'"
+              @click="openModerateModalFromDetail"
+            />
+          </div>
+        </div>
+      </template>
+    </UModal>
   </div>
 </template>
 
@@ -145,7 +282,7 @@ const pageTitle = useState('admin-layout-title');
 pageTitle.value = 'Moderasi Event';
 
 const toast = useToast();
-const { events, pending, moderateEvent } = useAdminEvents();
+const { events, pending, status, moderateEvent } = useAdminEvents();
 const { formatCurrency, formatDate } = useFormatters();
 
 const search = ref('');
@@ -155,6 +292,9 @@ const eventToModerate = ref<Event | null>(null);
 const moderateStatus = ref<EventStatus | ''>('');
 const moderateReason = ref('');
 const moderating = ref(false);
+
+const showDetailModal = ref(false);
+const selectedEvent = ref<Event | null>(null);
 
 const statusTabs = [
   { label: 'Semua', value: 'all' as const },
@@ -205,6 +345,18 @@ const openModerateModal = (event: Event) => {
   showModerateModal.value = true;
 };
 
+const openDetail = (event: Event) => {
+  selectedEvent.value = event;
+  showDetailModal.value = true;
+};
+
+const openModerateModalFromDetail = () => {
+  if (selectedEvent.value) {
+    showDetailModal.value = false;
+    openModerateModal(selectedEvent.value);
+  }
+};
+
 const doModerate = async () => {
   if (!eventToModerate.value || !moderateStatus.value) return;
   moderating.value = true;
@@ -226,6 +378,11 @@ const doModerate = async () => {
       description: res.message || 'Terjadi kesalahan saat memoderasi event.',
       color: 'error',
     });
+  }
+
+  // Update current detail modal status if it was opened
+  if (res.success && selectedEvent.value && selectedEvent.value.id === eventToModerate.value.id) {
+    selectedEvent.value.status = moderateStatus.value as EventStatus;
   }
 
   moderating.value = false;

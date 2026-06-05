@@ -4,10 +4,10 @@ export const useAdminTalents = () => {
   const { $api } = useNuxtApp();
   const page = ref(1);
 
-  const { data: response, pending, error, refresh } = useAsyncData(
+  const { data: response, pending, status, error, refresh } = useAsyncData(
     'admin-talents',
     () => $api<ApiResponse<AdminTalentsData>>(`/talents${page.value > 1 ? '?page=' + page.value : ''}`),
-    { watch: [page] }
+    { watch: [page], server: false, lazy: true }
   );
 
   const talents = computed<AdminTalent[]>(() => response.value?.data?.talents || []);
@@ -34,6 +34,7 @@ export const useAdminTalents = () => {
     talents,
     pagination,
     pending,
+    status,
     error,
     refresh,
     verifyTalent,

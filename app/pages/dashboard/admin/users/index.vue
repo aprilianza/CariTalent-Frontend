@@ -37,7 +37,7 @@
     <!-- User Table -->
     <UiCard :no-padding="true">
       <!-- Loading State -->
-      <div v-if="pending" class="flex flex-col items-center justify-center gap-3 py-16">
+      <div v-if="pending || status === 'idle'" class="flex flex-col items-center justify-center gap-3 py-16">
         <Icon name="mdi:loading" class="h-8 w-8 animate-spin text-highlight" />
         <p class="text-sm text-neutral-light/60">Memuat data pengguna...</p>
       </div>
@@ -133,7 +133,7 @@ const pageTitle = useState('admin-layout-title');
 pageTitle.value = 'Manajemen User';
 
 const toast = useToast();
-const { users, pending, deleteUser } = useAdminUsers();
+const { users, pending, status, deleteUser } = useAdminUsers();
 const { formatDate } = useFormatters();
 
 const search = ref('');

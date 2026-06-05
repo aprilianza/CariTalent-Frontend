@@ -52,7 +52,7 @@
           @view-applicants="(id) => navigateTo(`/dashboard/eo/events/${id}/applicants`)"
           @view-recommendations="(id) => navigateTo(`/dashboard/eo/events/${id}/recommendations`)"
           @edit="handleEditEvent"
-          @cancel="handleCancelEvent"
+          @delete="handleDeleteEvent"
         >
           <template #actions>
             <UiButton size="sm" color="primary" variant="soft" icon="mdi:arrow-right" @click="goTo('/dashboard/eo/events')">
@@ -144,17 +144,17 @@ const handleEditEvent = (id: number) => {
   });
 };
 
-const handleCancelEvent = async (id: number) => {
+const handleDeleteEvent = async (id: number) => {
   try {
     await deleteEvent(id);
     toast.add({
-      title: 'Event dibatalkan',
-      description: `Event #${id} berhasil dibatalkan.`,
-      color: 'warning',
+      title: 'Event dihapus',
+      description: `Event #${id} berhasil dihapus secara permanen.`,
+      color: 'success',
     });
   } catch (error: any) {
     toast.add({
-      title: 'Gagal membatalkan event',
+      title: 'Gagal menghapus event',
       description: error?.message || 'Terjadi kesalahan sistem',
       color: 'error',
     });

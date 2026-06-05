@@ -4,10 +4,10 @@ export const useAdminEvents = () => {
   const { $api } = useNuxtApp();
   const page = ref(1);
 
-  const { data: response, pending, error, refresh } = useAsyncData(
+  const { data: response, pending, status, error, refresh } = useAsyncData(
     'admin-events',
     () => $api<ApiResponse<EventsData>>(`/events${page.value > 1 ? '?page=' + page.value : ''}`),
-    { watch: [page] }
+    { watch: [page], server: false, lazy: true }
   );
 
   const events = computed<Event[]>(() => response.value?.data?.events || []);
@@ -34,6 +34,7 @@ export const useAdminEvents = () => {
     events,
     pagination,
     pending,
+    status,
     error,
     refresh,
     moderateEvent,

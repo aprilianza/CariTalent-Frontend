@@ -322,6 +322,12 @@ export type AdminTalent = {
   price_max?: number;
   city?: string;
   bio?: string;
+  portfolio_link?: string;
+  user?: {
+    name: string;
+    email: string;
+    phone: string;
+  };
 };
 
 export type AdminTalentsData = {

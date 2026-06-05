@@ -7,7 +7,7 @@
           <h1 class="font-display bg-gradient-to-r from-highlight to-accent bg-clip-text text-2xl font-bold text-transparent md:text-3xl">Cari Event</h1>
           <div class="mt-3 flex flex-wrap gap-2">
             <UiBadge :label="`Dibuka ${statusSummary.open}`" color="success" variant="soft" />
-            <UiBadge :label="`Ditutup ${statusSummary.closed}`" color="warning" variant="soft" />
+            <UiBadge :label="`Ditutup ${statusSummary.closed}`" color="error" variant="soft" />
             <UiBadge :label="`Selesai ${statusSummary.completed}`" color="primary" variant="soft" />
           </div>
         </div>
