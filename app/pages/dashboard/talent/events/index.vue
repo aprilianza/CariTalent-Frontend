@@ -84,38 +84,7 @@
           </div>
 
           <div class="space-y-5 px-5 py-5 sm:px-6">
-            <div v-if="selectedEvent" class="rounded-2xl border border-white/10 bg-white/5 p-4">
-              <div class="flex flex-wrap items-start justify-between gap-3">
-                <div class="min-w-0">
-                  <h4 class="text-base font-semibold text-ui-light">{{ selectedEvent.title }}</h4>
-                  <p class="mt-1 text-sm text-neutral-light/70">{{ selectedEvent.venue_name }} • {{ selectedEvent.city }}</p>
-                </div>
-                <UiBadge :label="selectedEvent.status" color="success" variant="soft" />
-              </div>
-              <div class="mt-4 grid gap-3 text-sm text-neutral-light/70 sm:grid-cols-2">
-                <div class="rounded-xl bg-white/[0.04] px-3 py-2">
-                  <p class="text-xs text-neutral-light/50">Anggaran</p>
-                  <p class="mt-1 font-semibold text-ui-light">{{ formatCurrency(selectedEvent.budget) }}</p>
-                </div>
-                <div class="rounded-xl bg-white/[0.04] px-3 py-2">
-                  <p class="text-xs text-neutral-light/50">Tanggal</p>
-                  <p class="mt-1 font-semibold text-ui-light">{{ formatDate(selectedEvent.event_date) }}</p>
-                </div>
-              </div>
 
-              <div class="mt-4 flex justify-start">
-                <UiButton
-                  v-if="selectedEvent.latitude !== undefined && selectedEvent.longitude !== undefined"
-                  size="sm"
-                  color="secondary"
-                  variant="soft"
-                  icon="mdi:map-marker-outline"
-                  @click="openGoogleMaps(selectedEvent.latitude, selectedEvent.longitude)"
-                >
-                  Lihat Lokasi
-                </UiButton>
-              </div>
-            </div>
 
             <UFormField label="Pesan" required class="w-full" :ui="{ label: 'text-sm font-semibold text-ui-light', container: 'w-full' }">
               <UTextarea

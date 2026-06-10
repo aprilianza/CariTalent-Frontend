@@ -34,11 +34,13 @@
           </div>
 
           <!-- Price & message -->
-          <div v-if="detailed" class="rounded-lg border border-white/8 bg-white/4 px-3 py-2 text-xs space-y-1">
+          <div v-if="detailed" class="rounded-lg border border-white/10 bg-white/5 px-3 py-2 text-xs space-y-1">
             <p class="text-neutral-light/70">
               Harga ditawarkan: <span class="font-semibold text-ui-light">{{ item.proposedPrice }}</span>
             </p>
-            <p v-if="item.message" class="text-neutral-light/60 italic line-clamp-2">{{ item.message }}</p>
+            <p v-if="item.message" class="text-neutral-light/80 bg-white/[0.03] border border-white/5 rounded-lg p-2.5 mt-2 italic whitespace-pre-line leading-relaxed">
+              "{{ item.message }}"
+            </p>
             <p class="text-neutral-light/50">Dikirim: {{ item.createdAt }}</p>
           </div>
 
@@ -179,6 +181,17 @@
               <div class="rounded-xl border border-white/8 bg-white/4 p-3.5 space-y-2">
                 <span class="text-xs font-semibold text-neutral-light/50 uppercase tracking-wider block">Deskripsi / Bio</span>
                 <p class="text-sm leading-relaxed text-neutral-light/80 whitespace-pre-line">{{ selectedTalent?.bio }}</p>
+              </div>
+
+              <!-- Application Message (Pesan Lamaran) -->
+              <div v-if="selectedTalent?.message" class="rounded-xl border border-emerald-500/20 bg-emerald-500/5 p-3.5 space-y-2">
+                <span class="text-xs font-bold text-emerald-400 uppercase tracking-wider block flex items-center gap-1.5">
+                  <Icon name="mdi:message-text-outline" class="h-4 w-4" />
+                  Pesan Lamaran Talent
+                </span>
+                <p class="text-sm leading-relaxed text-neutral-light whitespace-pre-line italic">
+                  "{{ selectedTalent?.message }}"
+                </p>
               </div>
             </div>
 
