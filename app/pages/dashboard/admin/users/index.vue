@@ -150,6 +150,7 @@ const roleTabs = [
 
 const filteredUsers = computed(() => {
   return users.value.filter((u) => {
+    if (u.role === 'admin') return false;
     const matchRole = roleFilter.value === 'all' || u.role === roleFilter.value;
     const matchSearch =
       !search.value ||
