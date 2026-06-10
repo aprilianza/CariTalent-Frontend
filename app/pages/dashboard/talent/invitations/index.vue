@@ -3,8 +3,8 @@
     <UiCard card-class="overflow-hidden border-white/10 bg-gradient-to-br from-highlight/12 via-white/5 to-accent/12 shadow-md">
       <div class="flex flex-wrap items-start justify-between gap-4">
         <div>
-          <p class="text-sm font-medium text-neutral-light/70">Talent Workspace</p>
-          <h1 class="font-display text-2xl font-bold bg-gradient-to-r from-highlight to-accent bg-clip-text text-transparent md:text-3xl">Invitations</h1>
+          <p class="text-sm font-medium text-neutral-light/70">Workspace Talent</p>
+          <h1 class="font-display text-2xl font-bold bg-gradient-to-r from-highlight to-accent bg-clip-text text-transparent md:text-3xl">Undangan</h1>
           <div class="mt-3 flex flex-wrap gap-2">
             <UiBadge :label="`Menunggu ${statusSummary.pending}`" color="warning" variant="soft" />
             <UiBadge :label="`Diterima ${statusSummary.accepted}`" color="success" variant="soft" />
@@ -30,7 +30,7 @@ definePageMeta({
   layout: 'talent',
 });
 
-useState('talent-layout-title', () => 'Talent Dashboard').value = 'Invitations';
+useState('talent-layout-title', () => 'Dashboard Talent').value = 'Undangan';
 
 const toast = useToast();
 

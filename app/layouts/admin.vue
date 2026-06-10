@@ -41,7 +41,7 @@
               <div class="min-w-0 flex-1">
                 <p class="text-xs font-semibold uppercase tracking-wide text-neutral-light/60">Konfirmasi Logout</p>
                 <h3 class="mt-2 font-display text-xl font-bold text-ui-light">Keluar dari akun?</h3>
-                <p class="mt-1 text-sm leading-relaxed text-neutral-light/70">Kamu akan diarahkan ke halaman login dan perlu masuk lagi untuk mengakses Admin Dashboard.</p>
+                <p class="mt-1 text-sm leading-relaxed text-neutral-light/70">Kamu akan diarahkan ke halaman login dan perlu masuk lagi untuk mengakses Dashboard Admin.</p>
               </div>
             </div>
           </div>
@@ -69,7 +69,7 @@ const { token, user, fetchUser, logout } = useAuth();
 const adminName = useState('admin-layout-username', () => 'Admin CariTalent');
 const isLogoutModalOpen = ref(false);
 const isLoggingOut = ref(false);
-const pageTitle = useState('admin-layout-title', () => 'Admin Dashboard');
+const pageTitle = useState('admin-layout-title', () => 'Dashboard Admin');
 
 const displayName = computed(() => user.value?.name || user.value?.stage_name || adminName.value);
 const displayRole = computed(() => {

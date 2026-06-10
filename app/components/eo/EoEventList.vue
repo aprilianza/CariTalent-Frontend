@@ -1,13 +1,13 @@
 <template>
   <UiCard
-    title="My Events"
+    title="Event Saya"
     :description="detailed ? 'Semua event yang kamu buat — kelola status, pelamar, dan rekomendasi talent' : 'Ringkasan event terbaru'"
     card-class="h-full"
   >
     <template #header>
       <div class="flex items-start justify-between gap-3 px-5 pt-5 pb-3">
         <div class="space-y-1">
-          <h3 class="text-base font-semibold text-ui-light">My Events</h3>
+          <h3 class="text-base font-semibold text-ui-light">Event Saya</h3>
           <p class="text-sm text-neutral-light/70">
             {{ detailed ? 'Semua event yang kamu buat — kelola status, pelamar, dan rekomendasi talent' : 'Ringkasan event terbaru' }}
           </p>

@@ -4,7 +4,7 @@
     <UiCard card-class="border-white/10 bg-gradient-to-r from-violet-500/10 to-fuchsia-500/10">
       <div>
         <h1 class="font-display text-2xl font-bold bg-gradient-to-r from-violet-400 to-fuchsia-400 bg-clip-text text-transparent">
-          Invitations Terkirim
+          Undangan Terkirim
         </h1>
         <p class="mt-1 text-sm text-neutral-light/70">
           Daftar talent yang kamu undang secara langsung ke event kamu
@@ -50,7 +50,7 @@
     <div v-else-if="filteredInvitations.length === 0" class="rounded-xl border border-dashed border-neutral-300 p-8 text-center dark:border-neutral-700">
       <Icon name="mdi:send-outline" class="mx-auto h-10 w-10 text-neutral-light/20 mb-3" />
       <p class="text-sm text-neutral-light/50">
-        {{ activeFilter === 'all' ? 'Belum ada invitation yang dikirim.' : `Tidak ada invitation berstatus ${activeFilter}.` }}
+        {{ activeFilter === 'all' ? 'Belum ada undangan yang dikirim.' : `Tidak ada undangan berstatus ${activeFilter}.` }}
       </p>
       <UiButton
         class="mt-4"
@@ -60,7 +60,7 @@
         icon="mdi:calendar-star-outline"
         @click="navigateTo('/dashboard/eo/events')"
       >
-        Lihat Events untuk Undang Talent
+        Lihat Event untuk Undang Talent
       </UiButton>
     </div>
 
@@ -84,7 +84,7 @@
                   <span class="text-xs text-neutral-500 dark:text-neutral-400">
                     <Icon name="mdi:star-outline" class="inline h-3 w-3 text-yellow-400" /> {{ inv.talent.average_rating.toFixed(1) }}
                   </span>
-                  <UiBadge v-if="inv.talent.verified" label="Verified" color="success" variant="soft" size="sm" dot />
+                  <UiBadge v-if="inv.talent.verified" label="Terverifikasi" color="success" variant="soft" size="sm" dot />
                 </div>
               </div>
               <UiBadge :label="statusMap[inv.status].label" :color="statusMap[inv.status].color" variant="soft" />
@@ -116,7 +116,7 @@ definePageMeta({
 });
 
 const pageTitle = useState('eo-layout-title');
-pageTitle.value = 'Invitations';
+pageTitle.value = 'Undangan';
 
 const { data: invitations, pending } = useEoInvitations();
 const { formatCurrency, formatDate } = useFormatters();

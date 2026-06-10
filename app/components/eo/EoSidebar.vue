@@ -39,13 +39,13 @@ const props = withDefaults(
   {
     links: () => [
       { label: 'Dashboard', to: '/dashboard/eo', icon: 'mdi:view-dashboard-outline' },
-      { label: 'My Events', to: '/dashboard/eo/events', icon: 'mdi:calendar-star-outline' },
-      { label: 'Bookings', to: '/dashboard/eo/bookings', icon: 'mdi:calendar-check-outline' },
-      { label: 'Invitations', to: '/dashboard/eo/invitations', icon: 'mdi:send-outline' },
-      { label: 'Profile', to: '/dashboard/eo/profile', icon: 'mdi:account-circle-outline' },
+      { label: 'Event Saya', to: '/dashboard/eo/events', icon: 'mdi:calendar-star-outline' },
+      { label: 'Pemesanan', to: '/dashboard/eo/bookings', icon: 'mdi:calendar-check-outline' },
+      { label: 'Undangan', to: '/dashboard/eo/invitations', icon: 'mdi:send-outline' },
+      { label: 'Profil', to: '/dashboard/eo/profile', icon: 'mdi:account-circle-outline' },
     ],
     headerTitle: 'CariTalent',
-    headerSubtitle: 'EO Workspace',
+    headerSubtitle: 'Workspace EO',
     headerIcon: 'mdi:music-note-plus',
     headerLink: '/dashboard/eo',
   },

@@ -68,7 +68,7 @@ let mediaQuery: MediaQueryList | null = null;
 let updateDeviceState: (() => void) | null = null;
 const { token, user, fetchUser, logout } = useAuth();
 const userName = useState('talent-layout-username', () => 'The Broken Strings');
-const pageTitle = useState('talent-layout-title', () => 'Talent Dashboard');
+const pageTitle = useState('talent-layout-title', () => 'Dashboard Talent');
 
 const displayName = computed(() => user.value?.name || user.value?.stage_name || userName.value);
 const displayRole = computed(() => {

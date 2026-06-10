@@ -5,7 +5,7 @@
       <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <h1 class="font-display text-2xl font-bold bg-gradient-to-r from-violet-400 to-fuchsia-400 bg-clip-text text-transparent">
-            My Events
+            Event Saya
           </h1>
           <p class="mt-1 text-sm text-neutral-light/70">
             Kelola semua event yang kamu buat — {{ events.length }} event total
@@ -104,7 +104,7 @@ definePageMeta({
 });
 
 const pageTitle = useState('eo-layout-title');
-pageTitle.value = 'My Events';
+pageTitle.value = 'Event Saya';
 
 const toast = useToast();
 

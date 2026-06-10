@@ -205,7 +205,7 @@ definePageMeta({
 import { useAuth } from '~/composables/useAuth';
 
 const pageTitle = useState('eo-layout-title');
-pageTitle.value = 'Profile';
+pageTitle.value = 'Profil';
 
 const toast = useToast();
 const { data: events } = useEoEvents();
@@ -356,12 +356,12 @@ const accountInfo = computed(() => [
     icon: 'mdi:domain',
   },
   {
-    label: 'Total Events',
+    label: 'Total Event',
     value: events.value.length,
     icon: 'mdi:calendar-star-outline',
   },
   {
-    label: 'Total Bookings',
+    label: 'Total Booking',
     value: bookings.value.length,
     icon: 'mdi:handshake-outline',
   },

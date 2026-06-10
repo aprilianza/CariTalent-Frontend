@@ -43,7 +43,7 @@ definePageMeta({
 });
 
 const pageTitle = useState('admin-layout-title');
-pageTitle.value = 'Overview';
+pageTitle.value = 'Ringkasan';
 
 const { user } = useAuth();
 const { data: stats, pending, error } = useAdminDashboard();

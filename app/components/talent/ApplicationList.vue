@@ -159,7 +159,7 @@ const statusMap: Record<ApplicationStatus, { label: string; color: 'success' | '
 };
 
 const sourceMap = {
-  apply: 'Apply langsung',
+  apply: 'Lamar langsung',
   invitation: 'Via Undangan',
 } as const;
 

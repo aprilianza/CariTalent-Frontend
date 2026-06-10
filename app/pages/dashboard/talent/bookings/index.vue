@@ -29,7 +29,7 @@ definePageMeta({
   layout: 'talent',
 });
 
-useState('talent-layout-title', () => 'Talent Dashboard').value = 'Bookings';
+useState('talent-layout-title', () => 'Dashboard Talent').value = 'Pemesanan';
 
 const currentPage = ref(1);
 const { data: bookings, pending, pagination } = useBookings({ page: currentPage.value });
