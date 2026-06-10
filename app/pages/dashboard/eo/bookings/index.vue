@@ -80,7 +80,7 @@ definePageMeta({
 });
 
 const pageTitle = useState('eo-layout-title');
-pageTitle.value = 'Bookings';
+pageTitle.value = 'Pemesanan';
 
 const toast = useToast();
 const api = useApiClient();

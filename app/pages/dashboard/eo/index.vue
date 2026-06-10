@@ -101,25 +101,25 @@ const latestBookings = computed(() => bookings.value.slice(0, 3));
 
 const statsCards = computed(() => [
   {
-    title: 'Total Events',
+    title: 'Total Event',
     value: events.value.length,
     hint: 'Semua event yang dibuat',
     icon: 'mdi:calendar-star-outline',
   },
   {
-    title: 'Active Events',
+    title: 'Event Aktif',
     value: events.value.filter((e) => e.status === 'dibuka').length,
     hint: 'Event yang sedang buka lamaran',
     icon: 'mdi:calendar-check-outline',
   },
   {
-    title: 'Total Bookings',
+    title: 'Total Booking',
     value: bookings.value.length,
     hint: 'Booking terkonfirmasi & selesai',
     icon: 'mdi:handshake-outline',
   },
   {
-    title: 'Completed',
+    title: 'Selesai',
     value: bookings.value.filter((b) => b.status === 'completed').length,
     hint: 'Booking yang telah selesai',
     icon: 'mdi:check-decagram-outline',
@@ -129,7 +129,7 @@ const statsCards = computed(() => [
 const quickActions = [
   { label: 'Buat Event Baru', icon: 'mdi:plus-circle-outline', color: 'primary' as const, to: '/dashboard/eo/events' },
   { label: 'Lihat Semua Event', icon: 'mdi:calendar-star-outline', color: 'secondary' as const, to: '/dashboard/eo/events' },
-  { label: 'Kelola Bookings', icon: 'mdi:calendar-check-outline', color: 'primary' as const, to: '/dashboard/eo/bookings' },
+  { label: 'Kelola Booking', icon: 'mdi:calendar-check-outline', color: 'primary' as const, to: '/dashboard/eo/bookings' },
 ] as const;
 
 const goTo = async (to: string) => {

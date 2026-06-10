@@ -32,7 +32,7 @@
           <USelectMenu v-model="selectedGenreOption" :items="genreOptions" placeholder="Semua genre" class="w-full" :ui="{ base: 'w-full rounded-xl border-white/20 bg-white/8 text-ui-light' }" />
         </UFormField>
 
-        <UFormField label="City" class="w-full">
+        <UFormField label="Kota" class="w-full">
           <UInput v-model="filterForm.city" placeholder="Bandung" class="w-full" :ui="{ base: 'w-full rounded-xl border-white/20 bg-white/8 text-ui-light' }" @keyup.enter="applyFilters" />
         </UFormField>
       </div>
@@ -46,11 +46,11 @@
           <UInput v-model="filterForm.budget_max" type="number" placeholder="5000000" class="w-full" :ui="{ base: 'w-full rounded-xl border-white/20 bg-white/8 text-ui-light' }" @keyup.enter="applyFilters" />
         </UFormField>
 
-        <UFormField label="Date From" class="w-full">
+        <UFormField label="Tanggal Dari" class="w-full">
           <UInput v-model="filterForm.date_from" type="date" class="w-full" :ui="{ base: 'w-full rounded-xl border-white/20 bg-white/8 text-ui-light' }" />
         </UFormField>
 
-        <UFormField label="Date To" class="w-full">
+        <UFormField label="Tanggal Hingga" class="w-full">
           <UInput v-model="filterForm.date_to" type="date" class="w-full" :ui="{ base: 'w-full rounded-xl border-white/20 bg-white/8 text-ui-light' }" />
         </UFormField>
       </div>
@@ -129,7 +129,7 @@ definePageMeta({
   layout: 'talent',
 });
 
-useState('talent-layout-title', () => 'Talent Dashboard').value = 'Event';
+useState('talent-layout-title', () => 'Dashboard Talent').value = 'Cari Event';
 
 const toast = useToast();
 const { formatCurrency, formatDate } = useFormatters();

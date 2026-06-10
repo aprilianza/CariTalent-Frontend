@@ -41,7 +41,7 @@
               <div class="min-w-0 flex-1">
                 <p class="text-xs font-semibold uppercase tracking-wide text-neutral-light/60">Konfirmasi Logout</p>
                 <h3 class="mt-2 font-display text-xl font-bold text-ui-light">Keluar dari akun?</h3>
-                <p class="mt-1 text-sm leading-relaxed text-neutral-light/70">Kamu akan diarahkan ke halaman login dan perlu masuk lagi untuk mengakses EO Dashboard.</p>
+                <p class="mt-1 text-sm leading-relaxed text-neutral-light/70">Kamu akan diarahkan ke halaman login dan perlu masuk lagi untuk mengakses Dashboard EO.</p>
               </div>
             </div>
           </div>
@@ -67,8 +67,8 @@ let updateDeviceState: (() => void) | null = null;
 const { token, user, fetchUser, logout } = useAuth();
 const isLogoutModalOpen = ref(false);
 const isLoggingOut = ref(false);
-const userName = useState('eo-layout-username', () => 'Kafe Kota');
-const pageTitle = useState('eo-layout-title', () => 'EO Dashboard');
+    const userName = useState('eo-layout-username', () => 'Kafe Kota');
+const pageTitle = useState('eo-layout-title', () => 'Dashboard EO');
 
 const displayName = computed(() => user.value?.name || user.value?.stage_name || userName.value);
 const displayRole = computed(() => {

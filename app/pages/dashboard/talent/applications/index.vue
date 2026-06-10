@@ -30,7 +30,7 @@ definePageMeta({
   layout: 'talent',
 });
 
-useState('talent-layout-title', () => 'Talent Dashboard').value = 'Lamaran';
+useState('talent-layout-title', () => 'Dashboard Talent').value = 'Lamaran';
 
 const toast = useToast();
 

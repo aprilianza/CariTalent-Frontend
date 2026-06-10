@@ -74,7 +74,7 @@
                   <Icon name="mdi:chevron-right" class="h-4 w-4 transition-transform group-hover/btn:translate-x-0.5 text-neutral-light/50" />
                 </button>
                 <UiBadge
-                  :label="talent.verified ? 'Verified' : 'Belum Verified'"
+                  :label="talent.verified ? 'Terverifikasi' : 'Belum Terverifikasi'"
                   :color="talent.verified ? 'success' : 'neutral'"
                   variant="soft"
                   :dot="talent.verified"
@@ -176,7 +176,7 @@
                 </div>
                 
                 <UiBadge 
-                  :label="selectedTalent.verified ? 'Verified' : 'Belum Verified'" 
+                  :label="selectedTalent.verified ? 'Terverifikasi' : 'Belum Terverifikasi'" 
                   :color="selectedTalent.verified ? 'success' : 'neutral'" 
                   variant="soft" 
                   class="font-bold tracking-wide" 
@@ -349,7 +349,7 @@ const handleVerifyFromModal = async () => {
     toast.add({
       title: newVerifiedStatus ? 'Talent diverifikasi' : 'Verifikasi dicabut',
       description: newVerifiedStatus
-        ? 'Status talent berhasil diubah menjadi verified.'
+        ? 'Status talent berhasil diubah menjadi terverifikasi.'
         : 'Verifikasi talent berhasil dicabut.',
       color: 'success',
     });
@@ -365,8 +365,8 @@ const handleVerifyFromModal = async () => {
 
 const verifiedTabs = [
   { label: 'Semua', value: 'all' as const },
-  { label: 'Sudah Verified', value: 'verified' as const },
-  { label: 'Belum Verified', value: 'unverified' as const },
+  { label: 'Terverifikasi', value: 'verified' as const },
+  { label: 'Belum Terverifikasi', value: 'unverified' as const },
 ];
 
 const filteredTalents = computed(() => {
@@ -389,7 +389,7 @@ const handleVerify = async (id: number, verified: boolean) => {
     toast.add({
       title: verified ? 'Talent diverifikasi' : 'Verifikasi dicabut',
       description: verified
-        ? 'Status talent berhasil diubah menjadi verified.'
+        ? 'Status talent berhasil diubah menjadi terverifikasi.'
         : 'Verifikasi talent berhasil dicabut.',
       color: 'success',
     });

@@ -38,16 +38,16 @@ const props = withDefaults(
   }>(),
   {
     links: () => [
-      { label: 'Overview', to: '/dashboard/admin', icon: 'mdi:view-dashboard-outline' },
-      { label: 'Users', to: '/dashboard/admin/users', icon: 'mdi:account-group-outline' },
-      { label: 'Talents', to: '/dashboard/admin/talents', icon: 'mdi:music-note-outline' },
-      { label: 'Events', to: '/dashboard/admin/events', icon: 'mdi:calendar-star-outline' },
+      { label: 'Ringkasan', to: '/dashboard/admin', icon: 'mdi:view-dashboard-outline' },
+      { label: 'Pengguna', to: '/dashboard/admin/users', icon: 'mdi:account-group-outline' },
+      { label: 'Talent', to: '/dashboard/admin/talents', icon: 'mdi:music-note-outline' },
+      { label: 'Event', to: '/dashboard/admin/events', icon: 'mdi:calendar-star-outline' },
     ],
     headerTitle: 'CariTalent',
-    headerSubtitle: 'Admin Panel',
+    headerSubtitle: 'Panel Admin',
     headerIcon: 'mdi:shield-crown-outline',
     headerLink: '/dashboard/admin',
-    footerTitle: 'Admin Tips',
+    footerTitle: 'Tips Admin',
     footerContent: 'Verifikasi talent secara berkala untuk menjaga kualitas platform.',
   },
 );
