@@ -42,5 +42,8 @@ const currentPage = ref(1);
 const reviewFilters = computed(() => ({ page: currentPage.value }));
 const { data: reviews, pending, meta, pagination } = useTalentReviews(reviewFilters);
 
-const averageRatingLabel = computed(() => `${meta.value.averageRating.toFixed(1)} / 5`);
+const averageRatingLabel = computed(() => {
+  const rating = Number(meta.value?.averageRating ?? 0);
+  return `${rating.toFixed(1)} / 5`;
+});
 </script>

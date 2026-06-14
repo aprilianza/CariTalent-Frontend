@@ -29,7 +29,7 @@ export type ApplicationStatus = 'pending' | 'accepted' | 'rejected';
 
 export type InvitationStatus = 'pending' | 'accepted' | 'rejected';
 
-export type BookingStatus = 'confirmed' | 'completed';
+export type BookingStatus = 'confirmed' | 'completed' | 'cancelled';
 
 export type EventStatus = 'dibuka' | 'ditutup' | 'selesai' | 'dibatalkan';
 

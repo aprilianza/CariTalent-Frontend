@@ -263,7 +263,7 @@ const mappedItems = computed(() =>
       rawId: app.id,
       stageName: app.talent.stage_name,
       city: app.talent.city || '-',
-      rating: app.talent.average_rating.toFixed(1),
+      rating: Number(app.talent.average_rating ?? 0).toFixed(1),
       verified: app.talent.verified,
       genres: app.talent.genre,
       sourceLabel: sourceMap[app.source],

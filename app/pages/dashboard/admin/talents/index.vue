@@ -90,7 +90,7 @@
                 </span>
                 <span v-if="talent.average_rating > 0" class="flex items-center gap-1">
                   <Icon name="mdi:star" class="h-3.5 w-3.5 text-accent" />
-                  {{ talent.average_rating.toFixed(1) }}
+                  {{ Number(talent.average_rating).toFixed(1) }}
                   <span class="text-neutral-light/40">({{ talent.total_reviews }} review)</span>
                 </span>
                 <span v-if="talent.price_min" class="flex items-center gap-1">
@@ -252,7 +252,7 @@
                 <div>
                   <p class="text-[9px] text-neutral-light/40 uppercase tracking-wider font-semibold">Rating Rata-rata</p>
                   <p class="text-sm font-bold text-neutral-200">
-                    {{ selectedTalent.average_rating > 0 ? selectedTalent.average_rating.toFixed(1) : '-' }}
+                    {{ selectedTalent.average_rating > 0 ? Number(selectedTalent.average_rating).toFixed(1) : '-' }}
                   </p>
                 </div>
               </div>

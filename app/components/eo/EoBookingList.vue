@@ -73,9 +73,10 @@ const { formatCurrency, formatDate } = useFormatters();
 const detailed = computed(() => props.detailed);
 const completingId = computed(() => props.completingId);
 
-const statusMap: Record<BookingStatus, { label: string; color: 'success' | 'primary' }> = {
+const statusMap: Record<BookingStatus, { label: string; color: 'success' | 'primary' | 'error' | 'neutral' }> = {
   confirmed: { label: 'Dikonfirmasi', color: 'success' },
   completed: { label: 'Selesai', color: 'primary' },
+  cancelled: { label: 'Dibatalkan', color: 'error' },
 };
 
 const sourceMap = { apply: 'Apply Langsung', invitation: 'Via Invitation' } as const;
@@ -91,7 +92,7 @@ const formatDateSafe = (value?: string) => {
 
 const mappedItems = computed(() =>
   props.bookings.map((b) => {
-    const status = statusMap[b.status];
+    const status = statusMap[b.status] ?? { label: b.status, color: 'neutral' as const };
     return {
       id: String(b.id),
       title: b.event.title,

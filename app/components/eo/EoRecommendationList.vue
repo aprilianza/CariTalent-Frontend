@@ -40,7 +40,7 @@
                 </div>
                 <p class="mt-0.5 text-xs text-neutral-500 dark:text-neutral-400">
                   <Icon name="mdi:map-marker-outline" class="inline h-3 w-3" /> {{ rec.talent.city || '-' }}
-                  · <Icon name="mdi:star-outline" class="inline h-3 w-3 text-yellow-400" /> {{ rec.talent.average_rating.toFixed(1) }}
+                  · <Icon name="mdi:star-outline" class="inline h-3 w-3 text-yellow-400" /> {{ Number(rec.talent.average_rating ?? 0).toFixed(1) }}
                 </p>
               </div>
             </div>
@@ -244,7 +244,7 @@ const openProfileModal = (talent: any) => {
     phone: talent.phone || '-',
     priceMin: talent.price_min ? formatCurrency(talent.price_min) : '-',
     priceMax: talent.price_max ? formatCurrency(talent.price_max) : '-',
-    rating: talent.average_rating ? talent.average_rating.toFixed(1) : '0.0',
+    rating: talent.average_rating ? Number(talent.average_rating).toFixed(1) : '0.0',
     genres: talent.genre || [],
     portfolioLink: talent.portfolio_link || '',
     bio: talent.bio || '-',
