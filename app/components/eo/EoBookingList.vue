@@ -89,17 +89,24 @@ const formatDateSafe = (value?: string) => {
   }
 };
 
-const mappedItems = computed(() =>
-  props.bookings.map((b) => {
-    const status = statusMap[b.status];
+const mappedItems = computed(() => {
+  if (!props.bookings) return [];
+  
+  return props.bookings.map((b) => {
+    // Gunakan fallback jika status tidak ada di map (misal: booking dibatalkan atau status baru dari API)
+    const status = statusMap[b.status] || { 
+      label: (b.status || 'Pending').toUpperCase(), 
+      color: 'primary' 
+    };
+    
     return {
       id: String(b.id),
-      title: b.event.title,
+      title: b.event?.title || 'Unknown Event',
       rawId: b.id,
-      eventTitle: b.event.title,
-      eventDate: formatDateSafe(b.event.event_date),
-      venue: b.event.venue_name,
-      talentName: b.talent.stage_name,
+      eventTitle: b.event?.title || 'Unknown Event',
+      eventDate: formatDateSafe(b.event?.event_date),
+      venue: b.event?.venue_name || '-',
+      talentName: b.talent?.stage_name || 'Unknown Talent',
       agreedPrice: formatCurrency(b.agreed_price),
       sourceLabel: b.source ? sourceMap[b.source] : '-',
       createdAt: formatDateSafe(b.created_at),
@@ -109,6 +116,6 @@ const mappedItems = computed(() =>
       canComplete: b.status === 'confirmed',
       canCancel: b.status === 'confirmed',
     };
-  }),
-);
+  });
+});
 </script>
