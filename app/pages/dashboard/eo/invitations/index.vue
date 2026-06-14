@@ -82,7 +82,7 @@
                     <Icon name="mdi:map-marker-outline" class="inline h-3 w-3" /> {{ inv.talent.city || '-' }}
                   </span>
                   <span class="text-xs text-neutral-500 dark:text-neutral-400">
-                    <Icon name="mdi:star-outline" class="inline h-3 w-3 text-yellow-400" /> {{ inv.talent.average_rating.toFixed(1) }}
+                    <Icon name="mdi:star-outline" class="inline h-3 w-3 text-yellow-400" /> {{ Number(inv.talent.average_rating ?? 0).toFixed(1) }}
                   </span>
                   <UiBadge v-if="inv.talent.verified" label="Terverifikasi" color="success" variant="soft" size="sm" dot />
                 </div>

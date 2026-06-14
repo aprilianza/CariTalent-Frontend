@@ -70,7 +70,7 @@ export const useTalentReviews = (filters?: MaybeRef<TalentReviewsFilters | undef
   const meta = computed(() => ({
     talentId: response.value?.data?.talent_id ?? 0,
     stageName: response.value?.data?.stage_name ?? '',
-    averageRating: response.value?.data?.average_rating ?? 0,
+    averageRating: Number(response.value?.data?.average_rating ?? 0),
     totalReviews: response.value?.data?.total_reviews ?? 0,
   }));
 
