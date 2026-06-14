@@ -95,12 +95,12 @@ const mappedItems = computed(() =>
     const status = statusMap[b.status] ?? { label: b.status, color: 'neutral' as const };
     return {
       id: String(b.id),
-      title: b.event.title,
+      title: b.event?.title || 'Unknown Event',
       rawId: b.id,
-      eventTitle: b.event.title,
-      eventDate: formatDateSafe(b.event.event_date),
-      venue: b.event.venue_name,
-      talentName: b.talent.stage_name,
+      eventTitle: b.event?.title || 'Unknown Event',
+      eventDate: formatDateSafe(b.event?.event_date),
+      venue: b.event?.venue_name || '-',
+      talentName: b.talent?.stage_name || 'Unknown Talent',
       agreedPrice: formatCurrency(b.agreed_price),
       sourceLabel: b.source ? sourceMap[b.source] : '-',
       createdAt: formatDateSafe(b.created_at),
@@ -110,6 +110,6 @@ const mappedItems = computed(() =>
       canComplete: b.status === 'confirmed',
       canCancel: b.status === 'confirmed',
     };
-  }),
-);
+  });
+});
 </script>
